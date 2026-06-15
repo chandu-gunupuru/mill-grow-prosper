@@ -92,9 +92,55 @@ const testimonials = [
 
 const gallery = [machinery, warehouse, paddyField, heroMill];
 
+const brands = [
+  { id: "sona-5", name: "Gayathri Sona Masoori", weight: "5 kg", price: 425, img: packetSona, tag: "Bestseller" },
+  { id: "basmati-5", name: "Gayathri Royal Basmati", weight: "5 kg", price: 695, img: packetBasmati, tag: "Premium" },
+  { id: "steam-10", name: "Gayathri Steam Rice", weight: "10 kg", price: 720, img: packetSteam, tag: "Daily Use" },
+  { id: "kolam-25", name: "Gayathri Kolam Rice", weight: "25 kg", price: 1550, img: packetKolam, tag: "Family Pack" },
+];
+
+type CartItem = { id: string; name: string; weight: string; price: number; img: string; qty: number };
+
 function Index() {
   const [navOpen, setNavOpen] = useState(false);
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [cartOpen, setCartOpen] = useState(false);
   const [form, setForm] = useState({ name: "", company: "", email: "", phone: "", product: "Sona Masoori Rice", qty: "", message: "" });
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("gayathri-cart");
+      if (saved) setCart(JSON.parse(saved));
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    try { localStorage.setItem("gayathri-cart", JSON.stringify(cart)); } catch {}
+  }, [cart]);
+
+  const cartCount = cart.reduce((n, i) => n + i.qty, 0);
+  const cartTotal = cart.reduce((n, i) => n + i.qty * i.price, 0);
+
+  function addToCart(b: typeof brands[number]) {
+    setCart(c => {
+      const ex = c.find(i => i.id === b.id);
+      if (ex) return c.map(i => i.id === b.id ? { ...i, qty: i.qty + 1 } : i);
+      return [...c, { id: b.id, name: b.name, weight: b.weight, price: b.price, img: b.img, qty: 1 }];
+    });
+    toast.success(`${b.name} added to cart`);
+  }
+  function updateQty(id: string, delta: number) {
+    setCart(c => c.flatMap(i => i.id === id ? (i.qty + delta <= 0 ? [] : [{ ...i, qty: i.qty + delta }]) : [i]));
+  }
+  function removeItem(id: string) {
+    setCart(c => c.filter(i => i.id !== id));
+  }
+  function checkout() {
+    if (!cart.length) return;
+    const lines = cart.map(i => `• ${i.name} (${i.weight}) × ${i.qty} = ₹${i.qty * i.price}`).join("%0A");
+    const msg = `Hello Gayathri Rice Mill, I'd like to order:%0A%0A${lines}%0A%0ATotal: ₹${cartTotal}`;
+    window.open(`https://wa.me/${WHATSAPP.replace(/[^0-9]/g,"")}?text=${msg}`, "_blank");
+  }
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
