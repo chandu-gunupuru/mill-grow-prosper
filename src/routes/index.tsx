@@ -705,9 +705,11 @@ function Index() {
                 <div className="p-5 border-t border-border bg-cream space-y-3">
                   <div className="flex justify-between text-lg font-bold"><span>Total</span><span className="text-primary">{currency === "INR" ? "₹" : currency + " "}{cartTotal.toFixed(2)}</span></div>
                   <button onClick={checkout} disabled={isLoading || isSyncing} className="w-full inline-flex items-center justify-center gap-2 bg-gradient-gold text-primary py-3 rounded-md font-bold shadow-gold hover:scale-[1.01] transition disabled:opacity-60 disabled:cursor-not-allowed">
+                    {isLoading || isSyncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <><ShoppingCart className="w-4 h-4" /> Buy Now</>}
+                  </button>
+                  <button onClick={checkout} disabled={isLoading || isSyncing} className="w-full inline-flex items-center justify-center gap-2 border border-primary text-primary py-2.5 rounded-md font-semibold hover:bg-primary/5 transition disabled:opacity-60 disabled:cursor-not-allowed">
                     {isLoading || isSyncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <><ExternalLink className="w-4 h-4" /> Checkout Securely</>}
                   </button>
-                  <p className="text-xs text-muted-foreground text-center">Secure checkout powered by Shopify. Shipping & taxes calculated at checkout.</p>
                 </div>
               )}
 
