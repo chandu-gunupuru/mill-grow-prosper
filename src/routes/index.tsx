@@ -44,9 +44,9 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const WHATSAPP = "+919999999999";
-const PHONE = "+91 99999 99999";
-const EMAIL = "sales@gayathririce.com";
+const WHATSAPP = "+919398553951";
+const PHONE = "+91 93985 53951";
+const EMAIL = "gunupuruchandu29@gmail.com";
 
 const products = [
   { name: "Sona Masoori Rice", img: riceSona, grade: "Premium AAA", pack: "5 / 25 / 50 kg bags", stock: "In stock" },
