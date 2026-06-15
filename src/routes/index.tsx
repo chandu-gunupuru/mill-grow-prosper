@@ -284,11 +284,12 @@ function Index() {
             {brands.map((b, idx) => (
               <motion.div
                 key={b.id}
+                id={`product-${b.id}`}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: idx * 0.06 }}
-                className="group bg-card rounded-2xl overflow-hidden border border-border hover:shadow-premium transition-all flex flex-col"
+                className="group bg-card rounded-2xl overflow-hidden border border-border hover:shadow-premium transition-all flex flex-col scroll-mt-24"
               >
                 <div className="relative aspect-square overflow-hidden bg-cream">
                   <img src={b.img} alt={b.name} width={1024} height={1024} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
