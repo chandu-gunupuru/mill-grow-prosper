@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { motion, AnimatePresence } from "motion/react";
 import {
   Phone, Mail, MapPin, MessageCircle, Award, Truck, Sparkles, ShieldCheck,
@@ -8,6 +9,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
+import { sendQuoteInquiry } from "@/lib/inquiry.functions";
 
 import heroMill from "@/assets/hero-mill.jpg";
 import paddyField from "@/assets/paddy-field.jpg";
