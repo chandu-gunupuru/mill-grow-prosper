@@ -84,10 +84,10 @@ const process = [
 ];
 
 const stats = [
-  { v: "25+", l: "Years in Business" },
-  { v: "50,000+", l: "Tons Processed Annually" },
-  { v: "1,200+", l: "Happy Customers" },
-  { v: "18", l: "States Served" },
+  { v: "8+", l: "Years in Business" },
+  { v: "20,000+", l: "Tons Processed Annually" },
+  { v: "900+", l: "Happy Customers" },
+  { v: "5+", l: "States Served" },
 ];
 
 const certs = ["FSSAI Certified", "ISO 22000:2018", "APEDA Export", "HACCP Standards"];
