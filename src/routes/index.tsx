@@ -145,15 +145,23 @@ function Index() {
     window.open(`https://wa.me/${WHATSAPP.replace(/[^0-9]/g,"")}?text=${msg}`, "_blank");
   }
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!form.name || !form.email || !form.phone) {
       toast.error("Please fill in name, email and phone.");
       return;
     }
-    const body = `New inquiry%0A%0AName: ${form.name}%0ACompany: ${form.company}%0AEmail: ${form.email}%0APhone: ${form.phone}%0AProduct: ${form.product}%0AQty: ${form.qty}%0AMessage: ${form.message}`;
-    window.location.href = `mailto:${EMAIL}?subject=Quote Request — ${form.product}&body=${body}`;
-    toast.success("Inquiry prepared. Your email client is opening.");
+    setSending(true);
+    try {
+      await sendInquiry({ data: form });
+      toast.success("Inquiry sent! We'll get back to you within 2 business hours.");
+      setForm({ name: "", company: "", email: "", phone: "", product: "Sona Masoori Rice", qty: "", message: "" });
+    } catch (err) {
+      console.error(err);
+      toast.error("Could not send inquiry. Please try again or call us directly.");
+    } finally {
+      setSending(false);
+    }
   }
 
   return (
