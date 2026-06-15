@@ -605,22 +605,29 @@ function Index() {
                 ) : (
                   <div className="space-y-4">
                     {cart.map(item => (
-                      <div key={item.id} className="flex gap-3 p-3 rounded-lg border border-border bg-card">
-                        <img src={item.img} alt={item.name} width={80} height={80} loading="lazy" className="w-20 h-20 rounded-md object-cover bg-cream" />
-                        <div className="flex-1 min-w-0">
-                          <div className="font-semibold text-sm text-primary truncate">{item.name}</div>
-                          <div className="text-xs text-muted-foreground">{item.weight}</div>
-                          <div className="mt-2 flex items-center justify-between">
-                            <div className="flex items-center gap-2 border border-border rounded-md">
-                              <button onClick={() => updateQty(item.id, -1)} aria-label="Decrease" className="w-7 h-7 grid place-items-center hover:bg-secondary"><Minus className="w-3.5 h-3.5" /></button>
-                              <span className="text-sm font-semibold w-6 text-center">{item.qty}</span>
-                              <button onClick={() => updateQty(item.id, 1)} aria-label="Increase" className="w-7 h-7 grid place-items-center hover:bg-secondary"><Plus className="w-3.5 h-3.5" /></button>
-                            </div>
-                            <div className="font-bold text-primary">₹{item.price * item.qty}</div>
+                    <div
+                      key={item.id}
+                      onClick={() => {
+                        setCartOpen(false);
+                        document.getElementById(`product-${item.id}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+                      }}
+                      className="flex gap-3 p-3 rounded-lg border border-border bg-card cursor-pointer hover:border-primary transition-colors"
+                    >
+                      <img src={item.img} alt={item.name} width={80} height={80} loading="lazy" className="w-20 h-20 rounded-md object-cover bg-cream" />
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-sm text-primary truncate">{item.name}</div>
+                        <div className="text-xs text-muted-foreground">{item.weight}</div>
+                        <div className="mt-2 flex items-center justify-between">
+                          <div className="flex items-center gap-2 border border-border rounded-md">
+                            <button onClick={e => { e.stopPropagation(); updateQty(item.id, -1); }} aria-label="Decrease" className="w-7 h-7 grid place-items-center hover:bg-secondary"><Minus className="w-3.5 h-3.5" /></button>
+                            <span className="text-sm font-semibold w-6 text-center">{item.qty}</span>
+                            <button onClick={e => { e.stopPropagation(); updateQty(item.id, 1); }} aria-label="Increase" className="w-7 h-7 grid place-items-center hover:bg-secondary"><Plus className="w-3.5 h-3.5" /></button>
                           </div>
+                          <div className="font-bold text-primary">₹{item.price * item.qty}</div>
                         </div>
-                        <button onClick={() => removeItem(item.id)} aria-label="Remove" className="text-muted-foreground hover:text-destructive self-start"><Trash2 className="w-4 h-4" /></button>
                       </div>
+                      <button onClick={e => { e.stopPropagation(); removeItem(item.id); }} aria-label="Remove" className="text-muted-foreground hover:text-destructive self-start"><Trash2 className="w-4 h-4" /></button>
+                    </div>
                     ))}
                   </div>
                 )}
