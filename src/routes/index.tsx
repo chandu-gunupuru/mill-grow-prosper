@@ -26,6 +26,12 @@ import packetBasmati from "@/assets/packet-basmati.jpg";
 import packetSteam from "@/assets/packet-steam.jpg";
 import packetKolam from "@/assets/packet-kolam.jpg";
 
+import millAerial from "@/assets/mill-aerial.jpg";
+import millInterior from "@/assets/mill-interior.jpg";
+import millLab from "@/assets/mill-lab.jpg";
+import millWarehouse from "@/assets/mill-warehouse.jpg";
+import millPacking from "@/assets/mill-packing.jpg";
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
