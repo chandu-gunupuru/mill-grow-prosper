@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { motion, AnimatePresence } from "motion/react";
 import {
   Phone, Mail, MapPin, MessageCircle, Award, Truck, Sparkles, ShieldCheck,
@@ -8,6 +9,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
+import { sendQuoteInquiry } from "@/lib/inquiry.functions";
 
 import heroMill from "@/assets/hero-mill.jpg";
 import paddyField from "@/assets/paddy-field.jpg";
@@ -106,7 +108,8 @@ function Index() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [form, setForm] = useState({ name: "", company: "", email: "", phone: "", product: "Sona Masoori Rice", qty: "", message: "" });
-
+  const [sending, setSending] = useState(false);
+  const sendInquiry = useServerFn(sendQuoteInquiry);
   useEffect(() => {
     try {
       const saved = localStorage.getItem("gayathri-cart");
@@ -142,15 +145,23 @@ function Index() {
     window.open(`https://wa.me/${WHATSAPP.replace(/[^0-9]/g,"")}?text=${msg}`, "_blank");
   }
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!form.name || !form.email || !form.phone) {
       toast.error("Please fill in name, email and phone.");
       return;
     }
-    const body = `New inquiry%0A%0AName: ${form.name}%0ACompany: ${form.company}%0AEmail: ${form.email}%0APhone: ${form.phone}%0AProduct: ${form.product}%0AQty: ${form.qty}%0AMessage: ${form.message}`;
-    window.location.href = `mailto:${EMAIL}?subject=Quote Request — ${form.product}&body=${body}`;
-    toast.success("Inquiry prepared. Your email client is opening.");
+    setSending(true);
+    try {
+      await sendInquiry({ data: form });
+      toast.success("Inquiry sent! We'll get back to you within 2 business hours.");
+      setForm({ name: "", company: "", email: "", phone: "", product: "Sona Masoori Rice", qty: "", message: "" });
+    } catch (err) {
+      console.error(err);
+      toast.error("Could not send inquiry. Please try again or call us directly.");
+    } finally {
+      setSending(false);
+    }
   }
 
   return (
@@ -538,8 +549,8 @@ function Index() {
               <input placeholder="Quantity (tons / bags)" value={form.qty} onChange={e => setForm({...form, qty: e.target.value})} className="w-full px-4 py-3 rounded-md bg-secondary border border-border focus:border-primary outline-none" />
             </div>
             <textarea placeholder="Message / Specifications" rows={4} value={form.message} onChange={e => setForm({...form, message: e.target.value})} className="w-full px-4 py-3 rounded-md bg-secondary border border-border focus:border-primary outline-none resize-none" />
-            <button type="submit" className="w-full inline-flex items-center justify-center gap-2 bg-gradient-gold text-primary py-3.5 rounded-md font-bold shadow-gold hover:scale-[1.01] transition">
-              Send Inquiry <ArrowRight className="w-4 h-4" />
+            <button type="submit" disabled={sending} className="w-full inline-flex items-center justify-center gap-2 bg-gradient-gold text-primary py-3.5 rounded-md font-bold shadow-gold hover:scale-[1.01] transition disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100">
+              {sending ? "Sending…" : <>Send Inquiry <ArrowRight className="w-4 h-4" /></>}
             </button>
             <p className="text-xs text-muted-foreground text-center">Your details are kept confidential. Used only for quote response.</p>
           </form>
