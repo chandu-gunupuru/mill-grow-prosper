@@ -98,7 +98,13 @@ const testimonials = [
   { n: "Al-Noor Exports", r: "Exporter, Dubai", q: "Export-grade packing and documentation — they made our shipments effortless." },
 ];
 
-const gallery = [machinery, warehouse, paddyField, heroMill];
+const gallery = [
+  { img: millAerial, alt: "Aerial view of Gayathri Modern Rice Mill facility" },
+  { img: millInterior, alt: "Modern rice milling machinery and processing floor" },
+  { img: millLab, alt: "In-house rice quality testing laboratory" },
+  { img: millWarehouse, alt: "Warehouse with stacked rice bags ready for dispatch" },
+  { img: millPacking, alt: "Automated rice packaging line" },
+];
 
 const brands = [
   { id: "sona-5", name: "Gayathri Sona Masoori", weight: "5 kg", price: 425, img: packetSona, tag: "Bestseller" },
