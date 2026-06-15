@@ -313,35 +313,68 @@ function Index() {
             <h2 className="mt-3 text-4xl md:text-5xl font-bold text-primary text-balance">Buy Premium Rice Packets Online</h2>
             <p className="mt-4 text-muted-foreground">Mill-fresh, lab-tested rice delivered straight to your doorstep. Free shipping on orders above ₹1,500.</p>
           </div>
-          <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {brands.map((b, idx) => (
-              <motion.div
-                key={b.id}
-                id={`product-${b.id}`}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: idx * 0.06 }}
-                className="group bg-card rounded-2xl overflow-hidden border border-border hover:shadow-premium transition-all flex flex-col scroll-mt-24"
-              >
-                <div className="relative aspect-square overflow-hidden bg-cream">
-                  <img src={b.img} alt={b.name} width={1024} height={1024} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                  <span className="absolute top-3 left-3 bg-gold text-primary text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">{b.tag}</span>
-                </div>
-                <div className="p-5 flex flex-col flex-1">
-                  <h3 className="font-bold text-primary leading-tight">{b.name}</h3>
-                  <div className="text-xs text-muted-foreground mt-1">{b.weight} pack</div>
-                  <div className="mt-3 flex items-baseline gap-2">
-                    <span className="font-display text-2xl font-bold text-primary">₹{b.price}</span>
-                    <span className="text-xs text-muted-foreground line-through">₹{Math.round(b.price * 1.15)}</span>
-                  </div>
-                  <button onClick={() => addToCart(b)} className="mt-4 w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2.5 rounded-md font-semibold hover:bg-gold hover:text-primary transition">
-                    <ShoppingCart className="w-4 h-4" /> Add to Cart
-                  </button>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          {productsLoading ? (
+            <div className="mt-14 grid place-items-center py-16 text-muted-foreground">
+              <Loader2 className="w-8 h-8 animate-spin" />
+            </div>
+          ) : shopifyProducts.length === 0 ? (
+            <div className="mt-14 text-center py-16 text-muted-foreground">No products found.</div>
+          ) : (
+            <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {shopifyProducts.map((p, idx) => {
+                const variant = p.node.variants.edges[0]?.node;
+                const img = p.node.images.edges[0]?.node;
+                const price = parseFloat(p.node.priceRange.minVariantPrice.amount);
+                const cur = p.node.priceRange.minVariantPrice.currencyCode;
+                const symbol = cur === "INR" ? "₹" : cur + " ";
+                const weight = variant?.selectedOptions?.find((o) => o.name === "Weight")?.value;
+                return (
+                  <motion.div
+                    key={p.node.id}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: idx * 0.06 }}
+                    className="group bg-card rounded-2xl overflow-hidden border border-border hover:shadow-premium transition-all flex flex-col"
+                  >
+                    <div className="relative aspect-square overflow-hidden bg-cream">
+                      {img && (
+                        <img src={img.url} alt={img.altText || p.node.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                      )}
+                    </div>
+                    <div className="p-5 flex flex-col flex-1">
+                      <h3 className="font-bold text-primary leading-tight">{p.node.title}</h3>
+                      {weight && <div className="text-xs text-muted-foreground mt-1">{weight} pack</div>}
+                      <div className="mt-3 flex items-baseline gap-2">
+                        <span className="font-display text-2xl font-bold text-primary">{symbol}{price.toFixed(0)}</span>
+                      </div>
+                      <div className="mt-4 flex flex-col gap-2">
+                        <button
+                          onClick={() => handleAddToCart(p)}
+                          disabled={isLoading || !variant?.availableForSale}
+                          className="w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2.5 rounded-md font-semibold hover:bg-gold hover:text-primary transition disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
+                          {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><ShoppingCart className="w-4 h-4" /> Add to Cart</>}
+                        </button>
+                        <button
+                          onClick={async () => {
+                            await handleAddToCart(p);
+                            const url = useCartStore.getState().getCheckoutUrl();
+                            if (url) window.open(url, "_blank");
+                          }}
+                          disabled={isLoading || !variant?.availableForSale}
+                          className="w-full inline-flex items-center justify-center gap-2 bg-gradient-gold text-primary py-2.5 rounded-md font-bold shadow-gold hover:scale-[1.01] transition disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
+                          Buy Now <ArrowRight className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          )}
+
         </div>
       </section>
 
