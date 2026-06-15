@@ -180,7 +180,7 @@ function Index() {
       <section id="about" className="py-24 bg-cream">
         <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
           <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
-            <img src={paddyField} alt="Paddy field at sunrise" width={1024} height={1024} loading="lazy" className="rounded-2xl shadow-premium w-full aspect-[4/5] object-cover" />
+            <img src={paddyField} alt="Beautiful lush green rice fields at golden hour" width={1024} height={1024} loading="lazy" className="rounded-2xl shadow-premium w-full aspect-[4/5] object-cover" />
           </motion.div>
           <div>
             <span className="text-gold font-semibold uppercase tracking-widest text-xs">About Us</span>
