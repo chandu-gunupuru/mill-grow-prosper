@@ -567,6 +567,79 @@ function Index() {
         <MessageCircle className="w-7 h-7" />
         <span className="absolute inline-flex h-full w-full rounded-full bg-[#25D366] opacity-40 animate-ping" />
       </a>
+
+      {/* CART DRAWER */}
+      <AnimatePresence>
+        {cartOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setCartOpen(false)}
+              className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm"
+            />
+            <motion.aside
+              initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }}
+              transition={{ type: "tween", duration: 0.3 }}
+              className="fixed top-0 right-0 bottom-0 z-[61] w-full sm:w-[420px] bg-background shadow-2xl flex flex-col"
+            >
+              <div className="flex items-center justify-between p-5 border-b border-border">
+                <div className="flex items-center gap-2">
+                  <ShoppingCart className="w-5 h-5 text-primary" />
+                  <h3 className="font-bold text-lg text-primary">Your Cart ({cartCount})</h3>
+                </div>
+                <button onClick={() => setCartOpen(false)} aria-label="Close cart" className="w-9 h-9 grid place-items-center rounded-md hover:bg-secondary">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-5">
+                {cart.length === 0 ? (
+                  <div className="h-full flex flex-col items-center justify-center text-center gap-3 py-20">
+                    <div className="w-16 h-16 rounded-full bg-secondary grid place-items-center">
+                      <ShoppingCart className="w-7 h-7 text-muted-foreground" />
+                    </div>
+                    <p className="text-muted-foreground">Your cart is empty</p>
+                    <button onClick={() => setCartOpen(false)} className="text-primary font-semibold hover:text-gold">Continue Shopping</button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {cart.map(item => (
+                      <div key={item.id} className="flex gap-3 p-3 rounded-lg border border-border bg-card">
+                        <img src={item.img} alt={item.name} width={80} height={80} loading="lazy" className="w-20 h-20 rounded-md object-cover bg-cream" />
+                        <div className="flex-1 min-w-0">
+                          <div className="font-semibold text-sm text-primary truncate">{item.name}</div>
+                          <div className="text-xs text-muted-foreground">{item.weight}</div>
+                          <div className="mt-2 flex items-center justify-between">
+                            <div className="flex items-center gap-2 border border-border rounded-md">
+                              <button onClick={() => updateQty(item.id, -1)} aria-label="Decrease" className="w-7 h-7 grid place-items-center hover:bg-secondary"><Minus className="w-3.5 h-3.5" /></button>
+                              <span className="text-sm font-semibold w-6 text-center">{item.qty}</span>
+                              <button onClick={() => updateQty(item.id, 1)} aria-label="Increase" className="w-7 h-7 grid place-items-center hover:bg-secondary"><Plus className="w-3.5 h-3.5" /></button>
+                            </div>
+                            <div className="font-bold text-primary">₹{item.price * item.qty}</div>
+                          </div>
+                        </div>
+                        <button onClick={() => removeItem(item.id)} aria-label="Remove" className="text-muted-foreground hover:text-destructive self-start"><Trash2 className="w-4 h-4" /></button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {cart.length > 0 && (
+                <div className="p-5 border-t border-border bg-cream space-y-3">
+                  <div className="flex justify-between text-sm"><span className="text-muted-foreground">Subtotal</span><span className="font-semibold">₹{cartTotal}</span></div>
+                  <div className="flex justify-between text-sm"><span className="text-muted-foreground">Shipping</span><span className="font-semibold text-primary">{cartTotal >= 1500 ? "Free" : "₹80"}</span></div>
+                  <div className="flex justify-between text-lg font-bold pt-2 border-t border-border"><span>Total</span><span className="text-primary">₹{cartTotal + (cartTotal >= 1500 ? 0 : 80)}</span></div>
+                  <button onClick={checkout} className="w-full inline-flex items-center justify-center gap-2 bg-gradient-gold text-primary py-3 rounded-md font-bold shadow-gold hover:scale-[1.01] transition">
+                    Checkout via WhatsApp <ArrowRight className="w-4 h-4" />
+                  </button>
+                  <p className="text-xs text-muted-foreground text-center">We'll confirm your order & arrange COD/UPI payment.</p>
+                </div>
+              )}
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
