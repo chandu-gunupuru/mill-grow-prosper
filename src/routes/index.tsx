@@ -44,9 +44,9 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const WHATSAPP = "+919999999999";
-const PHONE = "+91 99999 99999";
-const EMAIL = "sales@gayathririce.com";
+const WHATSAPP = "+919398553951";
+const PHONE = "+91 93985 53951";
+const EMAIL = "gunupuruchandu29@gmail.com";
 
 const products = [
   { name: "Sona Masoori Rice", img: riceSona, grade: "Premium AAA", pack: "5 / 25 / 50 kg bags", stock: "In stock" },
@@ -403,13 +403,13 @@ function Index() {
               </a>
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-lg bg-white/10 grid place-items-center"><MapPin className="w-5 h-5" /></div>
-                <div><div className="text-xs text-primary-foreground/60">Address</div><div className="font-semibold">Industrial Area, Nellore, Andhra Pradesh 524004, India</div></div>
+                <div><div className="text-xs text-primary-foreground/60">Address</div><div className="font-semibold">Jiyyammavalasa, Andhra Pradesh, India</div></div>
               </div>
             </div>
             <div className="mt-8 rounded-xl overflow-hidden border border-white/10">
               <iframe
                 title="Mill location"
-                src="https://www.google.com/maps?q=Nellore,Andhra+Pradesh&output=embed"
+                src="https://www.google.com/maps?q=Jiyyammavalasa,Andhra+Pradesh,India&output=embed"
                 width="100%"
                 height="240"
                 style={{ border: 0 }}
