@@ -84,10 +84,10 @@ const process = [
 ];
 
 const stats = [
-  { v: "25+", l: "Years in Business" },
-  { v: "50,000+", l: "Tons Processed Annually" },
-  { v: "1,200+", l: "Happy Customers" },
-  { v: "18", l: "States Served" },
+  { v: "8+", l: "Years in Business" },
+  { v: "20,000+", l: "Tons Processed Annually" },
+  { v: "900+", l: "Happy Customers" },
+  { v: "5+", l: "States Served" },
 ];
 
 const certs = ["FSSAI Certified", "ISO 22000:2018", "APEDA Export", "HACCP Standards"];
@@ -244,7 +244,7 @@ function Index() {
               Premium Quality Rice <span className="text-gold">Direct From Our Mill</span>
             </h1>
             <p className="mt-6 text-lg md:text-xl text-white/85 max-w-2xl">
-              Two decades of milling excellence. Processing 50,000+ tons annually with modern machinery, lab-tested quality and reliable bulk supply for distributors, exporters, hotels & retailers across India.
+              A decade of milling excellence. Processing 20,000+ tons annually with modern machinery, lab-tested quality and reliable bulk supply for distributors, exporters, hotels & retailers across India.
             </p>
             <div className="mt-10 flex flex-wrap gap-4">
               <a href="#contact" className="inline-flex items-center gap-2 bg-gradient-gold text-primary px-7 py-3.5 rounded-md font-semibold shadow-gold hover:scale-[1.02] transition">
@@ -274,9 +274,9 @@ function Index() {
           </motion.div>
           <div>
             <span className="text-gold font-semibold uppercase tracking-widest text-xs">About Us</span>
-            <h2 className="mt-3 text-4xl md:text-5xl font-bold text-primary text-balance">From Paddy Fields to Premium Plates — for 25 Years.</h2>
+            <h2 className="mt-3 text-4xl md:text-5xl font-bold text-primary text-balance">From Paddy Fields to Premium Plates — for 10 Years.</h2>
             <p className="mt-6 text-muted-foreground leading-relaxed">
-              Founded in 1999, Gayathri Modern Rice Mill is one of South India's most trusted rice processing companies. We source premium paddy directly from farmers, process it through state-of-the-art Satake-grade machinery, and deliver consistent, lab-tested quality to wholesalers, exporters and HoReCa clients across 18 states.
+              Founded in 2016, Gayathri Modern Rice Mill is one of South India's most trusted rice processing companies. We source premium paddy directly from farmers, process it through state-of-the-art Satake-grade machinery, and deliver consistent, lab-tested quality to wholesalers, exporters and HoReCa clients across 5 states.
             </p>
             <div className="mt-8 grid grid-cols-2 gap-4">
               {[
