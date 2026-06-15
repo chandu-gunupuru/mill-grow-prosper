@@ -170,21 +170,37 @@ function Index() {
             </div>
           </a>
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
-            {["About","Products","Process","Why Us","Contact"].map(i => (
+            {["About","Shop","Products","Process","Why Us","Contact"].map(i => (
               <a key={i} href={`#${i.toLowerCase().replace(" ","-")}`} className="text-foreground/80 hover:text-primary transition-colors">{i}</a>
             ))}
           </nav>
-          <a href="#contact" className="hidden md:inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-md text-sm font-semibold hover:opacity-90 transition">
-            Get a Quote <ArrowRight className="w-4 h-4" />
-          </a>
-          <button className="md:hidden" onClick={() => setNavOpen(!navOpen)} aria-label="Toggle menu">
-            {navOpen ? <X /> : <Menu />}
-          </button>
+          <div className="hidden md:flex items-center gap-3">
+            <button onClick={() => setCartOpen(true)} aria-label="Open cart" className="relative w-11 h-11 rounded-md border border-border bg-card grid place-items-center hover:border-primary hover:text-primary transition">
+              <ShoppingCart className="w-5 h-5" />
+              {cartCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 bg-gold text-primary text-[10px] font-bold rounded-full min-w-[18px] h-[18px] grid place-items-center px-1">{cartCount}</span>
+              )}
+            </button>
+            <a href="#contact" className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-md text-sm font-semibold hover:opacity-90 transition">
+              Get a Quote <ArrowRight className="w-4 h-4" />
+            </a>
+          </div>
+          <div className="flex md:hidden items-center gap-2">
+            <button onClick={() => setCartOpen(true)} aria-label="Open cart" className="relative w-10 h-10 grid place-items-center">
+              <ShoppingCart className="w-5 h-5" />
+              {cartCount > 0 && (
+                <span className="absolute top-0 right-0 bg-gold text-primary text-[10px] font-bold rounded-full min-w-[18px] h-[18px] grid place-items-center px-1">{cartCount}</span>
+              )}
+            </button>
+            <button onClick={() => setNavOpen(!navOpen)} aria-label="Toggle menu">
+              {navOpen ? <X /> : <Menu />}
+            </button>
+          </div>
         </div>
         {navOpen && (
           <div className="md:hidden border-t border-border bg-background">
             <div className="px-6 py-4 flex flex-col gap-3">
-              {["About","Products","Process","Why Us","Contact"].map(i => (
+              {["About","Shop","Products","Process","Why Us","Contact"].map(i => (
                 <a key={i} href={`#${i.toLowerCase().replace(" ","-")}`} onClick={() => setNavOpen(false)} className="text-foreground/80">{i}</a>
               ))}
             </div>
