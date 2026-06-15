@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { motion } from "motion/react";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import {
   Phone, Mail, MapPin, MessageCircle, Award, Truck, Sparkles, ShieldCheck,
   Factory, Leaf, Package, CheckCircle2, Star, ArrowRight, Menu, X, Download,
+  ShoppingCart, Plus, Minus, Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
@@ -18,6 +19,10 @@ import riceSteam from "@/assets/rice-steam.jpg";
 import riceRaw from "@/assets/rice-raw.jpg";
 import riceBroken from "@/assets/rice-broken.jpg";
 import riceBran from "@/assets/rice-bran.jpg";
+import packetSona from "@/assets/packet-sona.jpg";
+import packetBasmati from "@/assets/packet-basmati.jpg";
+import packetSteam from "@/assets/packet-steam.jpg";
+import packetKolam from "@/assets/packet-kolam.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
