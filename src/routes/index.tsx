@@ -1,15 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "motion/react";
 import {
   Phone, Mail, MapPin, MessageCircle, Award, Truck, Sparkles, ShieldCheck,
   Factory, Leaf, Package, CheckCircle2, Star, ArrowRight, Menu, X, Download,
-  ShoppingCart, Plus, Minus, Trash2,
+  ShoppingCart, Plus, Minus, Trash2, Loader2, ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { sendQuoteInquiry } from "@/lib/inquiry.functions";
+import { fetchShopifyProducts, type ShopifyProduct } from "@/lib/shopify";
+import { useCartStore } from "@/stores/cartStore";
+import { useCartSync } from "@/hooks/useCartSync";
 
 import heroMill from "@/assets/hero-mill.jpg";
 import paddyField from "@/assets/paddy-field.jpg";
@@ -21,16 +25,13 @@ import riceSteam from "@/assets/rice-steam.jpg";
 import riceRaw from "@/assets/rice-raw.jpg";
 import riceBroken from "@/assets/rice-broken.jpg";
 import riceBran from "@/assets/rice-bran.jpg";
-import packetSona from "@/assets/packet-sona.jpg";
-import packetBasmati from "@/assets/packet-basmati.jpg";
-import packetSteam from "@/assets/packet-steam.jpg";
-import packetKolam from "@/assets/packet-kolam.jpg";
 
 import millAerial from "@/assets/mill-aerial.jpg";
 import millInterior from "@/assets/mill-interior.jpg";
 import millLab from "@/assets/mill-lab.jpg";
 import millWarehouse from "@/assets/mill-warehouse.jpg";
 import millPacking from "@/assets/mill-packing.jpg";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -106,28 +107,34 @@ const gallery = [
   { img: millPacking, alt: "Automated rice packaging line" },
 ];
 
-const brands = [
-  { id: "sona-5", name: "Gayathri Sona Masoori", weight: "5 kg", price: 425, img: packetSona, tag: "Bestseller" },
-  { id: "basmati-5", name: "Gayathri Royal Basmati", weight: "5 kg", price: 695, img: packetBasmati, tag: "Premium" },
-  { id: "steam-10", name: "Gayathri Steam Rice", weight: "10 kg", price: 720, img: packetSteam, tag: "Daily Use" },
-  { id: "kolam-25", name: "Gayathri Kolam Rice", weight: "25 kg", price: 1550, img: packetKolam, tag: "Family Pack" },
-];
-
-type CartItem = { id: string; name: string; weight: string; price: number; img: string; qty: number };
-
 function Index() {
   const [navOpen, setNavOpen] = useState(false);
-  const [cart, setCart] = useState<CartItem[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [form, setForm] = useState({ name: "", company: "", email: "", phone: "", product: "Sona Masoori Rice", qty: "", message: "" });
   const [sending, setSending] = useState(false);
   const sendInquiry = useServerFn(sendQuoteInquiry);
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("gayathri-cart");
-      if (saved) setCart(JSON.parse(saved));
-    } catch {}
-  }, []);
+
+  // Sync Shopify cart on load + tab focus (clears after checkout)
+  useCartSync();
+
+  const items = useCartStore((s) => s.items);
+  const isLoading = useCartStore((s) => s.isLoading);
+  const isSyncing = useCartStore((s) => s.isSyncing);
+  const addItem = useCartStore((s) => s.addItem);
+  const updateQuantity = useCartStore((s) => s.updateQuantity);
+  const removeItem = useCartStore((s) => s.removeItem);
+  const getCheckoutUrl = useCartStore((s) => s.getCheckoutUrl);
+  const syncCart = useCartStore((s) => s.syncCart);
+
+  const cartCount = items.reduce((n, i) => n + i.quantity, 0);
+  const cartTotal = items.reduce((n, i) => n + i.quantity * parseFloat(i.price.amount), 0);
+  const currency = items[0]?.price.currencyCode || "INR";
+
+  const { data: shopifyProducts = [], isLoading: productsLoading } = useQuery({
+    queryKey: ["shopify-products"],
+    queryFn: () => fetchShopifyProducts(20),
+    staleTime: 1000 * 60 * 5,
+  });
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -136,33 +143,29 @@ function Index() {
     }
   }, []);
 
-  useEffect(() => {
-    try { localStorage.setItem("gayathri-cart", JSON.stringify(cart)); } catch {}
-  }, [cart]);
+  useEffect(() => { if (cartOpen) syncCart(); }, [cartOpen, syncCart]);
 
-  const cartCount = cart.reduce((n, i) => n + i.qty, 0);
-  const cartTotal = cart.reduce((n, i) => n + i.qty * i.price, 0);
-
-  function addToCart(b: typeof brands[number]) {
-    setCart(c => {
-      const ex = c.find(i => i.id === b.id);
-      if (ex) return c.map(i => i.id === b.id ? { ...i, qty: i.qty + 1 } : i);
-      return [...c, { id: b.id, name: b.name, weight: b.weight, price: b.price, img: b.img, qty: 1 }];
+  async function handleAddToCart(product: ShopifyProduct) {
+    const variant = product.node.variants.edges[0]?.node;
+    if (!variant) return;
+    await addItem({
+      product,
+      variantId: variant.id,
+      variantTitle: variant.title,
+      price: variant.price,
+      quantity: 1,
+      selectedOptions: variant.selectedOptions || [],
     });
-    toast.success(`${b.name} added to cart`);
+    toast.success(`${product.node.title} added to cart`);
   }
-  function updateQty(id: string, delta: number) {
-    setCart(c => c.flatMap(i => i.id === id ? (i.qty + delta <= 0 ? [] : [{ ...i, qty: i.qty + delta }]) : [i]));
-  }
-  function removeItem(id: string) {
-    setCart(c => c.filter(i => i.id !== id));
-  }
+
   function checkout() {
-    if (!cart.length) return;
-    const lines = cart.map(i => `• ${i.name} (${i.weight}) × ${i.qty} = ₹${i.qty * i.price}`).join("%0A");
-    const msg = `Hello Gayathri Rice Mill, I'd like to order:%0A%0A${lines}%0A%0ATotal: ₹${cartTotal}`;
-    window.open(`https://wa.me/${WHATSAPP.replace(/[^0-9]/g,"")}?text=${msg}`, "_blank");
+    const url = getCheckoutUrl();
+    if (!url) return;
+    window.open(url, "_blank");
+    setCartOpen(false);
   }
+
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -310,35 +313,68 @@ function Index() {
             <h2 className="mt-3 text-4xl md:text-5xl font-bold text-primary text-balance">Buy Premium Rice Packets Online</h2>
             <p className="mt-4 text-muted-foreground">Mill-fresh, lab-tested rice delivered straight to your doorstep. Free shipping on orders above ₹1,500.</p>
           </div>
-          <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {brands.map((b, idx) => (
-              <motion.div
-                key={b.id}
-                id={`product-${b.id}`}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: idx * 0.06 }}
-                className="group bg-card rounded-2xl overflow-hidden border border-border hover:shadow-premium transition-all flex flex-col scroll-mt-24"
-              >
-                <div className="relative aspect-square overflow-hidden bg-cream">
-                  <img src={b.img} alt={b.name} width={1024} height={1024} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                  <span className="absolute top-3 left-3 bg-gold text-primary text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">{b.tag}</span>
-                </div>
-                <div className="p-5 flex flex-col flex-1">
-                  <h3 className="font-bold text-primary leading-tight">{b.name}</h3>
-                  <div className="text-xs text-muted-foreground mt-1">{b.weight} pack</div>
-                  <div className="mt-3 flex items-baseline gap-2">
-                    <span className="font-display text-2xl font-bold text-primary">₹{b.price}</span>
-                    <span className="text-xs text-muted-foreground line-through">₹{Math.round(b.price * 1.15)}</span>
-                  </div>
-                  <button onClick={() => addToCart(b)} className="mt-4 w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2.5 rounded-md font-semibold hover:bg-gold hover:text-primary transition">
-                    <ShoppingCart className="w-4 h-4" /> Add to Cart
-                  </button>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          {productsLoading ? (
+            <div className="mt-14 grid place-items-center py-16 text-muted-foreground">
+              <Loader2 className="w-8 h-8 animate-spin" />
+            </div>
+          ) : shopifyProducts.length === 0 ? (
+            <div className="mt-14 text-center py-16 text-muted-foreground">No products found.</div>
+          ) : (
+            <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {shopifyProducts.map((p, idx) => {
+                const variant = p.node.variants.edges[0]?.node;
+                const img = p.node.images.edges[0]?.node;
+                const price = parseFloat(p.node.priceRange.minVariantPrice.amount);
+                const cur = p.node.priceRange.minVariantPrice.currencyCode;
+                const symbol = cur === "INR" ? "₹" : cur + " ";
+                const weight = variant?.selectedOptions?.find((o) => o.name === "Weight")?.value;
+                return (
+                  <motion.div
+                    key={p.node.id}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: idx * 0.06 }}
+                    className="group bg-card rounded-2xl overflow-hidden border border-border hover:shadow-premium transition-all flex flex-col"
+                  >
+                    <div className="relative aspect-square overflow-hidden bg-cream">
+                      {img && (
+                        <img src={img.url} alt={img.altText || p.node.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                      )}
+                    </div>
+                    <div className="p-5 flex flex-col flex-1">
+                      <h3 className="font-bold text-primary leading-tight">{p.node.title}</h3>
+                      {weight && <div className="text-xs text-muted-foreground mt-1">{weight} pack</div>}
+                      <div className="mt-3 flex items-baseline gap-2">
+                        <span className="font-display text-2xl font-bold text-primary">{symbol}{price.toFixed(0)}</span>
+                      </div>
+                      <div className="mt-4 flex flex-col gap-2">
+                        <button
+                          onClick={() => handleAddToCart(p)}
+                          disabled={isLoading || !variant?.availableForSale}
+                          className="w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2.5 rounded-md font-semibold hover:bg-gold hover:text-primary transition disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
+                          {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><ShoppingCart className="w-4 h-4" /> Add to Cart</>}
+                        </button>
+                        <button
+                          onClick={async () => {
+                            await handleAddToCart(p);
+                            const url = useCartStore.getState().getCheckoutUrl();
+                            if (url) window.open(url, "_blank");
+                          }}
+                          disabled={isLoading || !variant?.availableForSale}
+                          className="w-full inline-flex items-center justify-center gap-2 bg-gradient-gold text-primary py-2.5 rounded-md font-bold shadow-gold hover:scale-[1.01] transition disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
+                          Buy Now <ArrowRight className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          )}
+
         </div>
       </section>
 
@@ -628,7 +664,7 @@ function Index() {
               </div>
 
               <div className="flex-1 overflow-y-auto p-5">
-                {cart.length === 0 ? (
+                {items.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-center gap-3 py-20">
                     <div className="w-16 h-16 rounded-full bg-secondary grid place-items-center">
                       <ShoppingCart className="w-7 h-7 text-muted-foreground" />
@@ -638,46 +674,43 @@ function Index() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {cart.map(item => (
-                    <div
-                      key={item.id}
-                      onClick={() => {
-                        setCartOpen(false);
-                        document.getElementById(`product-${item.id}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
-                      }}
-                      className="flex gap-3 p-3 rounded-lg border border-border bg-card cursor-pointer hover:border-primary transition-colors"
-                    >
-                      <img src={item.img} alt={item.name} width={80} height={80} loading="lazy" className="w-20 h-20 rounded-md object-cover bg-cream" />
-                      <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-sm text-primary truncate">{item.name}</div>
-                        <div className="text-xs text-muted-foreground">{item.weight}</div>
-                        <div className="mt-2 flex items-center justify-between">
-                          <div className="flex items-center gap-2 border border-border rounded-md">
-                            <button onClick={e => { e.stopPropagation(); updateQty(item.id, -1); }} aria-label="Decrease" className="w-7 h-7 grid place-items-center hover:bg-secondary"><Minus className="w-3.5 h-3.5" /></button>
-                            <span className="text-sm font-semibold w-6 text-center">{item.qty}</span>
-                            <button onClick={e => { e.stopPropagation(); updateQty(item.id, 1); }} aria-label="Increase" className="w-7 h-7 grid place-items-center hover:bg-secondary"><Plus className="w-3.5 h-3.5" /></button>
+                    {items.map((item) => {
+                      const img = item.product.node.images.edges[0]?.node;
+                      const symbol = item.price.currencyCode === "INR" ? "₹" : item.price.currencyCode + " ";
+                      const lineTotal = parseFloat(item.price.amount) * item.quantity;
+                      return (
+                        <div key={item.variantId} className="flex gap-3 p-3 rounded-lg border border-border bg-card">
+                          {img && <img src={img.url} alt={item.product.node.title} width={80} height={80} loading="lazy" className="w-20 h-20 rounded-md object-cover bg-cream" />}
+                          <div className="flex-1 min-w-0">
+                            <div className="font-semibold text-sm text-primary truncate">{item.product.node.title}</div>
+                            <div className="text-xs text-muted-foreground">{item.variantTitle}</div>
+                            <div className="mt-2 flex items-center justify-between">
+                              <div className="flex items-center gap-2 border border-border rounded-md">
+                                <button onClick={() => updateQuantity(item.variantId, item.quantity - 1)} aria-label="Decrease" className="w-7 h-7 grid place-items-center hover:bg-secondary"><Minus className="w-3.5 h-3.5" /></button>
+                                <span className="text-sm font-semibold w-6 text-center">{item.quantity}</span>
+                                <button onClick={() => updateQuantity(item.variantId, item.quantity + 1)} aria-label="Increase" className="w-7 h-7 grid place-items-center hover:bg-secondary"><Plus className="w-3.5 h-3.5" /></button>
+                              </div>
+                              <div className="font-bold text-primary">{symbol}{lineTotal.toFixed(0)}</div>
+                            </div>
                           </div>
-                          <div className="font-bold text-primary">₹{item.price * item.qty}</div>
+                          <button onClick={() => removeItem(item.variantId)} aria-label="Remove" className="text-muted-foreground hover:text-destructive self-start"><Trash2 className="w-4 h-4" /></button>
                         </div>
-                      </div>
-                      <button onClick={e => { e.stopPropagation(); removeItem(item.id); }} aria-label="Remove" className="text-muted-foreground hover:text-destructive self-start"><Trash2 className="w-4 h-4" /></button>
-                    </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
 
-              {cart.length > 0 && (
+              {items.length > 0 && (
                 <div className="p-5 border-t border-border bg-cream space-y-3">
-                  <div className="flex justify-between text-sm"><span className="text-muted-foreground">Subtotal</span><span className="font-semibold">₹{cartTotal}</span></div>
-                  <div className="flex justify-between text-sm"><span className="text-muted-foreground">Shipping</span><span className="font-semibold text-primary">{cartTotal >= 1500 ? "Free" : "₹80"}</span></div>
-                  <div className="flex justify-between text-lg font-bold pt-2 border-t border-border"><span>Total</span><span className="text-primary">₹{cartTotal + (cartTotal >= 1500 ? 0 : 80)}</span></div>
-                  <button onClick={checkout} className="w-full inline-flex items-center justify-center gap-2 bg-gradient-gold text-primary py-3 rounded-md font-bold shadow-gold hover:scale-[1.01] transition">
-                    Checkout via WhatsApp <ArrowRight className="w-4 h-4" />
+                  <div className="flex justify-between text-lg font-bold"><span>Total</span><span className="text-primary">{currency === "INR" ? "₹" : currency + " "}{cartTotal.toFixed(2)}</span></div>
+                  <button onClick={checkout} disabled={isLoading || isSyncing} className="w-full inline-flex items-center justify-center gap-2 bg-gradient-gold text-primary py-3 rounded-md font-bold shadow-gold hover:scale-[1.01] transition disabled:opacity-60 disabled:cursor-not-allowed">
+                    {isLoading || isSyncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <><ExternalLink className="w-4 h-4" /> Checkout Securely</>}
                   </button>
-                  <p className="text-xs text-muted-foreground text-center">We'll confirm your order & arrange COD/UPI payment.</p>
+                  <p className="text-xs text-muted-foreground text-center">Secure checkout powered by Shopify. Shipping & taxes calculated at checkout.</p>
                 </div>
               )}
+
             </motion.aside>
           </>
         )}
