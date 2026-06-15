@@ -675,6 +675,17 @@ function Index() {
           </>
         )}
       </AnimatePresence>
+
+      {/* Floating WhatsApp Chat Button */}
+      <a
+        href={`https://wa.me/${WHATSAPP.replace(/[^0-9]/g, "")}?text=Hello%20Gayathri%20Modern%20Rice%20Mill%2C%20I%20would%20like%20to%20know%20more%20about%20your%20products.`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-green-500 text-white shadow-lg grid place-items-center hover:scale-110 transition-transform"
+        aria-label="Chat on WhatsApp"
+      >
+        <MessageCircle className="w-7 h-7" />
+      </a>
     </div>
   );
 }
