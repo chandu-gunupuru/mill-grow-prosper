@@ -499,16 +499,20 @@ function Index() {
       </section>
 
       {/* GALLERY */}
-      <section className="py-24">
+      <section id="gallery" className="py-24">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center max-w-2xl mx-auto">
             <span className="text-gold font-semibold uppercase tracking-widest text-xs">Gallery</span>
             <h2 className="mt-3 text-4xl md:text-5xl font-bold text-primary text-balance">Inside Our Mill</h2>
           </div>
-          <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4">
-            {gallery.map((img, i) => (
-              <div key={i} className={`overflow-hidden rounded-xl ${i === 0 ? "md:col-span-2 md:row-span-2 aspect-square" : "aspect-square"}`}>
-                <img src={img} alt={`Rice mill facility ${i+1}`} width={1024} height={1024} loading="lazy" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
+          <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 auto-rows-[200px] md:auto-rows-[220px]">
+            {gallery.map((item, i) => (
+              <div key={i} className={`overflow-hidden rounded-xl relative group ${i === 0 ? "col-span-2 row-span-2" : ""}`}>
+                <img src={item.img} alt={item.alt} width={1024} height={1024} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition duration-300">
+                  <p className="text-white text-sm font-semibold drop-shadow">{item.alt}</p>
+                </div>
               </div>
             ))}
           </div>
