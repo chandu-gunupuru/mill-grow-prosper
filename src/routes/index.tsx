@@ -250,7 +250,7 @@ function Index() {
               <a href="#contact" className="inline-flex items-center gap-2 bg-gradient-gold text-primary px-7 py-3.5 rounded-md font-semibold shadow-gold hover:scale-[1.02] transition">
                 Get a Quote <ArrowRight className="w-4 h-4" />
               </a>
-              <a href={`tel:${PHONE}`} className="inline-flex items-center gap-2 bg-white/10 backdrop-blur border border-white/30 text-white px-7 py-3.5 rounded-md font-semibold hover:bg-white/20 transition">
+              <a href={`tel:${PHONE.replace(/\s/g, "")}`} className="inline-flex items-center gap-2 bg-white/10 backdrop-blur border border-white/30 text-white px-7 py-3.5 rounded-md font-semibold hover:bg-white/20 transition">
                 <Phone className="w-4 h-4" /> Contact Us
               </a>
             </div>
