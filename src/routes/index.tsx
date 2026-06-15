@@ -130,6 +130,13 @@ function Index() {
   }, []);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+    if (window.location.hash) {
+      history.replaceState(null, "", window.location.pathname + window.location.search);
+    }
+  }, []);
+
+  useEffect(() => {
     try { localStorage.setItem("gayathri-cart", JSON.stringify(cart)); } catch {}
   }, [cart]);
 
