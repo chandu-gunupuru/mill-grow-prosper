@@ -272,6 +272,45 @@ function Index() {
         </div>
       </section>
 
+      {/* SHOP — RICE PACKETS */}
+      <section id="shop" className="py-24 bg-gradient-to-b from-background to-cream">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center max-w-2xl mx-auto">
+            <span className="text-gold font-semibold uppercase tracking-widest text-xs">Shop Our Rice</span>
+            <h2 className="mt-3 text-4xl md:text-5xl font-bold text-primary text-balance">Buy Premium Rice Packets Online</h2>
+            <p className="mt-4 text-muted-foreground">Mill-fresh, lab-tested rice delivered straight to your doorstep. Free shipping on orders above ₹1,500.</p>
+          </div>
+          <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {brands.map((b, idx) => (
+              <motion.div
+                key={b.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: idx * 0.06 }}
+                className="group bg-card rounded-2xl overflow-hidden border border-border hover:shadow-premium transition-all flex flex-col"
+              >
+                <div className="relative aspect-square overflow-hidden bg-cream">
+                  <img src={b.img} alt={b.name} width={1024} height={1024} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <span className="absolute top-3 left-3 bg-gold text-primary text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">{b.tag}</span>
+                </div>
+                <div className="p-5 flex flex-col flex-1">
+                  <h3 className="font-bold text-primary leading-tight">{b.name}</h3>
+                  <div className="text-xs text-muted-foreground mt-1">{b.weight} pack</div>
+                  <div className="mt-3 flex items-baseline gap-2">
+                    <span className="font-display text-2xl font-bold text-primary">₹{b.price}</span>
+                    <span className="text-xs text-muted-foreground line-through">₹{Math.round(b.price * 1.15)}</span>
+                  </div>
+                  <button onClick={() => addToCart(b)} className="mt-4 w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2.5 rounded-md font-semibold hover:bg-gold hover:text-primary transition">
+                    <ShoppingCart className="w-4 h-4" /> Add to Cart
+                  </button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* PRODUCTS */}
       <section id="products" className="py-24">
         <div className="max-w-7xl mx-auto px-6">
