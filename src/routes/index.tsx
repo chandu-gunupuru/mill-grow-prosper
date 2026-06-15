@@ -107,28 +107,34 @@ const gallery = [
   { img: millPacking, alt: "Automated rice packaging line" },
 ];
 
-const brands = [
-  { id: "sona-5", name: "Gayathri Sona Masoori", weight: "5 kg", price: 425, img: packetSona, tag: "Bestseller" },
-  { id: "basmati-5", name: "Gayathri Royal Basmati", weight: "5 kg", price: 695, img: packetBasmati, tag: "Premium" },
-  { id: "steam-10", name: "Gayathri Steam Rice", weight: "10 kg", price: 720, img: packetSteam, tag: "Daily Use" },
-  { id: "kolam-25", name: "Gayathri Kolam Rice", weight: "25 kg", price: 1550, img: packetKolam, tag: "Family Pack" },
-];
-
-type CartItem = { id: string; name: string; weight: string; price: number; img: string; qty: number };
-
 function Index() {
   const [navOpen, setNavOpen] = useState(false);
-  const [cart, setCart] = useState<CartItem[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [form, setForm] = useState({ name: "", company: "", email: "", phone: "", product: "Sona Masoori Rice", qty: "", message: "" });
   const [sending, setSending] = useState(false);
   const sendInquiry = useServerFn(sendQuoteInquiry);
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("gayathri-cart");
-      if (saved) setCart(JSON.parse(saved));
-    } catch {}
-  }, []);
+
+  // Sync Shopify cart on load + tab focus (clears after checkout)
+  useCartSync();
+
+  const items = useCartStore((s) => s.items);
+  const isLoading = useCartStore((s) => s.isLoading);
+  const isSyncing = useCartStore((s) => s.isSyncing);
+  const addItem = useCartStore((s) => s.addItem);
+  const updateQuantity = useCartStore((s) => s.updateQuantity);
+  const removeItem = useCartStore((s) => s.removeItem);
+  const getCheckoutUrl = useCartStore((s) => s.getCheckoutUrl);
+  const syncCart = useCartStore((s) => s.syncCart);
+
+  const cartCount = items.reduce((n, i) => n + i.quantity, 0);
+  const cartTotal = items.reduce((n, i) => n + i.quantity * parseFloat(i.price.amount), 0);
+  const currency = items[0]?.price.currencyCode || "INR";
+
+  const { data: shopifyProducts = [], isLoading: productsLoading } = useQuery({
+    queryKey: ["shopify-products"],
+    queryFn: () => fetchShopifyProducts(20),
+    staleTime: 1000 * 60 * 5,
+  });
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -137,33 +143,29 @@ function Index() {
     }
   }, []);
 
-  useEffect(() => {
-    try { localStorage.setItem("gayathri-cart", JSON.stringify(cart)); } catch {}
-  }, [cart]);
+  useEffect(() => { if (cartOpen) syncCart(); }, [cartOpen, syncCart]);
 
-  const cartCount = cart.reduce((n, i) => n + i.qty, 0);
-  const cartTotal = cart.reduce((n, i) => n + i.qty * i.price, 0);
-
-  function addToCart(b: typeof brands[number]) {
-    setCart(c => {
-      const ex = c.find(i => i.id === b.id);
-      if (ex) return c.map(i => i.id === b.id ? { ...i, qty: i.qty + 1 } : i);
-      return [...c, { id: b.id, name: b.name, weight: b.weight, price: b.price, img: b.img, qty: 1 }];
+  async function handleAddToCart(product: ShopifyProduct) {
+    const variant = product.node.variants.edges[0]?.node;
+    if (!variant) return;
+    await addItem({
+      product,
+      variantId: variant.id,
+      variantTitle: variant.title,
+      price: variant.price,
+      quantity: 1,
+      selectedOptions: variant.selectedOptions || [],
     });
-    toast.success(`${b.name} added to cart`);
+    toast.success(`${product.node.title} added to cart`);
   }
-  function updateQty(id: string, delta: number) {
-    setCart(c => c.flatMap(i => i.id === id ? (i.qty + delta <= 0 ? [] : [{ ...i, qty: i.qty + delta }]) : [i]));
-  }
-  function removeItem(id: string) {
-    setCart(c => c.filter(i => i.id !== id));
-  }
+
   function checkout() {
-    if (!cart.length) return;
-    const lines = cart.map(i => `• ${i.name} (${i.weight}) × ${i.qty} = ₹${i.qty * i.price}`).join("%0A");
-    const msg = `Hello Gayathri Rice Mill, I'd like to order:%0A%0A${lines}%0A%0ATotal: ₹${cartTotal}`;
-    window.open(`https://wa.me/${WHATSAPP.replace(/[^0-9]/g,"")}?text=${msg}`, "_blank");
+    const url = getCheckoutUrl();
+    if (!url) return;
+    window.open(url, "_blank");
+    setCartOpen(false);
   }
+
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
