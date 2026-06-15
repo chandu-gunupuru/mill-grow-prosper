@@ -244,7 +244,7 @@ function Index() {
               Premium Quality Rice <span className="text-gold">Direct From Our Mill</span>
             </h1>
             <p className="mt-6 text-lg md:text-xl text-white/85 max-w-2xl">
-              Two decades of milling excellence. Processing 50,000+ tons annually with modern machinery, lab-tested quality and reliable bulk supply for distributors, exporters, hotels & retailers across India.
+              A decade of milling excellence. Processing 20,000+ tons annually with modern machinery, lab-tested quality and reliable bulk supply for distributors, exporters, hotels & retailers across India.
             </p>
             <div className="mt-10 flex flex-wrap gap-4">
               <a href="#contact" className="inline-flex items-center gap-2 bg-gradient-gold text-primary px-7 py-3.5 rounded-md font-semibold shadow-gold hover:scale-[1.02] transition">
