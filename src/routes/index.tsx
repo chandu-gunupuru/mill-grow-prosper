@@ -686,7 +686,7 @@ function Index() {
                             <div className="text-xs text-muted-foreground">{item.variantTitle}</div>
                             <div className="mt-2 flex items-center justify-between">
                               <div className="flex items-center gap-2 border border-border rounded-md">
-                                <button onClick={() => updateQuantity(item.variantId, item.quantity - 1)} aria-label="Decrease" className="w-7 h-7 grid place-items-center hover:bg-secondary"><Minus className="w-3.5 h-3.5" /></button>
+                                <button onClick={() => updateQuantity(item.variantId, item.quantity - 1)} disabled={item.quantity <= 1} aria-label="Decrease" className="w-7 h-7 grid place-items-center hover:bg-secondary disabled:opacity-40 disabled:cursor-not-allowed"><Minus className="w-3.5 h-3.5" /></button>
                                 <span className="text-sm font-semibold w-6 text-center">{item.quantity}</span>
                                 <button onClick={() => updateQuantity(item.variantId, item.quantity + 1)} aria-label="Increase" className="w-7 h-7 grid place-items-center hover:bg-secondary"><Plus className="w-3.5 h-3.5" /></button>
                               </div>
