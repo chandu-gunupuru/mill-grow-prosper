@@ -199,7 +199,7 @@ function Index() {
             </div>
             <div className="leading-tight">
               <div className="font-display font-bold text-primary">Gayathri</div>
-              <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Modern Rice Mill</div>
+              <div className="text-[10px] uppercase tracking-widest text-gold font-medium">Modern Rice Mill</div>
             </div>
           </a>
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
