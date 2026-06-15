@@ -664,7 +664,7 @@ function Index() {
               </div>
 
               <div className="flex-1 overflow-y-auto p-5">
-                {cart.length === 0 ? (
+                {items.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-center gap-3 py-20">
                     <div className="w-16 h-16 rounded-full bg-secondary grid place-items-center">
                       <ShoppingCart className="w-7 h-7 text-muted-foreground" />
@@ -674,46 +674,43 @@ function Index() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {cart.map(item => (
-                    <div
-                      key={item.id}
-                      onClick={() => {
-                        setCartOpen(false);
-                        document.getElementById(`product-${item.id}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
-                      }}
-                      className="flex gap-3 p-3 rounded-lg border border-border bg-card cursor-pointer hover:border-primary transition-colors"
-                    >
-                      <img src={item.img} alt={item.name} width={80} height={80} loading="lazy" className="w-20 h-20 rounded-md object-cover bg-cream" />
-                      <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-sm text-primary truncate">{item.name}</div>
-                        <div className="text-xs text-muted-foreground">{item.weight}</div>
-                        <div className="mt-2 flex items-center justify-between">
-                          <div className="flex items-center gap-2 border border-border rounded-md">
-                            <button onClick={e => { e.stopPropagation(); updateQty(item.id, -1); }} aria-label="Decrease" className="w-7 h-7 grid place-items-center hover:bg-secondary"><Minus className="w-3.5 h-3.5" /></button>
-                            <span className="text-sm font-semibold w-6 text-center">{item.qty}</span>
-                            <button onClick={e => { e.stopPropagation(); updateQty(item.id, 1); }} aria-label="Increase" className="w-7 h-7 grid place-items-center hover:bg-secondary"><Plus className="w-3.5 h-3.5" /></button>
+                    {items.map((item) => {
+                      const img = item.product.node.images.edges[0]?.node;
+                      const symbol = item.price.currencyCode === "INR" ? "₹" : item.price.currencyCode + " ";
+                      const lineTotal = parseFloat(item.price.amount) * item.quantity;
+                      return (
+                        <div key={item.variantId} className="flex gap-3 p-3 rounded-lg border border-border bg-card">
+                          {img && <img src={img.url} alt={item.product.node.title} width={80} height={80} loading="lazy" className="w-20 h-20 rounded-md object-cover bg-cream" />}
+                          <div className="flex-1 min-w-0">
+                            <div className="font-semibold text-sm text-primary truncate">{item.product.node.title}</div>
+                            <div className="text-xs text-muted-foreground">{item.variantTitle}</div>
+                            <div className="mt-2 flex items-center justify-between">
+                              <div className="flex items-center gap-2 border border-border rounded-md">
+                                <button onClick={() => updateQuantity(item.variantId, item.quantity - 1)} aria-label="Decrease" className="w-7 h-7 grid place-items-center hover:bg-secondary"><Minus className="w-3.5 h-3.5" /></button>
+                                <span className="text-sm font-semibold w-6 text-center">{item.quantity}</span>
+                                <button onClick={() => updateQuantity(item.variantId, item.quantity + 1)} aria-label="Increase" className="w-7 h-7 grid place-items-center hover:bg-secondary"><Plus className="w-3.5 h-3.5" /></button>
+                              </div>
+                              <div className="font-bold text-primary">{symbol}{lineTotal.toFixed(0)}</div>
+                            </div>
                           </div>
-                          <div className="font-bold text-primary">₹{item.price * item.qty}</div>
+                          <button onClick={() => removeItem(item.variantId)} aria-label="Remove" className="text-muted-foreground hover:text-destructive self-start"><Trash2 className="w-4 h-4" /></button>
                         </div>
-                      </div>
-                      <button onClick={e => { e.stopPropagation(); removeItem(item.id); }} aria-label="Remove" className="text-muted-foreground hover:text-destructive self-start"><Trash2 className="w-4 h-4" /></button>
-                    </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
 
-              {cart.length > 0 && (
+              {items.length > 0 && (
                 <div className="p-5 border-t border-border bg-cream space-y-3">
-                  <div className="flex justify-between text-sm"><span className="text-muted-foreground">Subtotal</span><span className="font-semibold">₹{cartTotal}</span></div>
-                  <div className="flex justify-between text-sm"><span className="text-muted-foreground">Shipping</span><span className="font-semibold text-primary">{cartTotal >= 1500 ? "Free" : "₹80"}</span></div>
-                  <div className="flex justify-between text-lg font-bold pt-2 border-t border-border"><span>Total</span><span className="text-primary">₹{cartTotal + (cartTotal >= 1500 ? 0 : 80)}</span></div>
-                  <button onClick={checkout} className="w-full inline-flex items-center justify-center gap-2 bg-gradient-gold text-primary py-3 rounded-md font-bold shadow-gold hover:scale-[1.01] transition">
-                    Checkout via WhatsApp <ArrowRight className="w-4 h-4" />
+                  <div className="flex justify-between text-lg font-bold"><span>Total</span><span className="text-primary">{currency === "INR" ? "₹" : currency + " "}{cartTotal.toFixed(2)}</span></div>
+                  <button onClick={checkout} disabled={isLoading || isSyncing} className="w-full inline-flex items-center justify-center gap-2 bg-gradient-gold text-primary py-3 rounded-md font-bold shadow-gold hover:scale-[1.01] transition disabled:opacity-60 disabled:cursor-not-allowed">
+                    {isLoading || isSyncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <><ExternalLink className="w-4 h-4" /> Checkout Securely</>}
                   </button>
-                  <p className="text-xs text-muted-foreground text-center">We'll confirm your order & arrange COD/UPI payment.</p>
+                  <p className="text-xs text-muted-foreground text-center">Secure checkout powered by Shopify. Shipping & taxes calculated at checkout.</p>
                 </div>
               )}
+
             </motion.aside>
           </>
         )}
