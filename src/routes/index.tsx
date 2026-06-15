@@ -1,15 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "motion/react";
 import {
   Phone, Mail, MapPin, MessageCircle, Award, Truck, Sparkles, ShieldCheck,
   Factory, Leaf, Package, CheckCircle2, Star, ArrowRight, Menu, X, Download,
-  ShoppingCart, Plus, Minus, Trash2,
+  ShoppingCart, Plus, Minus, Trash2, Loader2, ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { sendQuoteInquiry } from "@/lib/inquiry.functions";
+import { fetchShopifyProducts, type ShopifyProduct } from "@/lib/shopify";
+import { useCartStore } from "@/stores/cartStore";
+import { useCartSync } from "@/hooks/useCartSync";
 
 import heroMill from "@/assets/hero-mill.jpg";
 import paddyField from "@/assets/paddy-field.jpg";
@@ -21,16 +25,13 @@ import riceSteam from "@/assets/rice-steam.jpg";
 import riceRaw from "@/assets/rice-raw.jpg";
 import riceBroken from "@/assets/rice-broken.jpg";
 import riceBran from "@/assets/rice-bran.jpg";
-import packetSona from "@/assets/packet-sona.jpg";
-import packetBasmati from "@/assets/packet-basmati.jpg";
-import packetSteam from "@/assets/packet-steam.jpg";
-import packetKolam from "@/assets/packet-kolam.jpg";
 
 import millAerial from "@/assets/mill-aerial.jpg";
 import millInterior from "@/assets/mill-interior.jpg";
 import millLab from "@/assets/mill-lab.jpg";
 import millWarehouse from "@/assets/mill-warehouse.jpg";
 import millPacking from "@/assets/mill-packing.jpg";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
