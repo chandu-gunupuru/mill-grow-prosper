@@ -108,8 +108,9 @@ function Index() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [form, setForm] = useState({ name: "", company: "", email: "", phone: "", product: "Sona Masoori Rice", qty: "", message: "" });
+  const [sending, setSending] = useState(false);
+  const sendInquiry = useServerFn(sendQuoteInquiry);
 
-  useEffect(() => {
     try {
       const saved = localStorage.getItem("gayathri-cart");
       if (saved) setCart(JSON.parse(saved));
