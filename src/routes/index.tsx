@@ -549,8 +549,8 @@ function Index() {
               <input placeholder="Quantity (tons / bags)" value={form.qty} onChange={e => setForm({...form, qty: e.target.value})} className="w-full px-4 py-3 rounded-md bg-secondary border border-border focus:border-primary outline-none" />
             </div>
             <textarea placeholder="Message / Specifications" rows={4} value={form.message} onChange={e => setForm({...form, message: e.target.value})} className="w-full px-4 py-3 rounded-md bg-secondary border border-border focus:border-primary outline-none resize-none" />
-            <button type="submit" className="w-full inline-flex items-center justify-center gap-2 bg-gradient-gold text-primary py-3.5 rounded-md font-bold shadow-gold hover:scale-[1.01] transition">
-              Send Inquiry <ArrowRight className="w-4 h-4" />
+            <button type="submit" disabled={sending} className="w-full inline-flex items-center justify-center gap-2 bg-gradient-gold text-primary py-3.5 rounded-md font-bold shadow-gold hover:scale-[1.01] transition disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100">
+              {sending ? "Sending…" : <>Send Inquiry <ArrowRight className="w-4 h-4" /></>}
             </button>
             <p className="text-xs text-muted-foreground text-center">Your details are kept confidential. Used only for quote response.</p>
           </form>
