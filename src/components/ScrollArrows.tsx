@@ -25,7 +25,7 @@ export function ScrollArrows() {
   };
 
   return (
-    <div className="fixed right-5 bottom-8 z-50 flex flex-col gap-3">
+    <div className="fixed right-5 bottom-10 z-[60] flex flex-col gap-3">
       <AnimatePresence>
         {showTop && (
           <motion.button
@@ -35,9 +35,9 @@ export function ScrollArrows() {
             transition={{ duration: 0.25 }}
             onClick={scrollToTop}
             aria-label="Scroll to top"
-            className="w-11 h-11 rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 grid place-items-center hover:scale-110 transition-transform"
+            className="w-12 h-12 rounded-full bg-card/95 backdrop-blur-md border-2 border-border text-foreground shadow-premium grid place-items-center hover:border-primary hover:text-primary hover:scale-110 transition-all"
           >
-            <ArrowUp className="w-5 h-5" />
+            <ArrowUp className="w-5 h-5" strokeWidth={2.5} />
           </motion.button>
         )}
       </AnimatePresence>
@@ -50,12 +50,13 @@ export function ScrollArrows() {
             transition={{ duration: 0.25 }}
             onClick={scrollToBottom}
             aria-label="Scroll to bottom"
-            className="w-11 h-11 rounded-full bg-gold text-primary shadow-lg shadow-gold/30 grid place-items-center hover:scale-110 transition-transform"
+            className="w-12 h-12 rounded-full bg-card/95 backdrop-blur-md border-2 border-border text-foreground shadow-premium grid place-items-center hover:border-gold hover:text-primary hover:scale-110 transition-all"
           >
-            <ArrowDown className="w-5 h-5" />
+            <ArrowDown className="w-5 h-5" strokeWidth={2.5} />
           </motion.button>
         )}
       </AnimatePresence>
     </div>
   );
 }
+
