@@ -19,22 +19,22 @@ import { supabase } from "@/integrations/supabase/client";
 import { Link } from "@tanstack/react-router";
 import { LogIn, LogOut, User as UserIcon } from "lucide-react";
 
-import heroMill from "@/assets/hero-mill.jpg?w=1600&format=webp&quality=72";
-import paddyField from "@/assets/paddy-field.jpg?w=900&format=webp&quality=72";
-import warehouse from "@/assets/warehouse.jpg?w=1200&format=webp&quality=72";
-import machinery from "@/assets/machinery.jpg?w=1600&format=webp&quality=65";
-import riceSona from "@/assets/rice-sona.jpg?w=800&format=webp&quality=72";
-import riceBasmati from "@/assets/rice-basmati.jpg?w=800&format=webp&quality=72";
-import riceSteam from "@/assets/rice-steam.jpg?w=800&format=webp&quality=72";
-import riceRaw from "@/assets/rice-raw.jpg?w=800&format=webp&quality=72";
-import riceBroken from "@/assets/rice-broken.jpg?w=800&format=webp&quality=72";
-import riceBran from "@/assets/rice-bran.jpg?w=800&format=webp&quality=72";
+import heroMill from "@/assets/hero-mill.jpg?w=1600&format=webp&quality=72&imagetools";
+import paddyField from "@/assets/paddy-field.jpg?w=900&format=webp&quality=72&imagetools";
+import warehouse from "@/assets/warehouse.jpg?w=1200&format=webp&quality=72&imagetools";
+import machinery from "@/assets/machinery.jpg?w=1600&format=webp&quality=65&imagetools";
+import riceSona from "@/assets/rice-sona.jpg?w=800&format=webp&quality=72&imagetools";
+import riceBasmati from "@/assets/rice-basmati.jpg?w=800&format=webp&quality=72&imagetools";
+import riceSteam from "@/assets/rice-steam.jpg?w=800&format=webp&quality=72&imagetools";
+import riceRaw from "@/assets/rice-raw.jpg?w=800&format=webp&quality=72&imagetools";
+import riceBroken from "@/assets/rice-broken.jpg?w=800&format=webp&quality=72&imagetools";
+import riceBran from "@/assets/rice-bran.jpg?w=800&format=webp&quality=72&imagetools";
 
-import millAerial from "@/assets/mill-aerial.jpg?w=1200&format=webp&quality=72";
-import millInterior from "@/assets/mill-interior.jpg?w=1200&format=webp&quality=72";
-import millLab from "@/assets/mill-lab.jpg?w=1200&format=webp&quality=72";
-import millWarehouse from "@/assets/mill-warehouse.jpg?w=1200&format=webp&quality=72";
-import millPacking from "@/assets/mill-packing.jpg?w=1200&format=webp&quality=72";
+import millAerial from "@/assets/mill-aerial.jpg?w=1200&format=webp&quality=72&imagetools";
+import millInterior from "@/assets/mill-interior.jpg?w=1200&format=webp&quality=72&imagetools";
+import millLab from "@/assets/mill-lab.jpg?w=1200&format=webp&quality=72&imagetools";
+import millWarehouse from "@/assets/mill-warehouse.jpg?w=1200&format=webp&quality=72&imagetools";
+import millPacking from "@/assets/mill-packing.jpg?w=1200&format=webp&quality=72&imagetools";
 
 
 
