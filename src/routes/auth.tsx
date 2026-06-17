@@ -293,43 +293,47 @@ function AuthPage() {
           {mode === "signin" ? "Welcome back. Sign in to continue." : mode === "signup" ? "Join to place wholesale orders." : "Enter your email and we'll send you a reset link."}
         </p>
 
-        <button
-          type="button"
-          onClick={handleGoogle}
-          disabled={busy}
-          className="w-full inline-flex items-center justify-center gap-2 border border-border bg-background hover:bg-secondary text-foreground py-2.5 rounded-md text-sm font-medium transition disabled:opacity-50"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.76h3.56c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.56-2.76c-.99.66-2.25 1.06-3.72 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/>
-            <path fill="#FBBC05" d="M5.84 14.11A6.6 6.6 0 0 1 5.5 12c0-.73.13-1.44.34-2.11V7.05H2.18A11 11 0 0 0 1 12c0 1.77.42 3.45 1.18 4.95l3.66-2.84z"/>
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.05l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/>
-          </svg>
-          Continue with Google
-        </button>
+        {mode !== "forgot" && (
+          <>
+            <button
+              type="button"
+              onClick={handleGoogle}
+              disabled={busy}
+              className="w-full inline-flex items-center justify-center gap-2 border border-border bg-background hover:bg-secondary text-foreground py-2.5 rounded-md text-sm font-medium transition disabled:opacity-50"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.76h3.56c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.56-2.76c-.99.66-2.25 1.06-3.72 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.11A6.6 6.6 0 0 1 5.5 12c0-.73.13-1.44.34-2.11V7.05H2.18A11 11 0 0 0 1 12c0 1.77.42 3.45 1.18 4.95l3.66-2.84z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.05l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/>
+              </svg>
+              Continue with Google
+            </button>
 
-        <div className="flex items-center gap-3 my-5">
-          <div className="h-px flex-1 bg-border" />
-          <span className="text-xs text-muted-foreground">OR</span>
-          <div className="h-px flex-1 bg-border" />
-        </div>
+            <div className="flex items-center gap-3 my-5">
+              <div className="h-px flex-1 bg-border" />
+              <span className="text-xs text-muted-foreground">OR</span>
+              <div className="h-px flex-1 bg-border" />
+            </div>
 
-        <div className="grid grid-cols-2 gap-2 mb-3 p-1 bg-secondary rounded-md">
-          <button
-            type="button"
-            onClick={() => { setMethod("email"); setOtpSent(false); }}
-            className={`inline-flex items-center justify-center gap-1.5 py-2 text-xs font-medium rounded transition ${method === "email" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground"}`}
-          >
-            <Mail className="w-3.5 h-3.5" /> Email
-          </button>
-          <button
-            type="button"
-            onClick={() => { setMethod("phone"); }}
-            className={`inline-flex items-center justify-center gap-1.5 py-2 text-xs font-medium rounded transition ${method === "phone" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground"}`}
-          >
-            <Phone className="w-3.5 h-3.5" /> Phone
-          </button>
-        </div>
+            <div className="grid grid-cols-2 gap-2 mb-3 p-1 bg-secondary rounded-md">
+              <button
+                type="button"
+                onClick={() => { setMethod("email"); setOtpSent(false); }}
+                className={`inline-flex items-center justify-center gap-1.5 py-2 text-xs font-medium rounded transition ${method === "email" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground"}`}
+              >
+                <Mail className="w-3.5 h-3.5" /> Email
+              </button>
+              <button
+                type="button"
+                onClick={() => { setMethod("phone"); }}
+                className={`inline-flex items-center justify-center gap-1.5 py-2 text-xs font-medium rounded transition ${method === "phone" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground"}`}
+              >
+                <Phone className="w-3.5 h-3.5" /> Phone
+              </button>
+            </div>
+          </>
+        )}
 
         {method === "email" ? (
           <form onSubmit={handleEmail} className="space-y-3">
