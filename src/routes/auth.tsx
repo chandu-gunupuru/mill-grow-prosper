@@ -89,19 +89,43 @@ function AuthPage() {
     if (result.redirected) return;
     navigate({ to: "/" });
   };
-  const friendlyPhoneError = (raw: string, stage: "send" | "verify") => {
+  const classifyPhoneError = (raw: string, stage: "send" | "verify") => {
     const m = raw.toLowerCase();
-    if (m.includes("invalid") && m.includes("phone")) return "That phone number looks invalid. Include the country code, e.g. +911234567890.";
-    if (m.includes("rate") || m.includes("too many")) return "Too many attempts. Please wait a minute before trying again.";
-    if (m.includes("sms") || m.includes("provider") || m.includes("not enabled") || m.includes("unsupported")) return "SMS sign-in isn't available right now. Please use email instead.";
-    if (stage === "verify" && (m.includes("token") || m.includes("expired") || m.includes("otp"))) return "That code is incorrect or has expired. Request a new one or use email.";
-    return stage === "send" ? "Couldn't send the OTP. Please try again or use email." : "Couldn't verify the code. Please try again or use email.";
+    // delivery / provider failures from the SMS gateway
+    const providerCodes = ["30003", "30004", "30005", "30006", "30007", "30008", "21610", "21614"];
+    const providerHit = providerCodes.some((c) => m.includes(c));
+    if (
+      providerHit ||
+      m.includes("undelivered") ||
+      m.includes("delivery failed") ||
+      m.includes("failed to deliver") ||
+      m.includes("carrier") ||
+      m.includes("landline") ||
+      m.includes("unreachable")
+    ) {
+      return { kind: "delivery_failed" as const, message: "Your carrier rejected the SMS (number unreachable, landline, or blocked). Please try a different number or use email." };
+    }
+    if (m.includes("sms") || m.includes("provider") || m.includes("not enabled") || m.includes("unsupported") || m.includes("twilio") || m.includes("messagebird")) {
+      return { kind: "provider_down" as const, message: "Our SMS provider is unavailable right now. Please use email to sign in." };
+    }
+    if (m.includes("invalid") && m.includes("phone")) {
+      return { kind: "invalid_phone" as const, message: "That phone number looks invalid. Include the country code, e.g. +911234567890." };
+    }
+    if (m.includes("rate") || m.includes("too many")) {
+      return { kind: "rate_limited" as const, message: "Too many attempts. Please wait a minute before trying again." };
+    }
+    if (stage === "verify" && (m.includes("token") || m.includes("expired") || m.includes("otp"))) {
+      return { kind: "bad_code" as const, message: "That code is incorrect or has expired. Request a new one or use email." };
+    }
+    return { kind: "unknown" as const, message: stage === "send" ? "Couldn't send the OTP. Please try again or use email." : "Couldn't verify the code. Please try again or use email." };
   };
 
   const switchToEmail = () => {
     setMethod("email");
     setOtpSent(false);
     setOtp("");
+    setSmsStatus("idle");
+    setSmsStatusMessage("");
     toast.message("Switched to email sign-in", { description: "Enter your email and password to continue." });
   };
 
@@ -112,6 +136,10 @@ function AuthPage() {
       return;
     }
     setBusy(true);
+    if (!otpSent) {
+      setSmsStatus("sending");
+      setSmsStatusMessage("Asking the SMS provider to send your code…");
+    }
     try {
       if (!otpSent) {
         const { error } = await supabase.auth.signInWithOtp({
@@ -120,7 +148,10 @@ function AuthPage() {
         });
         if (error) throw error;
         setOtpSent(true);
-        toast.success("OTP sent", { description: "Check your messages. It can take up to a minute." });
+        setSmsStatus("sent");
+        setSmsStatusMessage(`Code sent to ${phone.trim()}. It usually arrives in under 30 seconds.`);
+        setResendIn(45);
+        toast.success("OTP sent", { description: "Check your messages." });
       } else {
         const { error } = await supabase.auth.verifyOtp({ phone: phone.trim(), token: otp.trim(), type: "sms" });
         if (error) throw error;
@@ -129,14 +160,19 @@ function AuthPage() {
       }
     } catch (err) {
       const stage: "send" | "verify" = otpSent ? "verify" : "send";
-      const msg = friendlyPhoneError(err instanceof Error ? err.message : "", stage);
-      toast.error(msg, {
-        action: { label: "Use email", onClick: switchToEmail },
-      });
+      const info = classifyPhoneError(err instanceof Error ? err.message : "", stage);
+      if (stage === "send") {
+        setSmsStatus("failed");
+        setSmsStatusMessage(info.message);
+      }
+      const offerEmail = info.kind !== "bad_code";
+      toast.error(info.message, offerEmail ? { action: { label: "Use email", onClick: switchToEmail } } : undefined);
     } finally {
       setBusy(false);
     }
   };
+
+
 
 
 
