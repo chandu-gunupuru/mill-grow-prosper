@@ -69,6 +69,31 @@ function AuthPage() {
     if (result.redirected) return;
     navigate({ to: "/" });
   };
+  const handlePhone = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    try {
+      if (!otpSent) {
+        const { error } = await supabase.auth.signInWithOtp({
+          phone,
+          options: mode === "signup" ? { data: { full_name: fullName } } : undefined,
+        });
+        if (error) throw error;
+        setOtpSent(true);
+        toast.success("OTP sent to your phone");
+      } else {
+        const { error } = await supabase.auth.verifyOtp({ phone, token: otp, type: "sms" });
+        if (error) throw error;
+        toast.success("Welcome!");
+        navigate({ to: "/" });
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Phone sign-in failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+
 
   return (
     <div className="min-h-screen grid place-items-center bg-background px-6 py-12">
