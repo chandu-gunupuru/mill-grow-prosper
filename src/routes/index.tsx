@@ -268,7 +268,7 @@ function Index() {
 
       {/* HERO */}
       <section id="top" className="relative min-h-screen flex items-center pt-16 overflow-hidden">
-        <img src={heroMill} alt="Modern rice mill processing facility" width={1920} height={1080} className="absolute inset-0 w-full h-full object-cover" />
+        <img src={heroMill} alt="Modern rice mill processing facility" width={1920} height={1080} fetchPriority="high" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-hero" />
         <div className="relative max-w-7xl mx-auto px-6 py-20 w-full">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="max-w-3xl">
