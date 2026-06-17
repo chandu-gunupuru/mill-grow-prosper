@@ -23,10 +23,30 @@ function AuthPage() {
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [smsStatus, setSmsStatus] = useState<"idle" | "sending" | "sent" | "delayed" | "failed">("idle");
+  const [smsStatusMessage, setSmsStatusMessage] = useState<string>("");
+  const [resendIn, setResendIn] = useState(0);
 
   useEffect(() => {
     if (user) navigate({ to: "/" });
   }, [user, navigate]);
+
+  // Countdown for resend + delayed-delivery detection
+  useEffect(() => {
+    if (smsStatus !== "sent" || resendIn <= 0) return;
+    const t = setInterval(() => {
+      setResendIn((s) => {
+        if (s <= 1) {
+          clearInterval(t);
+          setSmsStatus((cur) => (cur === "sent" ? "delayed" : cur));
+          return 0;
+        }
+        return s - 1;
+      });
+    }, 1000);
+    return () => clearInterval(t);
+  }, [smsStatus, resendIn]);
+
 
   const handleEmail = async (e: React.FormEvent) => {
     e.preventDefault();
