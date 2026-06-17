@@ -256,13 +256,28 @@ function AuthPage() {
               {otpSent ? "Verify OTP" : "Send OTP"}
             </button>
             {otpSent && (
-              <button
-                type="button"
-                onClick={() => { setOtpSent(false); setOtp(""); }}
-                className="w-full text-xs text-muted-foreground hover:text-primary"
-              >
-                Use a different phone number
-              </button>
+              <div className="space-y-1.5 pt-1">
+                <p className="text-xs text-muted-foreground text-center">
+                  Didn't get the code? It can take up to a minute.
+                </p>
+                <div className="flex items-center justify-center gap-3 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => { setOtpSent(false); setOtp(""); }}
+                    className="text-muted-foreground hover:text-primary"
+                  >
+                    Change number / resend
+                  </button>
+                  <span className="text-border">•</span>
+                  <button
+                    type="button"
+                    onClick={switchToEmail}
+                    className="text-primary font-medium hover:underline"
+                  >
+                    Use email instead
+                  </button>
+                </div>
+              </div>
             )}
           </form>
         )}
