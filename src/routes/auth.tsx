@@ -137,7 +137,7 @@ function AuthPage() {
           <button
             type="submit"
             disabled={busy}
-            className="w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2.5 rounded-md text-sm font-semibold hover:opacity-90 transition disabled:opacity-50"
+            className="w-full inline-flex items-center justify-center gap-2 bg-sky-400 text-white py-2.5 rounded-md text-sm font-semibold hover:bg-sky-500 transition disabled:opacity-50"
           >
             {busy && <Loader2 className="w-4 h-4 animate-spin" />}
             {mode === "signin" ? "Sign in" : "Create account"}
