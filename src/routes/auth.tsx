@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Loader2, Leaf, ArrowLeft } from "lucide-react";
+import { Loader2, Leaf, ArrowLeft, Mail, Phone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/useAuth";
@@ -15,9 +15,13 @@ function AuthPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [method, setMethod] = useState<"email" | "phone">("email");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [otp, setOtp] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -65,6 +69,31 @@ function AuthPage() {
     if (result.redirected) return;
     navigate({ to: "/" });
   };
+  const handlePhone = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    try {
+      if (!otpSent) {
+        const { error } = await supabase.auth.signInWithOtp({
+          phone,
+          options: mode === "signup" ? { data: { full_name: fullName } } : undefined,
+        });
+        if (error) throw error;
+        setOtpSent(true);
+        toast.success("OTP sent to your phone");
+      } else {
+        const { error } = await supabase.auth.verifyOtp({ phone, token: otp, type: "sms" });
+        if (error) throw error;
+        toast.success("Welcome!");
+        navigate({ to: "/" });
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Phone sign-in failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+
 
   return (
     <div className="min-h-screen grid place-items-center bg-background px-6 py-12">
@@ -107,42 +136,110 @@ function AuthPage() {
           <div className="h-px flex-1 bg-border" />
         </div>
 
-        <form onSubmit={handleEmail} className="space-y-3">
-          {mode === "signup" && (
+        <div className="grid grid-cols-2 gap-2 mb-3 p-1 bg-secondary rounded-md">
+          <button
+            type="button"
+            onClick={() => { setMethod("email"); setOtpSent(false); }}
+            className={`inline-flex items-center justify-center gap-1.5 py-2 text-xs font-medium rounded transition ${method === "email" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground"}`}
+          >
+            <Mail className="w-3.5 h-3.5" /> Email
+          </button>
+          <button
+            type="button"
+            onClick={() => { setMethod("phone"); }}
+            className={`inline-flex items-center justify-center gap-1.5 py-2 text-xs font-medium rounded transition ${method === "phone" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground"}`}
+          >
+            <Phone className="w-3.5 h-3.5" /> Phone
+          </button>
+        </div>
+
+        {method === "email" ? (
+          <form onSubmit={handleEmail} className="space-y-3">
+            {mode === "signup" && (
+              <input
+                type="text"
+                placeholder="Full name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-md bg-secondary border border-border focus:border-primary outline-none text-sm"
+              />
+            )}
             <input
-              type="text"
-              placeholder="Full name"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
+              type="email"
+              required
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-2.5 rounded-md bg-secondary border border-border focus:border-primary outline-none text-sm"
             />
-          )}
-          <input
-            type="email"
-            required
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-2.5 rounded-md bg-secondary border border-border focus:border-primary outline-none text-sm"
-          />
-          <input
-            type="password"
-            required
-            minLength={6}
-            placeholder="Password (min 6 chars)"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-2.5 rounded-md bg-secondary border border-border focus:border-primary outline-none text-sm"
-          />
-          <button
-            type="submit"
-            disabled={busy}
-            className="w-full inline-flex items-center justify-center gap-2 bg-sky-400 text-white py-2.5 rounded-md text-sm font-semibold hover:bg-sky-500 transition disabled:opacity-50"
-          >
-            {busy && <Loader2 className="w-4 h-4 animate-spin" />}
-            {mode === "signin" ? "Sign in" : "Create account"}
-          </button>
-        </form>
+            <input
+              type="password"
+              required
+              minLength={6}
+              placeholder="Password (min 6 chars)"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-md bg-secondary border border-border focus:border-primary outline-none text-sm"
+            />
+            <button
+              type="submit"
+              disabled={busy}
+              className="w-full inline-flex items-center justify-center gap-2 bg-sky-400 text-white py-2.5 rounded-md text-sm font-semibold hover:bg-sky-500 transition disabled:opacity-50"
+            >
+              {busy && <Loader2 className="w-4 h-4 animate-spin" />}
+              {mode === "signin" ? "Sign in" : "Create account"}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handlePhone} className="space-y-3">
+            {mode === "signup" && !otpSent && (
+              <input
+                type="text"
+                placeholder="Full name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-md bg-secondary border border-border focus:border-primary outline-none text-sm"
+              />
+            )}
+            <input
+              type="tel"
+              required
+              placeholder="Phone (e.g. +911234567890)"
+              value={phone}
+              disabled={otpSent}
+              onChange={(e) => setPhone(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-md bg-secondary border border-border focus:border-primary outline-none text-sm disabled:opacity-60"
+            />
+            {otpSent && (
+              <input
+                type="text"
+                required
+                inputMode="numeric"
+                placeholder="Enter 6-digit OTP"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-md bg-secondary border border-border focus:border-primary outline-none text-sm tracking-widest"
+              />
+            )}
+            <button
+              type="submit"
+              disabled={busy}
+              className="w-full inline-flex items-center justify-center gap-2 bg-sky-400 text-white py-2.5 rounded-md text-sm font-semibold hover:bg-sky-500 transition disabled:opacity-50"
+            >
+              {busy && <Loader2 className="w-4 h-4 animate-spin" />}
+              {otpSent ? "Verify OTP" : "Send OTP"}
+            </button>
+            {otpSent && (
+              <button
+                type="button"
+                onClick={() => { setOtpSent(false); setOtp(""); }}
+                className="w-full text-xs text-muted-foreground hover:text-primary"
+              >
+                Use a different phone number
+              </button>
+            )}
+          </form>
+        )}
 
         <p className="text-sm text-center text-muted-foreground mt-5">
           {mode === "signin" ? "New here?" : "Already have an account?"}{" "}
