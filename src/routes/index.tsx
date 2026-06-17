@@ -19,22 +19,23 @@ import { supabase } from "@/integrations/supabase/client";
 import { Link } from "@tanstack/react-router";
 import { LogIn, LogOut, User as UserIcon } from "lucide-react";
 
-import heroMill from "@/assets/hero-mill.jpg";
-import paddyField from "@/assets/paddy-field.jpg";
-import warehouse from "@/assets/warehouse.jpg";
-import machinery from "@/assets/machinery.jpg";
-import riceSona from "@/assets/rice-sona.jpg";
-import riceBasmati from "@/assets/rice-basmati.jpg";
-import riceSteam from "@/assets/rice-steam.jpg";
-import riceRaw from "@/assets/rice-raw.jpg";
-import riceBroken from "@/assets/rice-broken.jpg";
-import riceBran from "@/assets/rice-bran.jpg";
+import heroMill from "@/assets/hero-mill.jpg?w=1600&format=webp&quality=72&imagetools";
+import paddyField from "@/assets/paddy-field.jpg?w=900&format=webp&quality=72&imagetools";
+import warehouse from "@/assets/warehouse.jpg?w=1200&format=webp&quality=72&imagetools";
+import machinery from "@/assets/machinery.jpg?w=1600&format=webp&quality=65&imagetools";
+import riceSona from "@/assets/rice-sona.jpg?w=800&format=webp&quality=72&imagetools";
+import riceBasmati from "@/assets/rice-basmati.jpg?w=800&format=webp&quality=72&imagetools";
+import riceSteam from "@/assets/rice-steam.jpg?w=800&format=webp&quality=72&imagetools";
+import riceRaw from "@/assets/rice-raw.jpg?w=800&format=webp&quality=72&imagetools";
+import riceBroken from "@/assets/rice-broken.jpg?w=800&format=webp&quality=72&imagetools";
+import riceBran from "@/assets/rice-bran.jpg?w=800&format=webp&quality=72&imagetools";
 
-import millAerial from "@/assets/mill-aerial.jpg";
-import millInterior from "@/assets/mill-interior.jpg";
-import millLab from "@/assets/mill-lab.jpg";
-import millWarehouse from "@/assets/mill-warehouse.jpg";
-import millPacking from "@/assets/mill-packing.jpg";
+import millAerial from "@/assets/mill-aerial.jpg?w=1200&format=webp&quality=72&imagetools";
+import millInterior from "@/assets/mill-interior.jpg?w=1200&format=webp&quality=72&imagetools";
+import millLab from "@/assets/mill-lab.jpg?w=1200&format=webp&quality=72&imagetools";
+import millWarehouse from "@/assets/mill-warehouse.jpg?w=1200&format=webp&quality=72&imagetools";
+import millPacking from "@/assets/mill-packing.jpg?w=1200&format=webp&quality=72&imagetools";
+
 
 
 export const Route = createFileRoute("/")({
@@ -267,7 +268,7 @@ function Index() {
 
       {/* HERO */}
       <section id="top" className="relative min-h-screen flex items-center pt-16 overflow-hidden">
-        <img src={heroMill} alt="Modern rice mill processing facility" width={1920} height={1080} className="absolute inset-0 w-full h-full object-cover" />
+        <img src={heroMill} alt="Modern rice mill processing facility" width={1920} height={1080} fetchPriority="high" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-hero" />
         <div className="relative max-w-7xl mx-auto px-6 py-20 w-full">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="max-w-3xl">
