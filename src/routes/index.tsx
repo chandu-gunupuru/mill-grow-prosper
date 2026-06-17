@@ -14,6 +14,10 @@ import { sendQuoteInquiry } from "@/lib/inquiry.functions";
 import { fetchShopifyProducts, type ShopifyProduct } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
 import { useCartSync } from "@/hooks/useCartSync";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { Link } from "@tanstack/react-router";
+import { LogIn, LogOut, User as UserIcon } from "lucide-react";
 
 import heroMill from "@/assets/hero-mill.jpg";
 import paddyField from "@/assets/paddy-field.jpg";
