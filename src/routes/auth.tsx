@@ -139,48 +139,112 @@ function AuthPage() {
     toast.message("Switched to email sign-in", { description: "Enter your email and password to continue." });
   };
 
-  const handlePhone = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!otpSent && !/^\+[1-9]\d{6,14}$/.test(phone.trim())) {
+  const sendOtp = async (isResend: boolean) => {
+    if (!/^\+[1-9]\d{6,14}$/.test(phone.trim())) {
       toast.error("Enter your phone in international format, e.g. +911234567890");
       return;
     }
-    setBusy(true);
-    if (!otpSent) {
-      setSmsStatus("sending");
-      setSmsStatusMessage("Asking the SMS provider to send your code…");
+    if (isResend && resendIn > 0) {
+      toast.error(`Please wait ${resendIn}s before requesting another code.`);
+      return;
     }
+    if (sendAttempts >= MAX_SENDS) {
+      toast.error("Resend limit reached", {
+        description: "Please use email to sign in instead.",
+        action: { label: "Use email", onClick: switchToEmail },
+      });
+      return;
+    }
+    setBusy(true);
+    setSmsStatus("sending");
+    setSmsStatusMessage(isResend ? "Requesting a new code from the SMS provider…" : "Asking the SMS provider to send your code…");
     try {
-      if (!otpSent) {
-        const { error } = await supabase.auth.signInWithOtp({
-          phone: phone.trim(),
-          options: mode === "signup" ? { data: { full_name: fullName } } : undefined,
-        });
-        if (error) throw error;
-        setOtpSent(true);
-        setSmsStatus("sent");
-        setSmsStatusMessage(`Code sent to ${phone.trim()}. It usually arrives in under 30 seconds.`);
-        setResendIn(45);
-        toast.success("OTP sent", { description: "Check your messages." });
-      } else {
-        const { error } = await supabase.auth.verifyOtp({ phone: phone.trim(), token: otp.trim(), type: "sms" });
-        if (error) throw error;
-        toast.success("Welcome!");
-        navigate({ to: "/" });
-      }
+      const { error } = await supabase.auth.signInWithOtp({
+        phone: phone.trim(),
+        options: mode === "signup" ? { data: { full_name: fullName } } : undefined,
+      });
+      if (error) throw error;
+      const nextAttempt = sendAttempts + 1;
+      setSendAttempts(nextAttempt);
+      setVerifyAttempts(0);
+      setOtp("");
+      setOtpSent(true);
+      setLastSentAt(Date.now());
+      const cooldown = cooldownFor(nextAttempt);
+      setResendIn(cooldown);
+      setSmsStatus("sent");
+      setSmsStatusMessage(
+        isResend
+          ? `New code sent to ${phone.trim()} (attempt ${nextAttempt} of ${MAX_SENDS}).`
+          : `Code sent to ${phone.trim()}. It usually arrives in under 30 seconds.`,
+      );
+      toast.success(isResend ? "New code sent" : "OTP sent", {
+        description: `You can request another in ${cooldown}s.`,
+      });
     } catch (err) {
-      const stage: "send" | "verify" = otpSent ? "verify" : "send";
-      const info = classifyPhoneError(err instanceof Error ? err.message : "", stage);
-      if (stage === "send") {
-        setSmsStatus("failed");
-        setSmsStatusMessage(info.message);
-      }
-      const offerEmail = info.kind !== "bad_code";
-      toast.error(info.message, offerEmail ? { action: { label: "Use email", onClick: switchToEmail } } : undefined);
+      const info = classifyPhoneError(err instanceof Error ? err.message : "", "send");
+      setSmsStatus("failed");
+      setSmsStatusMessage(info.message);
+      toast.error(info.message, {
+        action: { label: "Use email", onClick: switchToEmail },
+      });
     } finally {
       setBusy(false);
     }
   };
+
+  const verifyOtpCode = async () => {
+    if (verifyAttempts >= MAX_VERIFY) {
+      toast.error("Too many verification attempts", {
+        description: "Request a new code or use email to sign in.",
+        action: { label: "Use email", onClick: switchToEmail },
+      });
+      return;
+    }
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        phone: phone.trim(),
+        token: otp.trim(),
+        type: "sms",
+      });
+      if (error) throw error;
+      toast.success("Welcome!");
+      navigate({ to: "/" });
+    } catch (err) {
+      const next = verifyAttempts + 1;
+      setVerifyAttempts(next);
+      const info = classifyPhoneError(err instanceof Error ? err.message : "", "verify");
+      const remaining = Math.max(0, MAX_VERIFY - next);
+      const desc = remaining > 0
+        ? `${remaining} attempt${remaining === 1 ? "" : "s"} left before you'll need a new code.`
+        : "No attempts left. Request a new code or use email.";
+      toast.error(info.message, {
+        description: desc,
+        action: info.kind === "bad_code" ? undefined : { label: "Use email", onClick: switchToEmail },
+      });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handlePhone = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (otpSent) await verifyOtpCode();
+    else await sendOtp(false);
+  };
+
+  const handleChangeNumber = () => {
+    setOtpSent(false);
+    setOtp("");
+    setSmsStatus("idle");
+    setSmsStatusMessage("");
+    setSendAttempts(0);
+    setVerifyAttempts(0);
+    setResendIn(0);
+    setLastSentAt(null);
+  };
+
 
 
 
