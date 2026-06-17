@@ -14,6 +14,10 @@ import { sendQuoteInquiry } from "@/lib/inquiry.functions";
 import { fetchShopifyProducts, type ShopifyProduct } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
 import { useCartSync } from "@/hooks/useCartSync";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { Link } from "@tanstack/react-router";
+import { LogIn, LogOut, User as UserIcon } from "lucide-react";
 
 import heroMill from "@/assets/hero-mill.jpg";
 import paddyField from "@/assets/paddy-field.jpg";
@@ -117,6 +121,12 @@ function Index() {
   // Sync Shopify cart on load + tab focus (clears after checkout)
   useCartSync();
 
+  const { user } = useAuth();
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    toast.success("Signed out");
+  };
+
   const items = useCartStore((s) => s.items);
   const isLoading = useCartStore((s) => s.isLoading);
   const isSyncing = useCartStore((s) => s.isSyncing);
@@ -214,6 +224,20 @@ function Index() {
                 <span className="absolute -top-1.5 -right-1.5 bg-gold text-primary text-[10px] font-bold rounded-full min-w-[18px] h-[18px] grid place-items-center px-1">{cartCount}</span>
               )}
             </button>
+            {user ? (
+              <div className="flex items-center gap-2">
+                <span className="hidden lg:inline-flex items-center gap-1.5 text-sm text-foreground/80 px-2">
+                  <UserIcon className="w-4 h-4" /> {user.email}
+                </span>
+                <button onClick={handleSignOut} className="inline-flex items-center gap-1.5 border border-border bg-card px-3 py-2 rounded-md text-sm font-medium hover:border-primary transition" title="Sign out">
+                  <LogOut className="w-4 h-4" /> Sign out
+                </button>
+              </div>
+            ) : (
+              <Link to="/auth" className="inline-flex items-center gap-1.5 border border-border bg-card px-4 py-2 rounded-md text-sm font-semibold hover:border-primary hover:text-primary transition">
+                <LogIn className="w-4 h-4" /> Login
+              </Link>
+            )}
             <a href="#contact" className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-md text-sm font-semibold hover:opacity-90 transition">
               Get a Quote <ArrowRight className="w-4 h-4" />
             </a>
