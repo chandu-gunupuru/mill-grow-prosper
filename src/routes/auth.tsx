@@ -69,6 +69,10 @@ function AuthPage() {
   return (
     <div className="min-h-screen grid place-items-center bg-background px-6 py-12">
       <div className="w-full max-w-md bg-card border border-border rounded-xl p-8 shadow-lg">
+        <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition mb-4">
+          <ArrowLeft className="w-4 h-4" />
+          Back to website
+        </Link>
         <Link to="/" className="flex items-center gap-2 mb-6">
           <div className="w-9 h-9 rounded-md bg-gradient-gold grid place-items-center">
             <Leaf className="w-5 h-5 text-primary" />
