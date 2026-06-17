@@ -24,18 +24,23 @@ export function ScrollArrows() {
     window.scrollTo({ top: docHeight, behavior: "smooth" });
   };
 
+  const btnBase =
+    "w-[52px] h-[52px] rounded-full grid place-items-center transition-all duration-200 " +
+    "bg-card border-2 border-primary/40 text-primary shadow-premium " +
+    "hover:bg-primary hover:border-primary hover:text-primary-foreground hover:shadow-gold hover:scale-110 hover:-translate-y-0.5";
+
   return (
-    <div className="fixed right-5 bottom-10 z-[60] flex flex-col gap-3">
+    <div className="fixed right-6 bottom-10 z-[60] flex flex-col gap-3">
       <AnimatePresence>
         {showTop && (
           <motion.button
-            initial={{ opacity: 0, scale: 0.5, y: 10 }}
+            initial={{ opacity: 0, scale: 0.6, y: 14 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.5, y: 10 }}
-            transition={{ duration: 0.25 }}
+            exit={{ opacity: 0, scale: 0.6, y: 14 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
             onClick={scrollToTop}
             aria-label="Scroll to top"
-            className="w-12 h-12 rounded-full bg-card/95 backdrop-blur-md border-2 border-border text-foreground shadow-premium grid place-items-center hover:border-primary hover:text-primary hover:scale-110 transition-all"
+            className={btnBase}
           >
             <ArrowUp className="w-5 h-5" strokeWidth={2.5} />
           </motion.button>
@@ -44,13 +49,13 @@ export function ScrollArrows() {
       <AnimatePresence>
         {showBottom && (
           <motion.button
-            initial={{ opacity: 0, scale: 0.5, y: -10 }}
+            initial={{ opacity: 0, scale: 0.6, y: -14 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.5, y: -10 }}
-            transition={{ duration: 0.25 }}
+            exit={{ opacity: 0, scale: 0.6, y: -14 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
             onClick={scrollToBottom}
             aria-label="Scroll to bottom"
-            className="w-12 h-12 rounded-full bg-card/95 backdrop-blur-md border-2 border-border text-foreground shadow-premium grid place-items-center hover:border-gold hover:text-primary hover:scale-110 transition-all"
+            className={btnBase}
           >
             <ArrowDown className="w-5 h-5" strokeWidth={2.5} />
           </motion.button>
@@ -59,4 +64,5 @@ export function ScrollArrows() {
     </div>
   );
 }
+
 
