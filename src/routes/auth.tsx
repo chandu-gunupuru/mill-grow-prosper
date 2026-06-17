@@ -335,7 +335,44 @@ function AuthPage() {
           </>
         )}
 
-        {method === "email" ? (
+        {mode === "forgot" ? (
+          <form onSubmit={handleForgotPassword} className="space-y-3">
+            {forgotSent ? (
+              <div className="text-center space-y-3 py-4">
+                <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto" />
+                <p className="text-sm text-muted-foreground">
+                  If an account exists for <span className="font-medium text-foreground">{forgotEmail}</span>, we've sent a password reset link.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => { setMode("signin"); setForgotSent(false); setForgotEmail(""); }}
+                  className="text-primary font-medium hover:underline text-sm"
+                >
+                  Back to sign in
+                </button>
+              </div>
+            ) : (
+              <>
+                <input
+                  type="email"
+                  required
+                  placeholder="Email"
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-md bg-secondary border border-border focus:border-primary outline-none text-sm"
+                />
+                <button
+                  type="submit"
+                  disabled={busy}
+                  className="w-full inline-flex items-center justify-center gap-2 bg-sky-400 text-white py-2.5 rounded-md text-sm font-semibold hover:bg-sky-500 transition disabled:opacity-50"
+                >
+                  {busy && <Loader2 className="w-4 h-4 animate-spin" />}
+                  Send reset link
+                </button>
+              </>
+            )}
+          </form>
+        ) : method === "email" ? (
           <form onSubmit={handleEmail} className="space-y-3">
             {mode === "signup" && (
               <input
@@ -363,6 +400,17 @@ function AuthPage() {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-2.5 rounded-md bg-secondary border border-border focus:border-primary outline-none text-sm"
             />
+            {mode === "signin" && (
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setMode("forgot")}
+                  className="text-xs text-primary font-medium hover:underline"
+                >
+                  Forgot password?
+                </button>
+              </div>
+            )}
             <button
               type="submit"
               disabled={busy}
