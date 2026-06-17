@@ -542,16 +542,30 @@ function AuthPage() {
           </form>
         )}
 
-        <p className="text-sm text-center text-muted-foreground mt-5">
-          {mode === "signin" ? "New here?" : "Already have an account?"}{" "}
-          <button
-            type="button"
-            onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-            className="text-primary font-medium hover:underline"
-          >
-            {mode === "signin" ? "Create an account" : "Sign in"}
-          </button>
-        </p>
+        {mode !== "forgot" && (
+          <p className="text-sm text-center text-muted-foreground mt-5">
+            {mode === "signin" ? "New here?" : "Already have an account?"}{" "}
+            <button
+              type="button"
+              onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+              className="text-primary font-medium hover:underline"
+            >
+              {mode === "signin" ? "Create an account" : "Sign in"}
+            </button>
+          </p>
+        )}
+        {mode === "forgot" && !forgotSent && (
+          <p className="text-sm text-center text-muted-foreground mt-5">
+            Remember your password?{" "}
+            <button
+              type="button"
+              onClick={() => setMode("signin")}
+              className="text-primary font-medium hover:underline"
+            >
+              Sign in
+            </button>
+          </p>
+        )}
       </div>
     </div>
   );
