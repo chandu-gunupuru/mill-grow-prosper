@@ -14,7 +14,9 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode, setMode] = useState<"signin" | "signup" | "forgot">("signin");
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotSent, setForgotSent] = useState(false);
   const [method, setMethod] = useState<"email" | "phone">("email");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -81,6 +83,23 @@ function AuthPage() {
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Authentication failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      setForgotSent(true);
+      toast.success("Reset link sent! Check your email.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to send reset link");
     } finally {
       setBusy(false);
     }
