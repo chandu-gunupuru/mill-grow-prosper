@@ -69,30 +69,56 @@ function AuthPage() {
     if (result.redirected) return;
     navigate({ to: "/" });
   };
+  const friendlyPhoneError = (raw: string, stage: "send" | "verify") => {
+    const m = raw.toLowerCase();
+    if (m.includes("invalid") && m.includes("phone")) return "That phone number looks invalid. Include the country code, e.g. +911234567890.";
+    if (m.includes("rate") || m.includes("too many")) return "Too many attempts. Please wait a minute before trying again.";
+    if (m.includes("sms") || m.includes("provider") || m.includes("not enabled") || m.includes("unsupported")) return "SMS sign-in isn't available right now. Please use email instead.";
+    if (stage === "verify" && (m.includes("token") || m.includes("expired") || m.includes("otp"))) return "That code is incorrect or has expired. Request a new one or use email.";
+    return stage === "send" ? "Couldn't send the OTP. Please try again or use email." : "Couldn't verify the code. Please try again or use email.";
+  };
+
+  const switchToEmail = () => {
+    setMethod("email");
+    setOtpSent(false);
+    setOtp("");
+    toast.message("Switched to email sign-in", { description: "Enter your email and password to continue." });
+  };
+
   const handlePhone = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!otpSent && !/^\+[1-9]\d{6,14}$/.test(phone.trim())) {
+      toast.error("Enter your phone in international format, e.g. +911234567890");
+      return;
+    }
     setBusy(true);
     try {
       if (!otpSent) {
         const { error } = await supabase.auth.signInWithOtp({
-          phone,
+          phone: phone.trim(),
           options: mode === "signup" ? { data: { full_name: fullName } } : undefined,
         });
         if (error) throw error;
         setOtpSent(true);
-        toast.success("OTP sent to your phone");
+        toast.success("OTP sent", { description: "Check your messages. It can take up to a minute." });
       } else {
-        const { error } = await supabase.auth.verifyOtp({ phone, token: otp, type: "sms" });
+        const { error } = await supabase.auth.verifyOtp({ phone: phone.trim(), token: otp.trim(), type: "sms" });
         if (error) throw error;
         toast.success("Welcome!");
         navigate({ to: "/" });
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Phone sign-in failed");
+      const stage: "send" | "verify" = otpSent ? "verify" : "send";
+      const msg = friendlyPhoneError(err instanceof Error ? err.message : "", stage);
+      toast.error(msg, {
+        action: { label: "Use email", onClick: switchToEmail },
+      });
     } finally {
       setBusy(false);
     }
   };
+
+
 
 
   return (
@@ -230,13 +256,28 @@ function AuthPage() {
               {otpSent ? "Verify OTP" : "Send OTP"}
             </button>
             {otpSent && (
-              <button
-                type="button"
-                onClick={() => { setOtpSent(false); setOtp(""); }}
-                className="w-full text-xs text-muted-foreground hover:text-primary"
-              >
-                Use a different phone number
-              </button>
+              <div className="space-y-1.5 pt-1">
+                <p className="text-xs text-muted-foreground text-center">
+                  Didn't get the code? It can take up to a minute.
+                </p>
+                <div className="flex items-center justify-center gap-3 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => { setOtpSent(false); setOtp(""); }}
+                    className="text-muted-foreground hover:text-primary"
+                  >
+                    Change number / resend
+                  </button>
+                  <span className="text-border">•</span>
+                  <button
+                    type="button"
+                    onClick={switchToEmail}
+                    className="text-primary font-medium hover:underline"
+                  >
+                    Use email instead
+                  </button>
+                </div>
+              </div>
             )}
           </form>
         )}
