@@ -136,6 +136,9 @@ function AuthPage() {
     setOtp("");
     setSmsStatus("idle");
     setSmsStatusMessage("");
+    setSendAttempts(0);
+    setVerifyAttempts(0);
+    setResendIn(0);
     toast.message("Switched to email sign-in", { description: "Enter your email and password to continue." });
   };
 
