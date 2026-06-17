@@ -430,17 +430,32 @@ function AuthPage() {
               <div className="space-y-1.5 pt-1">
                 <p className="text-xs text-muted-foreground text-center">
                   {resendIn > 0
-                    ? `You can request a new code in ${resendIn}s.`
-                    : "Didn't get the code? Resend or change your number."}
+                    ? `You can request a new code in ${resendIn}s${sendAttempts >= MAX_SENDS ? " — resend limit reached" : ""}.`
+                    : sendAttempts >= MAX_SENDS
+                    ? "Resend limit reached. Please use email instead."
+                    : `Didn't get the code? You have ${MAX_SENDS - sendAttempts} resend${MAX_SENDS - sendAttempts === 1 ? "" : "s"} left.`}
                 </p>
+                {verifyAttempts > 0 && (
+                  <p className="text-xs text-muted-foreground text-center">
+                    Verification attempts: {verifyAttempts} / {MAX_VERIFY}
+                  </p>
+                )}
                 <div className="flex items-center justify-center gap-3 text-xs">
                   <button
                     type="button"
-                    disabled={resendIn > 0}
-                    onClick={() => { setOtpSent(false); setOtp(""); setSmsStatus("idle"); setSmsStatusMessage(""); }}
-                    className="text-muted-foreground hover:text-primary disabled:opacity-40"
+                    disabled={busy || resendIn > 0 || sendAttempts >= MAX_SENDS}
+                    onClick={() => sendOtp(true)}
+                    className="text-primary font-medium hover:underline disabled:opacity-40 disabled:no-underline"
                   >
-                    Change number / resend
+                    {resendIn > 0 ? `Resend in ${resendIn}s` : "Resend code"}
+                  </button>
+                  <span className="text-border">•</span>
+                  <button
+                    type="button"
+                    onClick={handleChangeNumber}
+                    className="text-muted-foreground hover:text-primary"
+                  >
+                    Change number
                   </button>
                   <span className="text-border">•</span>
                   <button
@@ -448,7 +463,7 @@ function AuthPage() {
                     onClick={switchToEmail}
                     className="text-primary font-medium hover:underline"
                   >
-                    Use email instead
+                    Use email
                   </button>
                 </div>
               </div>
