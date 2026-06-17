@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Loader2, Leaf, ArrowLeft, Mail, Phone } from "lucide-react";
+import { Loader2, Leaf, ArrowLeft, Mail, Phone, CheckCircle2, AlertTriangle, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/useAuth";
@@ -23,10 +23,30 @@ function AuthPage() {
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [smsStatus, setSmsStatus] = useState<"idle" | "sending" | "sent" | "delayed" | "failed">("idle");
+  const [smsStatusMessage, setSmsStatusMessage] = useState<string>("");
+  const [resendIn, setResendIn] = useState(0);
 
   useEffect(() => {
     if (user) navigate({ to: "/" });
   }, [user, navigate]);
+
+  // Countdown for resend + delayed-delivery detection
+  useEffect(() => {
+    if (smsStatus !== "sent" || resendIn <= 0) return;
+    const t = setInterval(() => {
+      setResendIn((s) => {
+        if (s <= 1) {
+          clearInterval(t);
+          setSmsStatus((cur) => (cur === "sent" ? "delayed" : cur));
+          return 0;
+        }
+        return s - 1;
+      });
+    }, 1000);
+    return () => clearInterval(t);
+  }, [smsStatus, resendIn]);
+
 
   const handleEmail = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,19 +89,43 @@ function AuthPage() {
     if (result.redirected) return;
     navigate({ to: "/" });
   };
-  const friendlyPhoneError = (raw: string, stage: "send" | "verify") => {
+  const classifyPhoneError = (raw: string, stage: "send" | "verify") => {
     const m = raw.toLowerCase();
-    if (m.includes("invalid") && m.includes("phone")) return "That phone number looks invalid. Include the country code, e.g. +911234567890.";
-    if (m.includes("rate") || m.includes("too many")) return "Too many attempts. Please wait a minute before trying again.";
-    if (m.includes("sms") || m.includes("provider") || m.includes("not enabled") || m.includes("unsupported")) return "SMS sign-in isn't available right now. Please use email instead.";
-    if (stage === "verify" && (m.includes("token") || m.includes("expired") || m.includes("otp"))) return "That code is incorrect or has expired. Request a new one or use email.";
-    return stage === "send" ? "Couldn't send the OTP. Please try again or use email." : "Couldn't verify the code. Please try again or use email.";
+    // delivery / provider failures from the SMS gateway
+    const providerCodes = ["30003", "30004", "30005", "30006", "30007", "30008", "21610", "21614"];
+    const providerHit = providerCodes.some((c) => m.includes(c));
+    if (
+      providerHit ||
+      m.includes("undelivered") ||
+      m.includes("delivery failed") ||
+      m.includes("failed to deliver") ||
+      m.includes("carrier") ||
+      m.includes("landline") ||
+      m.includes("unreachable")
+    ) {
+      return { kind: "delivery_failed" as const, message: "Your carrier rejected the SMS (number unreachable, landline, or blocked). Please try a different number or use email." };
+    }
+    if (m.includes("sms") || m.includes("provider") || m.includes("not enabled") || m.includes("unsupported") || m.includes("twilio") || m.includes("messagebird")) {
+      return { kind: "provider_down" as const, message: "Our SMS provider is unavailable right now. Please use email to sign in." };
+    }
+    if (m.includes("invalid") && m.includes("phone")) {
+      return { kind: "invalid_phone" as const, message: "That phone number looks invalid. Include the country code, e.g. +911234567890." };
+    }
+    if (m.includes("rate") || m.includes("too many")) {
+      return { kind: "rate_limited" as const, message: "Too many attempts. Please wait a minute before trying again." };
+    }
+    if (stage === "verify" && (m.includes("token") || m.includes("expired") || m.includes("otp"))) {
+      return { kind: "bad_code" as const, message: "That code is incorrect or has expired. Request a new one or use email." };
+    }
+    return { kind: "unknown" as const, message: stage === "send" ? "Couldn't send the OTP. Please try again or use email." : "Couldn't verify the code. Please try again or use email." };
   };
 
   const switchToEmail = () => {
     setMethod("email");
     setOtpSent(false);
     setOtp("");
+    setSmsStatus("idle");
+    setSmsStatusMessage("");
     toast.message("Switched to email sign-in", { description: "Enter your email and password to continue." });
   };
 
@@ -92,6 +136,10 @@ function AuthPage() {
       return;
     }
     setBusy(true);
+    if (!otpSent) {
+      setSmsStatus("sending");
+      setSmsStatusMessage("Asking the SMS provider to send your code…");
+    }
     try {
       if (!otpSent) {
         const { error } = await supabase.auth.signInWithOtp({
@@ -100,7 +148,10 @@ function AuthPage() {
         });
         if (error) throw error;
         setOtpSent(true);
-        toast.success("OTP sent", { description: "Check your messages. It can take up to a minute." });
+        setSmsStatus("sent");
+        setSmsStatusMessage(`Code sent to ${phone.trim()}. It usually arrives in under 30 seconds.`);
+        setResendIn(45);
+        toast.success("OTP sent", { description: "Check your messages." });
       } else {
         const { error } = await supabase.auth.verifyOtp({ phone: phone.trim(), token: otp.trim(), type: "sms" });
         if (error) throw error;
@@ -109,14 +160,19 @@ function AuthPage() {
       }
     } catch (err) {
       const stage: "send" | "verify" = otpSent ? "verify" : "send";
-      const msg = friendlyPhoneError(err instanceof Error ? err.message : "", stage);
-      toast.error(msg, {
-        action: { label: "Use email", onClick: switchToEmail },
-      });
+      const info = classifyPhoneError(err instanceof Error ? err.message : "", stage);
+      if (stage === "send") {
+        setSmsStatus("failed");
+        setSmsStatusMessage(info.message);
+      }
+      const offerEmail = info.kind !== "bad_code";
+      toast.error(info.message, offerEmail ? { action: { label: "Use email", onClick: switchToEmail } } : undefined);
     } finally {
       setBusy(false);
     }
   };
+
+
 
 
 
@@ -236,6 +292,44 @@ function AuthPage() {
               onChange={(e) => setPhone(e.target.value)}
               className="w-full px-4 py-2.5 rounded-md bg-secondary border border-border focus:border-primary outline-none text-sm disabled:opacity-60"
             />
+            {otpSent && smsStatus !== "idle" && (
+              <div
+                role="status"
+                aria-live="polite"
+                className={`flex items-start gap-2 text-xs rounded-md px-3 py-2 border ${
+                  smsStatus === "failed"
+                    ? "bg-destructive/10 border-destructive/30 text-destructive"
+                    : smsStatus === "delayed"
+                    ? "bg-amber-50 border-amber-200 text-amber-900 dark:bg-amber-950/40 dark:border-amber-900/40 dark:text-amber-200"
+                    : smsStatus === "sent"
+                    ? "bg-emerald-50 border-emerald-200 text-emerald-900 dark:bg-emerald-950/40 dark:border-emerald-900/40 dark:text-emerald-200"
+                    : "bg-secondary border-border text-muted-foreground"
+                }`}
+              >
+                {smsStatus === "sending" && <Loader2 className="w-3.5 h-3.5 mt-0.5 animate-spin shrink-0" />}
+                {smsStatus === "sent" && <CheckCircle2 className="w-3.5 h-3.5 mt-0.5 shrink-0" />}
+                {smsStatus === "delayed" && <Clock className="w-3.5 h-3.5 mt-0.5 shrink-0" />}
+                {smsStatus === "failed" && <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0" />}
+                <div className="flex-1">
+                  <p className="font-medium">
+                    {smsStatus === "sending" && "Sending…"}
+                    {smsStatus === "sent" && `SMS dispatched${resendIn > 0 ? ` · arriving in ~${resendIn}s` : ""}`}
+                    {smsStatus === "delayed" && "Still no SMS?"}
+                    {smsStatus === "failed" && "SMS delivery failed"}
+                  </p>
+                  {smsStatusMessage && <p className="opacity-90 mt-0.5">{smsStatusMessage}</p>}
+                  {(smsStatus === "delayed" || smsStatus === "failed") && (
+                    <button
+                      type="button"
+                      onClick={switchToEmail}
+                      className="mt-1 font-semibold underline underline-offset-2"
+                    >
+                      Sign in with email instead →
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
             {otpSent && (
               <input
                 type="text"
@@ -258,13 +352,16 @@ function AuthPage() {
             {otpSent && (
               <div className="space-y-1.5 pt-1">
                 <p className="text-xs text-muted-foreground text-center">
-                  Didn't get the code? It can take up to a minute.
+                  {resendIn > 0
+                    ? `You can request a new code in ${resendIn}s.`
+                    : "Didn't get the code? Resend or change your number."}
                 </p>
                 <div className="flex items-center justify-center gap-3 text-xs">
                   <button
                     type="button"
-                    onClick={() => { setOtpSent(false); setOtp(""); }}
-                    className="text-muted-foreground hover:text-primary"
+                    disabled={resendIn > 0}
+                    onClick={() => { setOtpSent(false); setOtp(""); setSmsStatus("idle"); setSmsStatusMessage(""); }}
+                    className="text-muted-foreground hover:text-primary disabled:opacity-40"
                   >
                     Change number / resend
                   </button>
