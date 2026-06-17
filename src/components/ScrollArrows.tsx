@@ -25,44 +25,42 @@ export function ScrollArrows() {
   };
 
   const btnBase =
-    "w-[52px] h-[52px] rounded-full grid place-items-center transition-all duration-200 " +
-    "bg-card border-2 border-primary/40 text-primary shadow-premium " +
-    "hover:bg-primary hover:border-primary hover:text-primary-foreground hover:shadow-gold hover:scale-110 hover:-translate-y-0.5";
+    "w-14 h-14 rounded-full grid place-items-center transition-all duration-200 " +
+    "bg-gold border-[3px] border-primary text-primary shadow-gold " +
+    "hover:bg-primary hover:border-gold hover:text-primary-foreground hover:shadow-premium hover:scale-110";
 
   return (
-    <div className="fixed right-6 bottom-10 z-[60] flex flex-col gap-3">
+    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[60] flex items-center gap-3">
       <AnimatePresence>
         {showTop && (
           <motion.button
-            initial={{ opacity: 0, scale: 0.6, y: 14 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.6, y: 14 }}
+            initial={{ opacity: 0, scale: 0.6, x: 20 }}
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            exit={{ opacity: 0, scale: 0.6, x: 20 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
             onClick={scrollToTop}
             aria-label="Scroll to top"
             className={btnBase}
           >
-            <ArrowUp className="w-5 h-5" strokeWidth={2.5} />
+            <ArrowUp className="w-6 h-6" strokeWidth={2.5} />
           </motion.button>
         )}
       </AnimatePresence>
       <AnimatePresence>
         {showBottom && (
           <motion.button
-            initial={{ opacity: 0, scale: 0.6, y: -14 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.6, y: -14 }}
+            initial={{ opacity: 0, scale: 0.6, x: -20 }}
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            exit={{ opacity: 0, scale: 0.6, x: -20 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
             onClick={scrollToBottom}
             aria-label="Scroll to bottom"
             className={btnBase}
           >
-            <ArrowDown className="w-5 h-5" strokeWidth={2.5} />
+            <ArrowDown className="w-6 h-6" strokeWidth={2.5} />
           </motion.button>
         )}
       </AnimatePresence>
     </div>
   );
 }
-
-
