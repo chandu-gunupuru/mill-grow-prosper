@@ -31,7 +31,7 @@ export function ScrollArrows() {
     "hover:bg-[#b91c1c] hover:scale-110 hover:shadow-[0_12px_32px_-4px_rgba(220,38,38,0.75)]";
 
   return (
-    <div className="fixed right-6 bottom-8 z-[60] flex flex-col items-center gap-3">
+    <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[60] flex items-center gap-3">
       <AnimatePresence>
         {showTop && (
           <motion.button
