@@ -26,14 +26,22 @@ function AuthPage() {
   const [smsStatus, setSmsStatus] = useState<"idle" | "sending" | "sent" | "delayed" | "failed">("idle");
   const [smsStatusMessage, setSmsStatusMessage] = useState<string>("");
   const [resendIn, setResendIn] = useState(0);
+  const [sendAttempts, setSendAttempts] = useState(0);
+  const [verifyAttempts, setVerifyAttempts] = useState(0);
+  const [lastSentAt, setLastSentAt] = useState<number | null>(null);
+
+  const MAX_SENDS = 4;
+  const MAX_VERIFY = 5;
+  // Exponential-ish backoff per resend attempt (seconds): 1st send -> 30s, 2nd -> 60s, 3rd -> 120s, 4th -> 180s
+  const cooldownFor = (attemptCount: number) => [30, 60, 120, 180][Math.min(attemptCount - 1, 3)] ?? 180;
 
   useEffect(() => {
     if (user) navigate({ to: "/" });
   }, [user, navigate]);
 
-  // Countdown for resend + delayed-delivery detection
+  // Tick the cooldown every second; flip to "delayed" only once the cooldown expires
   useEffect(() => {
-    if (smsStatus !== "sent" || resendIn <= 0) return;
+    if (resendIn <= 0) return;
     const t = setInterval(() => {
       setResendIn((s) => {
         if (s <= 1) {
@@ -45,7 +53,9 @@ function AuthPage() {
       });
     }, 1000);
     return () => clearInterval(t);
-  }, [smsStatus, resendIn]);
+  }, [resendIn]);
+
+
 
 
   const handleEmail = async (e: React.FormEvent) => {
