@@ -292,6 +292,44 @@ function AuthPage() {
               onChange={(e) => setPhone(e.target.value)}
               className="w-full px-4 py-2.5 rounded-md bg-secondary border border-border focus:border-primary outline-none text-sm disabled:opacity-60"
             />
+            {otpSent && smsStatus !== "idle" && (
+              <div
+                role="status"
+                aria-live="polite"
+                className={`flex items-start gap-2 text-xs rounded-md px-3 py-2 border ${
+                  smsStatus === "failed"
+                    ? "bg-destructive/10 border-destructive/30 text-destructive"
+                    : smsStatus === "delayed"
+                    ? "bg-amber-50 border-amber-200 text-amber-900 dark:bg-amber-950/40 dark:border-amber-900/40 dark:text-amber-200"
+                    : smsStatus === "sent"
+                    ? "bg-emerald-50 border-emerald-200 text-emerald-900 dark:bg-emerald-950/40 dark:border-emerald-900/40 dark:text-emerald-200"
+                    : "bg-secondary border-border text-muted-foreground"
+                }`}
+              >
+                {smsStatus === "sending" && <Loader2 className="w-3.5 h-3.5 mt-0.5 animate-spin shrink-0" />}
+                {smsStatus === "sent" && <CheckCircle2 className="w-3.5 h-3.5 mt-0.5 shrink-0" />}
+                {smsStatus === "delayed" && <Clock className="w-3.5 h-3.5 mt-0.5 shrink-0" />}
+                {smsStatus === "failed" && <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0" />}
+                <div className="flex-1">
+                  <p className="font-medium">
+                    {smsStatus === "sending" && "Sending…"}
+                    {smsStatus === "sent" && `SMS dispatched${resendIn > 0 ? ` · arriving in ~${resendIn}s` : ""}`}
+                    {smsStatus === "delayed" && "Still no SMS?"}
+                    {smsStatus === "failed" && "SMS delivery failed"}
+                  </p>
+                  {smsStatusMessage && <p className="opacity-90 mt-0.5">{smsStatusMessage}</p>}
+                  {(smsStatus === "delayed" || smsStatus === "failed") && (
+                    <button
+                      type="button"
+                      onClick={switchToEmail}
+                      className="mt-1 font-semibold underline underline-offset-2"
+                    >
+                      Sign in with email instead →
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
             {otpSent && (
               <input
                 type="text"
@@ -314,13 +352,16 @@ function AuthPage() {
             {otpSent && (
               <div className="space-y-1.5 pt-1">
                 <p className="text-xs text-muted-foreground text-center">
-                  Didn't get the code? It can take up to a minute.
+                  {resendIn > 0
+                    ? `You can request a new code in ${resendIn}s.`
+                    : "Didn't get the code? Resend or change your number."}
                 </p>
                 <div className="flex items-center justify-center gap-3 text-xs">
                   <button
                     type="button"
-                    onClick={() => { setOtpSent(false); setOtp(""); }}
-                    className="text-muted-foreground hover:text-primary"
+                    disabled={resendIn > 0}
+                    onClick={() => { setOtpSent(false); setOtp(""); setSmsStatus("idle"); setSmsStatusMessage(""); }}
+                    className="text-muted-foreground hover:text-primary disabled:opacity-40"
                   >
                     Change number / resend
                   </button>
