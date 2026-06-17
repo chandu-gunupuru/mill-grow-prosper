@@ -287,10 +287,10 @@ function AuthPage() {
           <span className="font-display font-bold text-primary">Gayathri</span>
         </Link>
         <h1 className="text-2xl font-display font-bold mb-1">
-          {mode === "signin" ? "Sign in" : "Create your account"}
+          {mode === "signin" ? "Sign in" : mode === "signup" ? "Create your account" : "Reset your password"}
         </h1>
         <p className="text-sm text-muted-foreground mb-6">
-          {mode === "signin" ? "Welcome back. Sign in to continue." : "Join to place wholesale orders."}
+          {mode === "signin" ? "Welcome back. Sign in to continue." : mode === "signup" ? "Join to place wholesale orders." : "Enter your email and we'll send you a reset link."}
         </p>
 
         <button
