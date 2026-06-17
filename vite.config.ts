@@ -18,8 +18,8 @@ export default defineConfig({
   tanstackStart: {
     server: { entry: "server" },
   },
+  plugins: [imagetools()],
   vite: {
-    plugins: [imagetools()],
     resolve: {
       alias: {
         "entities/lib/decode.js": path.resolve(__dirname, "node_modules/entities/lib/decode.js"),
@@ -29,4 +29,5 @@ export default defineConfig({
     },
   },
 });
+
 
