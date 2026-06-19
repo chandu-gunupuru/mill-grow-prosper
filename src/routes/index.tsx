@@ -17,7 +17,8 @@ import { useCartSync } from "@/hooks/useCartSync";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "@tanstack/react-router";
-import { LogIn, LogOut, User as UserIcon, Settings, LayoutDashboard } from "lucide-react";
+import { LogIn, LogOut, User as UserIcon, Settings, LayoutDashboard, ChevronRight } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { openShopifyCheckout, getOpenInSameTab, setOpenInSameTab } from "@/lib/checkout";
 import { getStoreStatus } from "@/lib/store-status.functions";
 import { logProductClick } from "@/lib/analytics";
@@ -120,6 +121,7 @@ function Index() {
   const [navOpen, setNavOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
   const [form, setForm] = useState({ name: "", company: "", email: "", phone: "", product: "Sona Masoori Rice", qty: "", message: "" });
   const [sending, setSending] = useState(false);
   const sendInquiry = useServerFn(sendQuoteInquiry);
@@ -305,41 +307,76 @@ function Index() {
           </nav>
           <div className="hidden md:flex items-center gap-2">
             {user && (
-              <>
-                <button
-                  onClick={() => setProfileOpen(true)}
-                  className="flex items-center gap-1.5 px-2 py-1.5 rounded-md text-sm font-semibold text-primary hover:bg-primary/5 transition-colors"
-                  title="Profile"
-                >
-                  {user.user_metadata?.avatar_url ? (
-                    <img src={user.user_metadata.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover border border-primary/20" />
-                  ) : (
-                    <UserIcon className="w-4 h-4" />
-                  )}
-                  <span className="max-w-[100px] truncate">{user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0]}</span>
-                </button>
-                <Link
-                  to="/admin/orders"
-                  className="w-9 h-9 rounded-md border border-border bg-card grid place-items-center hover:border-primary hover:text-primary transition"
-                  title="Admin"
-                >
-                  <LayoutDashboard className="w-4 h-4" />
-                </Link>
-                <Link
-                  to="/settings"
-                  className="w-9 h-9 rounded-md border border-border bg-card grid place-items-center hover:border-primary hover:text-primary transition"
-                  title="Settings"
-                >
-                  <Settings className="w-4 h-4" />
-                </Link>
-                <button
-                  onClick={handleSignOut}
-                  className="w-9 h-9 rounded-md border border-border bg-card grid place-items-center hover:border-primary hover:text-primary transition"
-                  title="Sign out"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </>
+              <Sheet open={accountOpen} onOpenChange={setAccountOpen}>
+                <SheetTrigger asChild>
+                  <button className="flex items-center gap-1.5 px-2 py-1.5 rounded-md text-sm font-semibold text-primary hover:bg-primary/5 transition-colors">
+                    {user.user_metadata?.avatar_url ? (
+                      <img src={user.user_metadata.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover border border-primary/20" />
+                    ) : (
+                      <UserIcon className="w-4 h-4" />
+                    )}
+                    <span className="max-w-[100px] truncate">{user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0]}</span>
+                  </button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-80 sm:max-w-sm">
+                  <SheetHeader>
+                    <SheetTitle className="flex items-center gap-3">
+                      {user.user_metadata?.avatar_url ? (
+                        <img src={user.user_metadata.avatar_url} alt="" className="w-10 h-10 rounded-full object-cover border border-primary/20" />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-primary/10 grid place-items-center">
+                          <UserIcon className="w-5 h-5 text-primary" />
+                        </div>
+                      )}
+                      <div className="text-left">
+                        <div className="text-base font-semibold">{user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0]}</div>
+                        <div className="text-xs text-muted-foreground font-normal">{user.email}</div>
+                      </div>
+                    </SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-8 flex flex-col gap-2">
+                    <button
+                      onClick={() => { setAccountOpen(false); setProfileOpen(true); }}
+                      className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors"
+                    >
+                      <span className="flex items-center gap-3">
+                        <UserIcon className="w-4 h-4 text-muted-foreground" /> Profile
+                      </span>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                    </button>
+                    <Link
+                      to="/admin/orders"
+                      onClick={() => setAccountOpen(false)}
+                      className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors"
+                    >
+                      <span className="flex items-center gap-3">
+                        <LayoutDashboard className="w-4 h-4 text-muted-foreground" /> Admin
+                      </span>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                    </Link>
+                    <Link
+                      to="/settings"
+                      onClick={() => setAccountOpen(false)}
+                      className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors"
+                    >
+                      <span className="flex items-center gap-3">
+                        <Settings className="w-4 h-4 text-muted-foreground" /> Settings
+                      </span>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                    </Link>
+                    <div className="my-2 h-px bg-border" />
+                    <button
+                      onClick={() => { setAccountOpen(false); handleSignOut(); }}
+                      className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium text-destructive hover:bg-destructive/5 transition-colors"
+                    >
+                      <span className="flex items-center gap-3">
+                        <LogOut className="w-4 h-4" /> Sign out
+                      </span>
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </SheetContent>
+              </Sheet>
             )}
             <button onClick={() => setCartOpen(true)} aria-label="Open cart" className="relative w-11 h-11 rounded-md border border-border bg-card grid place-items-center hover:border-primary hover:text-primary transition">
               <ShoppingCart className="w-5 h-5" />
