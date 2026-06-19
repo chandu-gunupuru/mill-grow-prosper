@@ -319,7 +319,12 @@ function Index() {
             {user ? (
               <div className="flex items-center gap-2">
                 <Link to="/admin/orders" className="hidden lg:inline-flex items-center gap-1.5 text-sm text-foreground/80 hover:text-primary px-2" title="Admin orders">
-                  Admin
+                  {user.user_metadata?.avatar_url ? (
+                    <img src={user.user_metadata.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover border border-border" />
+                  ) : (
+                    <UserIcon className="w-4 h-4" />
+                  )}
+                  {user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0]}
                 </Link>
                 <button onClick={handleSignOut} className="inline-flex items-center gap-1.5 border border-border bg-card px-3 py-2 rounded-md text-sm font-medium hover:border-primary transition" title="Sign out">
                   <LogOut className="w-4 h-4" /> Sign out
