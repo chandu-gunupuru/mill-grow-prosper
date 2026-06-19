@@ -121,6 +121,7 @@ function Index() {
   const [navOpen, setNavOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
   const [form, setForm] = useState({ name: "", company: "", email: "", phone: "", product: "Sona Masoori Rice", qty: "", message: "" });
   const [sending, setSending] = useState(false);
   const sendInquiry = useServerFn(sendQuoteInquiry);
