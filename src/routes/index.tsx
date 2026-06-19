@@ -19,6 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Link } from "@tanstack/react-router";
 import { LogIn, LogOut, User as UserIcon } from "lucide-react";
 import { openShopifyCheckout, getOpenInSameTab, setOpenInSameTab } from "@/lib/checkout";
+import { getStoreStatus } from "@/lib/store-status.functions";
 
 import heroMill from "@/assets/hero-mill.jpg?w=1600&format=webp&quality=72&imagetools";
 import paddyField from "@/assets/paddy-field.jpg?w=900&format=webp&quality=72&imagetools";
@@ -119,6 +120,12 @@ function Index() {
   const [form, setForm] = useState({ name: "", company: "", email: "", phone: "", product: "Sona Masoori Rice", qty: "", message: "" });
   const [sending, setSending] = useState(false);
   const sendInquiry = useServerFn(sendQuoteInquiry);
+  const fetchStoreStatus = useServerFn(getStoreStatus);
+  const { data: storeStatus } = useQuery({
+    queryKey: ["store-status"],
+    queryFn: () => fetchStoreStatus(),
+    staleTime: 5 * 60 * 1000,
+  });
 
   // Sync Shopify cart on load + tab focus (clears after checkout)
   useCartSync();
@@ -307,6 +314,40 @@ function Index() {
           </div>
         )}
       </header>
+
+      {/* STORE STATUS BANNER */}
+      {storeStatus && (
+        <div className="fixed top-16 inset-x-0 z-40">
+          <div
+            className={`px-4 py-2 text-sm font-medium flex items-center justify-center gap-2 border-b ${
+              storeStatus.paymentsEnabled
+                ? "bg-emerald-50 text-emerald-900 border-emerald-200"
+                : "bg-amber-50 text-amber-900 border-amber-200"
+            }`}
+            role="status"
+            aria-live="polite"
+          >
+            {storeStatus.paymentsEnabled ? (
+              <>
+                <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                <span>
+                  Store claimed{storeStatus.planName ? ` (${storeStatus.planName})` : ""} —
+                  payments are enabled. Checkout is live.
+                </span>
+              </>
+            ) : (
+              <>
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                <span>
+                  Demo mode: store is not yet claimed, so live payments are disabled.
+                  Browse freely — checkout will not charge any card.
+                </span>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
 
       {/* HERO */}
       <section id="top" className="relative min-h-screen flex items-center pt-16 overflow-hidden">
