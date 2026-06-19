@@ -17,14 +17,7 @@ import { useCartSync } from "@/hooks/useCartSync";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "@tanstack/react-router";
-import { LogIn, LogOut, User as UserIcon, Settings, ChevronDown } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { LogIn, LogOut, User as UserIcon, Settings, LayoutDashboard } from "lucide-react";
 import { openShopifyCheckout, getOpenInSameTab, setOpenInSameTab } from "@/lib/checkout";
 import { getStoreStatus } from "@/lib/store-status.functions";
 import { logProductClick } from "@/lib/analytics";
@@ -310,38 +303,43 @@ function Index() {
               <a key={i} href={`#${i.toLowerCase().replace(" ","-")}`} className="text-foreground/80 hover:text-primary transition-colors">{i}</a>
             ))}
           </nav>
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-2">
             {user && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-primary/80 transition-colors">
-                    {user.user_metadata?.avatar_url ? (
-                      <img src={user.user_metadata.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover border border-primary/20" />
-                    ) : (
-                      <UserIcon className="w-4 h-4" />
-                    )}
-                    {user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0]}
-                    <ChevronDown className="w-3 h-3" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => setProfileOpen(true)} className="cursor-pointer">
-                    <UserIcon className="w-4 h-4 mr-2" /> Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/admin/orders" className="cursor-pointer">Admin</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/settings" className="cursor-pointer">
-                      <Settings className="w-4 h-4 mr-2" /> Settings
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
-                    <LogOut className="w-4 h-4 mr-2" /> Sign out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <>
+                <button
+                  onClick={() => setProfileOpen(true)}
+                  className="flex items-center gap-1.5 px-2 py-1.5 rounded-md text-sm font-semibold text-primary hover:bg-primary/5 transition-colors"
+                  title="Profile"
+                >
+                  {user.user_metadata?.avatar_url ? (
+                    <img src={user.user_metadata.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover border border-primary/20" />
+                  ) : (
+                    <UserIcon className="w-4 h-4" />
+                  )}
+                  <span className="max-w-[100px] truncate">{user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0]}</span>
+                </button>
+                <Link
+                  to="/admin/orders"
+                  className="w-9 h-9 rounded-md border border-border bg-card grid place-items-center hover:border-primary hover:text-primary transition"
+                  title="Admin"
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                </Link>
+                <Link
+                  to="/settings"
+                  className="w-9 h-9 rounded-md border border-border bg-card grid place-items-center hover:border-primary hover:text-primary transition"
+                  title="Settings"
+                >
+                  <Settings className="w-4 h-4" />
+                </Link>
+                <button
+                  onClick={handleSignOut}
+                  className="w-9 h-9 rounded-md border border-border bg-card grid place-items-center hover:border-primary hover:text-primary transition"
+                  title="Sign out"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </>
             )}
             <button onClick={() => setCartOpen(true)} aria-label="Open cart" className="relative w-11 h-11 rounded-md border border-border bg-card grid place-items-center hover:border-primary hover:text-primary transition">
               <ShoppingCart className="w-5 h-5" />
