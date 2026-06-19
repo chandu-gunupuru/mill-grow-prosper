@@ -28,6 +28,7 @@ import {
 import { openShopifyCheckout, getOpenInSameTab, setOpenInSameTab } from "@/lib/checkout";
 import { getStoreStatus } from "@/lib/store-status.functions";
 import { logProductClick } from "@/lib/analytics";
+import { ProfileModal } from "@/components/ProfileModal";
 
 import heroMill from "@/assets/hero-mill.jpg?w=1600&format=webp&quality=72&imagetools";
 import paddyField from "@/assets/paddy-field.jpg?w=900&format=webp&quality=72&imagetools";
@@ -125,6 +126,7 @@ const gallery = [
 function Index() {
   const [navOpen, setNavOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [form, setForm] = useState({ name: "", company: "", email: "", phone: "", product: "Sona Masoori Rice", qty: "", message: "" });
   const [sending, setSending] = useState(false);
   const sendInquiry = useServerFn(sendQuoteInquiry);
@@ -288,6 +290,8 @@ function Index() {
   return (
     <div className="min-h-screen bg-background">
       <Toaster richColors position="top-center" />
+      {user && <ProfileModal open={profileOpen} onClose={() => setProfileOpen(false)} user={user} />}
+
 
       {/* NAV */}
       <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-md bg-background/80 border-b border-border">
@@ -321,11 +325,16 @@ function Index() {
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setProfileOpen(true)} className="cursor-pointer">
+                    <UserIcon className="w-4 h-4 mr-2" /> Profile
+                  </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/admin/orders" className="cursor-pointer">Admin</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/settings" className="cursor-pointer">Settings</Link>
+                    <Link to="/settings" className="cursor-pointer">
+                      <Settings className="w-4 h-4 mr-2" /> Settings
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
