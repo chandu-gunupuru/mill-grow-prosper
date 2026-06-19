@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "motion/react";
 import {
   Phone, Mail, MapPin, MessageCircle, Award, Truck, Sparkles, ShieldCheck,
-  Factory, Leaf, Package, CheckCircle2, Star, ArrowRight, Menu, X, Download,
+  Factory, Leaf, Package, CheckCircle2, Star, ArrowRight, ArrowLeft, Menu, X, Download,
   ShoppingCart, Plus, Minus, Trash2, Loader2, ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -170,11 +170,17 @@ function Index() {
     toast.success(`${product.node.title} added to cart`);
   }
 
-  function checkout() {
+  async function checkout() {
     const url = getCheckoutUrl();
-    if (!url) return;
-    window.open(url, "_blank");
+    if (!url) {
+      toast.error("Checkout link is missing. Please try adding the item again or contact us.");
+      return;
+    }
     setCartOpen(false);
+    const popup = window.open(url, "_blank");
+    if (!popup || popup.closed) {
+      window.location.href = url;
+    }
   }
 
 
@@ -680,7 +686,10 @@ function Index() {
               className="fixed top-0 right-0 bottom-0 z-[61] w-full sm:w-[420px] bg-background shadow-2xl flex flex-col"
             >
               <div className="flex items-center justify-between p-5 border-b border-border">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
+                  <button onClick={() => setCartOpen(false)} aria-label="Back" className="w-9 h-9 grid place-items-center rounded-md hover:bg-secondary">
+                    <ArrowLeft className="w-5 h-5" />
+                  </button>
                   <ShoppingCart className="w-5 h-5 text-primary" />
                   <h3 className="font-bold text-lg text-primary">Your Cart ({cartCount})</h3>
                 </div>
