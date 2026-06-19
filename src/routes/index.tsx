@@ -120,6 +120,12 @@ function Index() {
   const [form, setForm] = useState({ name: "", company: "", email: "", phone: "", product: "Sona Masoori Rice", qty: "", message: "" });
   const [sending, setSending] = useState(false);
   const sendInquiry = useServerFn(sendQuoteInquiry);
+  const fetchStoreStatus = useServerFn(getStoreStatus);
+  const { data: storeStatus } = useQuery({
+    queryKey: ["store-status"],
+    queryFn: () => fetchStoreStatus(),
+    staleTime: 5 * 60 * 1000,
+  });
 
   // Sync Shopify cart on load + tab focus (clears after checkout)
   useCartSync();
