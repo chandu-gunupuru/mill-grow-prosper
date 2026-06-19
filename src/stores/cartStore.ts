@@ -51,7 +51,7 @@ export const useCartStore = create<CartStore>()(
         const { items, cartId, clearCart } = get();
         const existingItem = items.find((i) => i.variantId === item.variantId);
 
-        set({ isLoading: true });
+        set({ isLoading: true, checkoutError: null });
         try {
           if (!cartId) {
             const result = await createShopifyCart(item.variantId, item.quantity);
@@ -60,6 +60,11 @@ export const useCartStore = create<CartStore>()(
                 cartId: result.cartId,
                 checkoutUrl: result.checkoutUrl,
                 items: [{ ...item, lineId: result.lineId }],
+              });
+            } else {
+              set({
+                checkoutError:
+                  "We couldn't reach the checkout right now. Please try again in a moment or contact us.",
               });
             }
           } else if (existingItem) {
@@ -87,6 +92,10 @@ export const useCartStore = create<CartStore>()(
           }
         } catch (error) {
           console.error("Failed to add item:", error);
+          set({
+            checkoutError:
+              "Something went wrong adding this item. Please check your connection and try again.",
+          });
         } finally {
           set({ isLoading: false });
         }
