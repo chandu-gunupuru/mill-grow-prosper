@@ -290,6 +290,8 @@ function Index() {
   return (
     <div className="min-h-screen bg-background">
       <Toaster richColors position="top-center" />
+      {user && <ProfileModal open={profileOpen} onClose={() => setProfileOpen(false)} user={user} />}
+
 
       {/* NAV */}
       <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-md bg-background/80 border-b border-border">
