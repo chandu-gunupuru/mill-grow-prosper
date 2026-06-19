@@ -10,7 +10,10 @@ function makeWindow(opts: { popupBlocked?: boolean; noDocument?: boolean } = {})
     ? undefined
     : ({
         body,
-        createElement: vi.fn(() => ({ click: vi.fn() } as unknown as HTMLAnchorElement)),
+        createElement: vi.fn(() => ({
+          click: vi.fn(),
+          style: {} as CSSStyleDeclaration,
+        } as unknown as HTMLAnchorElement)),
       } as unknown as Document);
 
   return { location, open, document, body } as unknown as Window;
