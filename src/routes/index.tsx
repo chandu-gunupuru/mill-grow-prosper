@@ -300,7 +300,11 @@ function Index() {
             ))}
             {user && (
               <span className="flex items-center gap-1.5 text-sm font-semibold text-primary">
-                <UserIcon className="w-4 h-4" />
+                {user.user_metadata?.avatar_url ? (
+                  <img src={user.user_metadata.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover border border-primary/20" />
+                ) : (
+                  <UserIcon className="w-4 h-4" />
+                )}
                 {user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0]}
               </span>
             )}
@@ -318,7 +322,12 @@ function Index() {
                   Admin
                 </Link>
                 <span className="hidden lg:inline-flex items-center gap-1.5 text-sm text-foreground/80 px-2">
-                  <UserIcon className="w-4 h-4" /> {user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0]}
+                  {user.user_metadata?.avatar_url ? (
+                    <img src={user.user_metadata.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover border border-border" />
+                  ) : (
+                    <UserIcon className="w-4 h-4" />
+                  )}
+                  {user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0]}
                 </span>
                 <button onClick={handleSignOut} className="inline-flex items-center gap-1.5 border border-border bg-card px-3 py-2 rounded-md text-sm font-medium hover:border-primary transition" title="Sign out">
                   <LogOut className="w-4 h-4" /> Sign out
