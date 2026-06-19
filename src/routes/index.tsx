@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "motion/react";
 import {
   Phone, Mail, MapPin, MessageCircle, Award, Truck, Sparkles, ShieldCheck,
-  Factory, Leaf, Package, CheckCircle2, Star, ArrowRight, Menu, X, Download,
+  Factory, Leaf, Package, CheckCircle2, Star, ArrowRight, ArrowLeft, Menu, X, Download,
   ShoppingCart, Plus, Minus, Trash2, Loader2, ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
