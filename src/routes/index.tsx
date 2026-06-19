@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "motion/react";
 import {
   Phone, Mail, MapPin, MessageCircle, Award, Truck, Sparkles, ShieldCheck,
   Factory, Leaf, Package, CheckCircle2, Star, ArrowRight, ArrowLeft, Menu, X, Download,
-  ShoppingCart, Plus, Minus, Trash2, Loader2, ExternalLink,
+  ShoppingCart, Plus, Minus, Trash2, Loader2, ExternalLink, AlertCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
@@ -18,6 +18,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "@tanstack/react-router";
 import { LogIn, LogOut, User as UserIcon } from "lucide-react";
+import { openShopifyCheckout, getOpenInSameTab, setOpenInSameTab } from "@/lib/checkout";
 
 import heroMill from "@/assets/hero-mill.jpg?w=1600&format=webp&quality=72&imagetools";
 import paddyField from "@/assets/paddy-field.jpg?w=900&format=webp&quality=72&imagetools";
