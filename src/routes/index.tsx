@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "motion/react";
@@ -122,6 +122,7 @@ function Index() {
   const [cartOpen, setCartOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
+  const touchStartX = useRef(0);
   const [form, setForm] = useState({ name: "", company: "", email: "", phone: "", product: "Sona Masoori Rice", qty: "", message: "" });
   const [sending, setSending] = useState(false);
   const sendInquiry = useServerFn(sendQuoteInquiry);
@@ -318,7 +319,17 @@ function Index() {
                     <span className="max-w-[100px] truncate">{user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0]}</span>
                   </button>
                 </SheetTrigger>
-                <SheetContent side="right" className="w-80 sm:max-w-sm">
+                <SheetContent
+                  side="right"
+                  className="w-80 sm:max-w-sm"
+                  onInteractOutside={() => setAccountOpen(false)}
+                  onEscapeKeyDown={() => setAccountOpen(false)}
+                  onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+                  onTouchEnd={(e) => {
+                    const diff = e.changedTouches[0].clientX - touchStartX.current;
+                    if (diff > 80) setAccountOpen(false);
+                  }}
+                >
                   <SheetHeader>
                     <SheetTitle className="flex items-center gap-3">
                       {user.user_metadata?.avatar_url ? (
@@ -334,47 +345,64 @@ function Index() {
                       </div>
                     </SheetTitle>
                   </SheetHeader>
-                  <div className="mt-8 flex flex-col gap-2">
-                    <button
-                      onClick={() => { setAccountOpen(false); setProfileOpen(true); }}
-                      className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors"
-                    >
-                      <span className="flex items-center gap-3">
-                        <UserIcon className="w-4 h-4 text-muted-foreground" /> Profile
-                      </span>
-                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                    </button>
-                    <Link
-                      to="/admin/orders"
-                      onClick={() => setAccountOpen(false)}
-                      className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors"
-                    >
-                      <span className="flex items-center gap-3">
-                        <LayoutDashboard className="w-4 h-4 text-muted-foreground" /> Admin
-                      </span>
-                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                    </Link>
-                    <Link
-                      to="/settings"
-                      onClick={() => setAccountOpen(false)}
-                      className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors"
-                    >
-                      <span className="flex items-center gap-3">
-                        <Settings className="w-4 h-4 text-muted-foreground" /> Settings
-                      </span>
-                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                    </Link>
-                    <div className="my-2 h-px bg-border" />
-                    <button
-                      onClick={() => { setAccountOpen(false); handleSignOut(); }}
-                      className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium text-destructive hover:bg-destructive/5 transition-colors"
-                    >
-                      <span className="flex items-center gap-3">
-                        <LogOut className="w-4 h-4" /> Sign out
-                      </span>
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
-                  </div>
+                  <motion.div
+                    initial="hidden"
+                    animate="visible"
+                    exit="hidden"
+                    variants={{
+                      hidden: { opacity: 0 },
+                      visible: { opacity: 1, transition: { staggerChildren: 0.06, delayChildren: 0.1 } },
+                    }}
+                    className="mt-8 flex flex-col gap-2"
+                  >
+                    <motion.div variants={{ hidden: { opacity: 0, x: 30 }, visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 300, damping: 24 } } }}>
+                      <button
+                        onClick={() => { setAccountOpen(false); setProfileOpen(true); }}
+                        className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors"
+                      >
+                        <span className="flex items-center gap-3">
+                          <UserIcon className="w-4 h-4 text-muted-foreground" /> Profile
+                        </span>
+                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                      </button>
+                    </motion.div>
+                    <motion.div variants={{ hidden: { opacity: 0, x: 30 }, visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 300, damping: 24 } } }}>
+                      <Link
+                        to="/admin/orders"
+                        onClick={() => setAccountOpen(false)}
+                        className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors"
+                      >
+                        <span className="flex items-center gap-3">
+                          <LayoutDashboard className="w-4 h-4 text-muted-foreground" /> Admin
+                        </span>
+                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                      </Link>
+                    </motion.div>
+                    <motion.div variants={{ hidden: { opacity: 0, x: 30 }, visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 300, damping: 24 } } }}>
+                      <Link
+                        to="/settings"
+                        onClick={() => setAccountOpen(false)}
+                        className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors"
+                      >
+                        <span className="flex items-center gap-3">
+                          <Settings className="w-4 h-4 text-muted-foreground" /> Settings
+                        </span>
+                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                      </Link>
+                    </motion.div>
+                    <motion.div variants={{ hidden: { opacity: 0, x: 30 }, visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 300, damping: 24 } } }} className="my-2 h-px bg-border" />
+                    <motion.div variants={{ hidden: { opacity: 0, x: 30 }, visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 300, damping: 24 } } }}>
+                      <button
+                        onClick={() => { setAccountOpen(false); handleSignOut(); }}
+                        className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium text-destructive hover:bg-destructive/5 transition-colors"
+                      >
+                        <span className="flex items-center gap-3">
+                          <LogOut className="w-4 h-4" /> Sign out
+                        </span>
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </motion.div>
+                  </motion.div>
                 </SheetContent>
               </Sheet>
             )}
@@ -391,6 +419,19 @@ function Index() {
             )}
           </div>
           <div className="flex md:hidden items-center gap-2">
+            {user && (
+              <button
+                onClick={() => setAccountOpen(true)}
+                className="relative w-10 h-10 rounded-md border border-border bg-card grid place-items-center hover:border-primary hover:text-primary transition"
+                aria-label="Open account menu"
+              >
+                {user.user_metadata?.avatar_url ? (
+                  <img src={user.user_metadata.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover" />
+                ) : (
+                  <UserIcon className="w-5 h-5" />
+                )}
+              </button>
+            )}
             <button onClick={() => setCartOpen(true)} aria-label="Open cart" className="relative w-10 h-10 grid place-items-center">
               <ShoppingCart className="w-5 h-5" />
               {cartCount > 0 && (
@@ -408,13 +449,6 @@ function Index() {
               {["About","Shop","Products","Process","Why Us","Contact"].map(i => (
                 <a key={i} href={`#${i.toLowerCase().replace(" ","-")}`} onClick={() => setNavOpen(false)} className="text-foreground/80">{i}</a>
               ))}
-              {user && (
-                <>
-                  <Link to="/admin/orders" onClick={() => setNavOpen(false)} className="text-foreground/80 font-medium">Admin</Link>
-                  <Link to="/settings" onClick={() => setNavOpen(false)} className="text-foreground/80 font-medium">Settings</Link>
-                  <button onClick={() => { handleSignOut(); setNavOpen(false); }} className="text-left text-foreground/80 font-medium">Sign out</button>
-                </>
-              )}
               {!user && (
                 <Link to="/auth" onClick={() => setNavOpen(false)} className="text-foreground/80 font-medium">Login</Link>
               )}
