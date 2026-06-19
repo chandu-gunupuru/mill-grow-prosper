@@ -323,11 +323,16 @@ function Index() {
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setProfileOpen(true)} className="cursor-pointer">
+                    <UserIcon className="w-4 h-4 mr-2" /> Profile
+                  </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/admin/orders" className="cursor-pointer">Admin</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/settings" className="cursor-pointer">Settings</Link>
+                    <Link to="/settings" className="cursor-pointer">
+                      <Settings className="w-4 h-4 mr-2" /> Settings
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
