@@ -265,6 +265,9 @@ function Index() {
             </button>
             {user ? (
               <div className="flex items-center gap-2">
+                <Link to="/admin/orders" className="hidden lg:inline-flex items-center gap-1.5 text-sm text-foreground/80 hover:text-primary px-2" title="Admin orders">
+                  Admin
+                </Link>
                 <span className="hidden lg:inline-flex items-center gap-1.5 text-sm text-foreground/80 px-2">
                   <UserIcon className="w-4 h-4" /> {user.email}
                 </span>
@@ -277,6 +280,7 @@ function Index() {
                 <LogIn className="w-4 h-4" /> Login
               </Link>
             )}
+
             <a href="#contact" className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-md text-sm font-semibold hover:opacity-90 transition">
               Get a Quote <ArrowRight className="w-4 h-4" />
             </a>
