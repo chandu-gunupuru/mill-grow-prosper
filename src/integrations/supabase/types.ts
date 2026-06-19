@@ -203,6 +203,51 @@ export type Database = {
         }
         Relationships: []
       }
+      user_settings: {
+        Row: {
+          company_address: string | null
+          company_email: string | null
+          company_name: string | null
+          company_phone: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          notify_email: boolean
+          notify_marketing: boolean
+          notify_sms: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_address?: string | null
+          company_email?: string | null
+          company_name?: string | null
+          company_phone?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          notify_email?: boolean
+          notify_marketing?: boolean
+          notify_sms?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_address?: string | null
+          company_email?: string | null
+          company_name?: string | null
+          company_phone?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          notify_email?: boolean
+          notify_marketing?: boolean
+          notify_sms?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
