@@ -26,12 +26,14 @@ interface CartStore {
   checkoutUrl: string | null;
   isLoading: boolean;
   isSyncing: boolean;
+  checkoutError: string | null;
   addItem: (item: Omit<CartItem, "lineId">) => Promise<void>;
   updateQuantity: (variantId: string, quantity: number) => Promise<void>;
   removeItem: (variantId: string) => Promise<void>;
   clearCart: () => void;
   syncCart: () => Promise<void>;
   getCheckoutUrl: () => string | null;
+  setCheckoutError: (msg: string | null) => void;
 }
 
 export const useCartStore = create<CartStore>()(
@@ -42,6 +44,8 @@ export const useCartStore = create<CartStore>()(
       checkoutUrl: null,
       isLoading: false,
       isSyncing: false,
+      checkoutError: null,
+      setCheckoutError: (msg) => set({ checkoutError: msg }),
 
       addItem: async (item) => {
         const { items, cartId, clearCart } = get();
