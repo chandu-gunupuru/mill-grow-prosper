@@ -770,6 +770,15 @@ function Index() {
                   <button onClick={checkout} disabled={isLoading || isSyncing} className="w-full inline-flex items-center justify-center gap-2 border border-primary text-primary py-2.5 rounded-md font-semibold hover:bg-primary/5 transition disabled:opacity-60 disabled:cursor-not-allowed">
                     {isLoading || isSyncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <><ExternalLink className="w-4 h-4" /> Checkout Securely</>}
                   </button>
+                  <label className="flex items-center gap-2 text-xs text-muted-foreground select-none pt-1 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={sameTab}
+                      onChange={(e) => toggleSameTab(e.target.checked)}
+                      className="w-4 h-4 accent-primary rounded"
+                    />
+                    Open checkout in the same tab (use this if your browser blocks popups)
+                  </label>
                 </div>
               )}
 
