@@ -491,18 +491,19 @@ function Index() {
                       <div className="mt-4 flex flex-col gap-2">
                         <button
                           onClick={() => handleAddToCart(p)}
-                          disabled={isLoading || !variant?.availableForSale}
+                          disabled={isLoading || buyingId !== null || !variant?.availableForSale}
                           className="w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2.5 rounded-md font-semibold hover:bg-gold hover:text-primary transition disabled:opacity-60 disabled:cursor-not-allowed"
                         >
                           {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><ShoppingCart className="w-4 h-4" /> Add to Cart</>}
                         </button>
                         <button
                           onClick={() => buyNow(p)}
-                          disabled={isLoading || !variant?.availableForSale}
+                          disabled={isLoading || buyingId !== null || !variant?.availableForSale}
                           className="w-full inline-flex items-center justify-center gap-2 bg-gradient-gold text-primary py-2.5 rounded-md font-bold shadow-gold hover:scale-[1.01] transition disabled:opacity-60 disabled:cursor-not-allowed"
                         >
-                          Buy Now <ArrowRight className="w-4 h-4" />
+                          {buyingId === p.node.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Buy Now <ArrowRight className="w-4 h-4" /></>}
                         </button>
+
                       </div>
                     </div>
                   </motion.div>
