@@ -149,7 +149,11 @@ export const useCartStore = create<CartStore>()(
           const data = await storefrontApiRequest(CART_QUERY, { id: cartId });
           if (!data) return;
           const cart = data?.data?.cart;
-          if (!cart || cart.totalQuantity === 0) clearCart();
+          if (!cart || cart.totalQuantity === 0) {
+            clearCart();
+          } else if (cart.checkoutUrl) {
+            set({ checkoutUrl: cart.checkoutUrl });
+          }
         } catch (error) {
           console.error("Failed to sync cart with Shopify:", error);
         } finally {
