@@ -58,7 +58,7 @@ export const STOREFRONT_QUERY = `
 `;
 
 export const CART_QUERY = `
-  query cart($id: ID!) { cart(id: $id) { id totalQuantity } }
+  query cart($id: ID!) { cart(id: $id) { id totalQuantity checkoutUrl } }
 `;
 
 export const CART_CREATE_MUTATION = `
