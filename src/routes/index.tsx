@@ -11,7 +11,7 @@ import {
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { sendQuoteInquiry } from "@/lib/inquiry.functions";
-import { fetchShopifyProducts, type ShopifyProduct } from "@/lib/shopify";
+import { fetchShopifyProducts, createShopifyCart, type ShopifyProduct } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
 import { useCartSync } from "@/hooks/useCartSync";
 import { useAuth } from "@/hooks/useAuth";
