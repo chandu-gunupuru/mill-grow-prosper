@@ -188,20 +188,32 @@ function Index() {
     const url = getCheckoutUrl();
     const result = openShopifyCheckout(url);
     if (!result.ok) {
-      setCheckoutError(
-        "Checkout link is missing. Please try adding the item again or contact us.",
-      );
-      return;
+      if (result.reason === "popup_blocked" && url) {
+        setBlockedUrl(url);
+        setCheckoutError(
+          "Your browser blocked the checkout window. Click the link below to continue.",
+        );
+      } else {
+        setBlockedUrl(null);
+        setCheckoutError(
+          "Checkout link is missing. Please try adding the item again or contact us.",
+        );
+      }
+      return false;
     }
+    setBlockedUrl(null);
     setCheckoutError(null);
     setCartOpen(false);
+    return true;
   }
 
   async function buyNow(product: ShopifyProduct) {
     await handleAddToCart(product);
     if (useCartStore.getState().checkoutError) return;
-    checkout();
+    const ok = checkout();
+    if (!ok) setCartOpen(true);
   }
+
 
 
   async function submit(e: React.FormEvent) {
