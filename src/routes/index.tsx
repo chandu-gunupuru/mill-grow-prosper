@@ -137,6 +137,15 @@ function Index() {
   const removeItem = useCartStore((s) => s.removeItem);
   const getCheckoutUrl = useCartStore((s) => s.getCheckoutUrl);
   const syncCart = useCartStore((s) => s.syncCart);
+  const checkoutError = useCartStore((s) => s.checkoutError);
+  const setCheckoutError = useCartStore((s) => s.setCheckoutError);
+
+  const [sameTab, setSameTab] = useState(false);
+  useEffect(() => { setSameTab(getOpenInSameTab()); }, []);
+  function toggleSameTab(v: boolean) {
+    setSameTab(v);
+    setOpenInSameTab(v);
+  }
 
   const cartCount = items.reduce((n, i) => n + i.quantity, 0);
   const cartTotal = items.reduce((n, i) => n + i.quantity * parseFloat(i.price.amount), 0);
@@ -168,20 +177,28 @@ function Index() {
       quantity: 1,
       selectedOptions: variant.selectedOptions || [],
     });
-    toast.success(`${product.node.title} added to cart`);
+    if (!useCartStore.getState().checkoutError) {
+      toast.success(`${product.node.title} added to cart`);
+    }
   }
 
-  async function checkout() {
+  function checkout() {
     const url = getCheckoutUrl();
-    if (!url) {
-      toast.error("Checkout link is missing. Please try adding the item again or contact us.");
+    const result = openShopifyCheckout(url);
+    if (!result.ok) {
+      setCheckoutError(
+        "Checkout link is missing. Please try adding the item again or contact us.",
+      );
       return;
     }
+    setCheckoutError(null);
     setCartOpen(false);
-    const popup = window.open(url, "_blank");
-    if (!popup || popup.closed) {
-      window.location.href = url;
-    }
+  }
+
+  async function buyNow(product: ShopifyProduct) {
+    await handleAddToCart(product);
+    if (useCartStore.getState().checkoutError) return;
+    checkout();
   }
 
 
