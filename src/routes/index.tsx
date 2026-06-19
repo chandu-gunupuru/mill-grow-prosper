@@ -364,6 +364,16 @@ function Index() {
               {["About","Shop","Products","Process","Why Us","Contact"].map(i => (
                 <a key={i} href={`#${i.toLowerCase().replace(" ","-")}`} onClick={() => setNavOpen(false)} className="text-foreground/80">{i}</a>
               ))}
+              {user && (
+                <>
+                  <Link to="/admin/orders" onClick={() => setNavOpen(false)} className="text-foreground/80 font-medium">Admin</Link>
+                  <Link to="/settings" onClick={() => setNavOpen(false)} className="text-foreground/80 font-medium">Settings</Link>
+                  <button onClick={() => { handleSignOut(); setNavOpen(false); }} className="text-left text-foreground/80 font-medium">Sign out</button>
+                </>
+              )}
+              {!user && (
+                <Link to="/auth" onClick={() => setNavOpen(false)} className="text-foreground/80 font-medium">Login</Link>
+              )}
             </div>
           </div>
         )}
