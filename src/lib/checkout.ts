@@ -1,3 +1,5 @@
+import { formatCheckoutUrl } from "@/lib/shopify";
+
 // Centralized helper for opening the Shopify checkout URL.
 // Handles popup-blockers and the "force same tab" user preference.
 
@@ -63,6 +65,9 @@ export function openShopifyCheckout(
   opts: OpenCheckoutOptions = {},
 ): OpenCheckoutResult {
   if (!url) return { ok: false, reason: "missing_url" };
+
+  // Ensure required Shopify parameter is always present
+  const checkoutUrl = formatCheckoutUrl(url);
 
   const w = opts.win ?? (typeof window !== "undefined" ? window : undefined);
   if (!w) return { ok: false, reason: "missing_url" };
