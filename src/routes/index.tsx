@@ -653,16 +653,21 @@ function Index() {
         </div>
       </footer>
 
-      {/* WHATSAPP FLOATING */}
-      <a
-        href={`https://wa.me/${WHATSAPP.replace(/[^0-9]/g,"")}?text=Hello%20Gayathri%20Rice%20Mill,%20I'd%20like%20a%20wholesale%20quote.`}
-        target="_blank" rel="noreferrer"
+      {/* Floating WhatsApp Chat Button */}
+      <button
+        onClick={() =>
+          window.open(
+            `https://wa.me/${WHATSAPP.replace(/[^0-9]/g, "")}?text=Hello%20Gayathri%20Rice%20Mill,%20I'd%20like%20a%20wholesale%20quote.`,
+            "_blank",
+            "noopener,noreferrer"
+          )
+        }
         className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-[#25D366] text-white grid place-items-center shadow-2xl hover:scale-110 transition"
-        aria-label="WhatsApp us"
+        aria-label="Chat on WhatsApp"
       >
         <MessageCircle className="w-7 h-7" />
         <span className="absolute inline-flex h-full w-full rounded-full bg-[#25D366] opacity-40 animate-ping" />
-      </a>
+      </button>
 
       {/* CART DRAWER */}
       <AnimatePresence>
