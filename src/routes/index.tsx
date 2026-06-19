@@ -406,18 +406,7 @@ function Index() {
                           {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><ShoppingCart className="w-4 h-4" /> Add to Cart</>}
                         </button>
                         <button
-                          onClick={async () => {
-                            await handleAddToCart(p);
-                            const url = useCartStore.getState().getCheckoutUrl();
-                            if (!url) {
-                              toast.error("Checkout link is missing. Please try again.");
-                              return;
-                            }
-                            const popup = window.open(url, "_blank");
-                            if (!popup || popup.closed) {
-                              window.location.href = url;
-                            }
-                          }}
+                          onClick={() => buyNow(p)}
                           disabled={isLoading || !variant?.availableForSale}
                           className="w-full inline-flex items-center justify-center gap-2 bg-gradient-gold text-primary py-2.5 rounded-md font-bold shadow-gold hover:scale-[1.01] transition disabled:opacity-60 disabled:cursor-not-allowed"
                         >
