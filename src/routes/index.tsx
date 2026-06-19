@@ -338,10 +338,6 @@ function Index() {
                 <LogIn className="w-4 h-4" /> Login
               </Link>
             )}
-
-            <a href="#contact" className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-md text-sm font-semibold hover:opacity-90 transition">
-              Get a Quote <ArrowRight className="w-4 h-4" />
-            </a>
           </div>
           <div className="flex md:hidden items-center gap-2">
             <button onClick={() => setCartOpen(true)} aria-label="Open cart" className="relative w-10 h-10 grid place-items-center">
