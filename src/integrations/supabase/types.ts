@@ -101,6 +101,36 @@ export type Database = {
         }
         Relationships: []
       }
+      product_click_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          product_id: string
+          session_id: string
+          user_id: string | null
+          variant_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          product_id: string
+          session_id: string
+          user_id?: string | null
+          variant_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          product_id?: string
+          session_id?: string
+          user_id?: string | null
+          variant_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

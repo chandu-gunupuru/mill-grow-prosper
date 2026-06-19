@@ -20,6 +20,7 @@ import { Link } from "@tanstack/react-router";
 import { LogIn, LogOut, User as UserIcon } from "lucide-react";
 import { openShopifyCheckout, getOpenInSameTab, setOpenInSameTab } from "@/lib/checkout";
 import { getStoreStatus } from "@/lib/store-status.functions";
+import { logProductClick } from "@/lib/analytics";
 
 import heroMill from "@/assets/hero-mill.jpg?w=1600&format=webp&quality=72&imagetools";
 import paddyField from "@/assets/paddy-field.jpg?w=900&format=webp&quality=72&imagetools";
@@ -190,6 +191,8 @@ function Index() {
   }
 
   async function handleAddToCart(product: ShopifyProduct) {
+    const variantId = product.node.variants.edges[0]?.node?.id ?? null;
+    void logProductClick("add_to_cart", product.node.id, variantId);
     const ok = await addProductToCart(product);
     if (ok) toast.success(`${product.node.title} added to cart`);
   }
@@ -224,6 +227,7 @@ function Index() {
     // touched, so the cart badge does not increment.
     const variant = product.node.variants.edges[0]?.node;
     if (!variant) return;
+    void logProductClick("buy_now", product.node.id, variant.id);
     setBuyingId(product.node.id);
     try {
       const result = await createShopifyCart(variant.id, 1);
