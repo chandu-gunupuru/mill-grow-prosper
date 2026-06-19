@@ -1,10 +1,22 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { openShopifyCheckout, getOpenInSameTab, setOpenInSameTab } from "./checkout";
 
-function makeWindow(opts: { popupBlocked?: boolean } = {}) {
+function makeWindow(opts: { popupBlocked?: boolean; noDocument?: boolean } = {}) {
   const location = { href: "" } as Location;
   const open = vi.fn(() => (opts.popupBlocked ? null : ({ closed: false } as Window)));
-  return { location, open } as unknown as Window;
+
+  const body = { appendChild: vi.fn(), removeChild: vi.fn() } as unknown as HTMLBodyElement;
+  const document = opts.noDocument
+    ? undefined
+    : ({
+        body,
+        createElement: vi.fn(() => ({
+          click: vi.fn(),
+          style: {} as CSSStyleDeclaration,
+        } as unknown as HTMLAnchorElement)),
+      } as unknown as Document);
+
+  return { location, open, document, body } as unknown as Window;
 }
 
 describe("openShopifyCheckout", () => {
@@ -28,17 +40,26 @@ describe("openShopifyCheckout", () => {
     const url = "https://shop.example.com/checkout/abc";
     const result = openShopifyCheckout(url, { win });
     expect(result).toEqual({ ok: true, mode: "new_tab" });
-    expect(win.open).toHaveBeenCalledWith(url, "_blank");
+    expect(win.open).toHaveBeenCalledWith(url, "_blank", "noopener,noreferrer");
     expect(win.location.href).toBe("");
   });
 
-  it("mobile / strict popup blocker: falls back to same-tab navigation", () => {
+  it("popup blocked: falls back to anchor-click and returns new_tab when it succeeds", () => {
     const win = makeWindow({ popupBlocked: true });
     const url = "https://shop.example.com/checkout/xyz";
     const result = openShopifyCheckout(url, { win });
-    expect(result).toEqual({ ok: true, mode: "same_tab" });
-    expect(win.open).toHaveBeenCalledWith(url, "_blank");
-    expect(win.location.href).toBe(url);
+    expect(result).toEqual({ ok: true, mode: "new_tab" });
+    expect(win.open).toHaveBeenCalledWith(url, "_blank", "noopener,noreferrer");
+    expect(win.location.href).toBe("");
+  });
+
+  it("strict popup blocker (no document): returns popup_blocked", () => {
+    const win = makeWindow({ popupBlocked: true, noDocument: true });
+    const url = "https://shop.example.com/checkout/xyz";
+    const result = openShopifyCheckout(url, { win });
+    expect(result).toEqual({ ok: false, reason: "popup_blocked" });
+    expect(win.open).toHaveBeenCalledWith(url, "_blank", "noopener,noreferrer");
+    expect(win.location.href).toBe("");
   });
 
   it("respects the forceSameTab setting (skips window.open entirely)", () => {

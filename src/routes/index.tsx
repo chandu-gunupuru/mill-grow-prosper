@@ -141,11 +141,13 @@ function Index() {
   const setCheckoutError = useCartStore((s) => s.setCheckoutError);
 
   const [sameTab, setSameTab] = useState(false);
+  const [blockedUrl, setBlockedUrl] = useState<string | null>(null);
   useEffect(() => { setSameTab(getOpenInSameTab()); }, []);
   function toggleSameTab(v: boolean) {
     setSameTab(v);
     setOpenInSameTab(v);
   }
+
 
   const cartCount = items.reduce((n, i) => n + i.quantity, 0);
   const cartTotal = items.reduce((n, i) => n + i.quantity * parseFloat(i.price.amount), 0);
@@ -186,20 +188,32 @@ function Index() {
     const url = getCheckoutUrl();
     const result = openShopifyCheckout(url);
     if (!result.ok) {
-      setCheckoutError(
-        "Checkout link is missing. Please try adding the item again or contact us.",
-      );
-      return;
+      if (result.reason === "popup_blocked" && url) {
+        setBlockedUrl(url);
+        setCheckoutError(
+          "Your browser blocked the checkout window. Click the link below to continue.",
+        );
+      } else {
+        setBlockedUrl(null);
+        setCheckoutError(
+          "Checkout link is missing. Please try adding the item again or contact us.",
+        );
+      }
+      return false;
     }
+    setBlockedUrl(null);
     setCheckoutError(null);
     setCartOpen(false);
+    return true;
   }
 
   async function buyNow(product: ShopifyProduct) {
     await handleAddToCart(product);
     if (useCartStore.getState().checkoutError) return;
-    checkout();
+    const ok = checkout();
+    if (!ok) setCartOpen(true);
   }
+
 
 
   async function submit(e: React.FormEvent) {
@@ -764,12 +778,30 @@ function Index() {
               {items.length > 0 && (
                 <div className="p-5 border-t border-border bg-cream space-y-3">
                   <div className="flex justify-between text-lg font-bold"><span>Total</span><span className="text-primary">{currency === "INR" ? "₹" : currency + " "}{cartTotal.toFixed(2)}</span></div>
-                  <button onClick={checkout} disabled={isLoading || isSyncing} className="w-full inline-flex items-center justify-center gap-2 bg-gradient-gold text-primary py-3 rounded-md font-bold shadow-gold hover:scale-[1.01] transition disabled:opacity-60 disabled:cursor-not-allowed">
-                    {isLoading || isSyncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <><ShoppingCart className="w-4 h-4" /> Buy Now</>}
-                  </button>
-                  <button onClick={checkout} disabled={isLoading || isSyncing} className="w-full inline-flex items-center justify-center gap-2 border border-primary text-primary py-2.5 rounded-md font-semibold hover:bg-primary/5 transition disabled:opacity-60 disabled:cursor-not-allowed">
-                    {isLoading || isSyncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <><ExternalLink className="w-4 h-4" /> Checkout Securely</>}
-                  </button>
+                  {blockedUrl ? (
+                    <>
+                      <a
+                        href={blockedUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full inline-flex items-center justify-center gap-2 bg-gradient-gold text-primary py-3 rounded-md font-bold shadow-gold hover:scale-[1.01] transition"
+                      >
+                        <ExternalLink className="w-4 h-4" /> Click to Open Checkout
+                      </a>
+                      <button onClick={() => { setBlockedUrl(null); setCheckoutError(null); }} className="w-full inline-flex items-center justify-center gap-2 border border-border text-muted-foreground py-2 rounded-md text-sm hover:bg-secondary transition">
+                        <ArrowLeft className="w-4 h-4" /> Back to Cart
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button onClick={checkout} disabled={isLoading || isSyncing} className="w-full inline-flex items-center justify-center gap-2 bg-gradient-gold text-primary py-3 rounded-md font-bold shadow-gold hover:scale-[1.01] transition disabled:opacity-60 disabled:cursor-not-allowed">
+                        {isLoading || isSyncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <><ShoppingCart className="w-4 h-4" /> Buy Now</>}
+                      </button>
+                      <button onClick={checkout} disabled={isLoading || isSyncing} className="w-full inline-flex items-center justify-center gap-2 border border-primary text-primary py-2.5 rounded-md font-semibold hover:bg-primary/5 transition disabled:opacity-60 disabled:cursor-not-allowed">
+                        {isLoading || isSyncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <><ExternalLink className="w-4 h-4" /> Checkout Securely</>}
+                      </button>
+                    </>
+                  )}
                   <label className="flex items-center gap-2 text-xs text-muted-foreground select-none pt-1 cursor-pointer">
                     <input
                       type="checkbox"
@@ -781,6 +813,7 @@ function Index() {
                   </label>
                 </div>
               )}
+
 
             </motion.aside>
           </>
