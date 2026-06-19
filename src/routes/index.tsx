@@ -308,14 +308,31 @@ function Index() {
           </nav>
           <div className="hidden md:flex items-center gap-3">
             {user && (
-              <Link to="/admin/orders" className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-primary/80 transition-colors">
-                {user.user_metadata?.avatar_url ? (
-                  <img src={user.user_metadata.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover border border-primary/20" />
-                ) : (
-                  <UserIcon className="w-4 h-4" />
-                )}
-                {user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0]}
-              </Link>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-primary/80 transition-colors">
+                    {user.user_metadata?.avatar_url ? (
+                      <img src={user.user_metadata.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover border border-primary/20" />
+                    ) : (
+                      <UserIcon className="w-4 h-4" />
+                    )}
+                    {user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0]}
+                    <ChevronDown className="w-3 h-3" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <Link to="/admin/orders" className="cursor-pointer">Admin</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/settings" className="cursor-pointer">Settings</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
+                    <LogOut className="w-4 h-4 mr-2" /> Sign out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
             <button onClick={() => setCartOpen(true)} aria-label="Open cart" className="relative w-11 h-11 rounded-md border border-border bg-card grid place-items-center hover:border-primary hover:text-primary transition">
               <ShoppingCart className="w-5 h-5" />
@@ -323,11 +340,7 @@ function Index() {
                 <span className="absolute -top-1.5 -right-1.5 bg-gold text-primary text-[10px] font-bold rounded-full min-w-[18px] h-[18px] grid place-items-center px-1">{cartCount}</span>
               )}
             </button>
-            {user ? (
-              <button onClick={handleSignOut} className="inline-flex items-center gap-1.5 border border-border bg-card px-3 py-2 rounded-md text-sm font-medium hover:border-primary transition" title="Sign out">
-                <LogOut className="w-4 h-4" /> Sign out
-              </button>
-            ) : (
+            {!user && (
               <Link to="/auth" className="inline-flex items-center gap-1.5 border border-border bg-card px-4 py-2 rounded-md text-sm font-semibold hover:border-primary hover:text-primary transition">
                 <LogIn className="w-4 h-4" /> Login
               </Link>
