@@ -217,13 +217,40 @@ function Index() {
     return true;
   }
 
+  const [buyingId, setBuyingId] = useState<string | null>(null);
   async function buyNow(product: ShopifyProduct) {
-    // Buy Now goes straight to checkout — no "added to cart" toast.
-    const ok = await addProductToCart(product);
-    if (!ok) return;
-    const checkoutOk = checkout();
-    if (!checkoutOk) setCartOpen(true);
+    // Buy Now is a direct checkout: create a one-off Shopify cart for just
+    // this item and open its checkoutUrl. The user's persistent cart is NOT
+    // touched, so the cart badge does not increment.
+    const variant = product.node.variants.edges[0]?.node;
+    if (!variant) return;
+    setBuyingId(product.node.id);
+    try {
+      const result = await createShopifyCart(variant.id, 1);
+      if (!result?.checkoutUrl) {
+        setBlockedUrl(null);
+        setCheckoutError("Could not start checkout. Please try again.");
+        setCartOpen(true);
+        return;
+      }
+      const opened = openShopifyCheckout(result.checkoutUrl);
+      if (!opened.ok) {
+        if (opened.reason === "popup_blocked") {
+          setBlockedUrl(result.checkoutUrl);
+          setCheckoutError(
+            "Your browser blocked the checkout window. Click the link below to continue.",
+          );
+        } else {
+          setBlockedUrl(null);
+          setCheckoutError("Could not open checkout window.");
+        }
+        setCartOpen(true);
+      }
+    } finally {
+      setBuyingId(null);
+    }
   }
+
 
 
 
