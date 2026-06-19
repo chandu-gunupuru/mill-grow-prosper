@@ -175,9 +175,9 @@ function Index() {
 
   useEffect(() => { if (cartOpen) syncCart(); }, [cartOpen, syncCart]);
 
-  async function handleAddToCart(product: ShopifyProduct) {
+  async function addProductToCart(product: ShopifyProduct) {
     const variant = product.node.variants.edges[0]?.node;
-    if (!variant) return;
+    if (!variant) return false;
     await addItem({
       product,
       variantId: variant.id,
@@ -186,9 +186,12 @@ function Index() {
       quantity: 1,
       selectedOptions: variant.selectedOptions || [],
     });
-    if (!useCartStore.getState().checkoutError) {
-      toast.success(`${product.node.title} added to cart`);
-    }
+    return !useCartStore.getState().checkoutError;
+  }
+
+  async function handleAddToCart(product: ShopifyProduct) {
+    const ok = await addProductToCart(product);
+    if (ok) toast.success(`${product.node.title} added to cart`);
   }
 
   function checkout() {
@@ -215,11 +218,13 @@ function Index() {
   }
 
   async function buyNow(product: ShopifyProduct) {
-    await handleAddToCart(product);
-    if (useCartStore.getState().checkoutError) return;
-    const ok = checkout();
-    if (!ok) setCartOpen(true);
+    // Buy Now goes straight to checkout — no "added to cart" toast.
+    const ok = await addProductToCart(product);
+    if (!ok) return;
+    const checkoutOk = checkout();
+    if (!checkoutOk) setCartOpen(true);
   }
+
 
 
 
