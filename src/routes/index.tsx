@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "motion/react";
 import {
   Phone, Mail, MapPin, MessageCircle, Award, Truck, Sparkles, ShieldCheck,
   Factory, Leaf, Package, CheckCircle2, Star, ArrowRight, ArrowLeft, Menu, X, Download,
-  ShoppingCart, Plus, Minus, Trash2, Loader2, ExternalLink,
+  ShoppingCart, Plus, Minus, Trash2, Loader2, ExternalLink, AlertCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
@@ -18,6 +18,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "@tanstack/react-router";
 import { LogIn, LogOut, User as UserIcon } from "lucide-react";
+import { openShopifyCheckout, getOpenInSameTab, setOpenInSameTab } from "@/lib/checkout";
 
 import heroMill from "@/assets/hero-mill.jpg?w=1600&format=webp&quality=72&imagetools";
 import paddyField from "@/assets/paddy-field.jpg?w=900&format=webp&quality=72&imagetools";
@@ -136,6 +137,15 @@ function Index() {
   const removeItem = useCartStore((s) => s.removeItem);
   const getCheckoutUrl = useCartStore((s) => s.getCheckoutUrl);
   const syncCart = useCartStore((s) => s.syncCart);
+  const checkoutError = useCartStore((s) => s.checkoutError);
+  const setCheckoutError = useCartStore((s) => s.setCheckoutError);
+
+  const [sameTab, setSameTab] = useState(false);
+  useEffect(() => { setSameTab(getOpenInSameTab()); }, []);
+  function toggleSameTab(v: boolean) {
+    setSameTab(v);
+    setOpenInSameTab(v);
+  }
 
   const cartCount = items.reduce((n, i) => n + i.quantity, 0);
   const cartTotal = items.reduce((n, i) => n + i.quantity * parseFloat(i.price.amount), 0);
@@ -167,20 +177,28 @@ function Index() {
       quantity: 1,
       selectedOptions: variant.selectedOptions || [],
     });
-    toast.success(`${product.node.title} added to cart`);
+    if (!useCartStore.getState().checkoutError) {
+      toast.success(`${product.node.title} added to cart`);
+    }
   }
 
-  async function checkout() {
+  function checkout() {
     const url = getCheckoutUrl();
-    if (!url) {
-      toast.error("Checkout link is missing. Please try adding the item again or contact us.");
+    const result = openShopifyCheckout(url);
+    if (!result.ok) {
+      setCheckoutError(
+        "Checkout link is missing. Please try adding the item again or contact us.",
+      );
       return;
     }
+    setCheckoutError(null);
     setCartOpen(false);
-    const popup = window.open(url, "_blank");
-    if (!popup || popup.closed) {
-      window.location.href = url;
-    }
+  }
+
+  async function buyNow(product: ShopifyProduct) {
+    await handleAddToCart(product);
+    if (useCartStore.getState().checkoutError) return;
+    checkout();
   }
 
 
@@ -388,18 +406,7 @@ function Index() {
                           {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><ShoppingCart className="w-4 h-4" /> Add to Cart</>}
                         </button>
                         <button
-                          onClick={async () => {
-                            await handleAddToCart(p);
-                            const url = useCartStore.getState().getCheckoutUrl();
-                            if (!url) {
-                              toast.error("Checkout link is missing. Please try again.");
-                              return;
-                            }
-                            const popup = window.open(url, "_blank");
-                            if (!popup || popup.closed) {
-                              window.location.href = url;
-                            }
-                          }}
+                          onClick={() => buyNow(p)}
                           disabled={isLoading || !variant?.availableForSale}
                           className="w-full inline-flex items-center justify-center gap-2 bg-gradient-gold text-primary py-2.5 rounded-md font-bold shadow-gold hover:scale-[1.01] transition disabled:opacity-60 disabled:cursor-not-allowed"
                         >
@@ -705,6 +712,17 @@ function Index() {
                 </button>
               </div>
 
+              {checkoutError && (
+                <div className="mx-5 mt-4 flex items-start gap-3 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive" role="alert">
+                  <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">{checkoutError}</div>
+                  <button onClick={() => setCheckoutError(null)} aria-label="Dismiss error" className="text-destructive/70 hover:text-destructive">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+
+
               <div className="flex-1 overflow-y-auto p-5">
                 {items.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-center gap-3 py-20">
@@ -752,6 +770,15 @@ function Index() {
                   <button onClick={checkout} disabled={isLoading || isSyncing} className="w-full inline-flex items-center justify-center gap-2 border border-primary text-primary py-2.5 rounded-md font-semibold hover:bg-primary/5 transition disabled:opacity-60 disabled:cursor-not-allowed">
                     {isLoading || isSyncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <><ExternalLink className="w-4 h-4" /> Checkout Securely</>}
                   </button>
+                  <label className="flex items-center gap-2 text-xs text-muted-foreground select-none pt-1 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={sameTab}
+                      onChange={(e) => toggleSameTab(e.target.checked)}
+                      className="w-4 h-4 accent-primary rounded"
+                    />
+                    Open checkout in the same tab (use this if your browser blocks popups)
+                  </label>
                 </div>
               )}
 

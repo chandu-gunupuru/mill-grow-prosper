@@ -26,12 +26,14 @@ interface CartStore {
   checkoutUrl: string | null;
   isLoading: boolean;
   isSyncing: boolean;
+  checkoutError: string | null;
   addItem: (item: Omit<CartItem, "lineId">) => Promise<void>;
   updateQuantity: (variantId: string, quantity: number) => Promise<void>;
   removeItem: (variantId: string) => Promise<void>;
   clearCart: () => void;
   syncCart: () => Promise<void>;
   getCheckoutUrl: () => string | null;
+  setCheckoutError: (msg: string | null) => void;
 }
 
 export const useCartStore = create<CartStore>()(
@@ -42,12 +44,14 @@ export const useCartStore = create<CartStore>()(
       checkoutUrl: null,
       isLoading: false,
       isSyncing: false,
+      checkoutError: null,
+      setCheckoutError: (msg) => set({ checkoutError: msg }),
 
       addItem: async (item) => {
         const { items, cartId, clearCart } = get();
         const existingItem = items.find((i) => i.variantId === item.variantId);
 
-        set({ isLoading: true });
+        set({ isLoading: true, checkoutError: null });
         try {
           if (!cartId) {
             const result = await createShopifyCart(item.variantId, item.quantity);
@@ -56,6 +60,11 @@ export const useCartStore = create<CartStore>()(
                 cartId: result.cartId,
                 checkoutUrl: result.checkoutUrl,
                 items: [{ ...item, lineId: result.lineId }],
+              });
+            } else {
+              set({
+                checkoutError:
+                  "We couldn't reach the checkout right now. Please try again in a moment or contact us.",
               });
             }
           } else if (existingItem) {
@@ -83,6 +92,10 @@ export const useCartStore = create<CartStore>()(
           }
         } catch (error) {
           console.error("Failed to add item:", error);
+          set({
+            checkoutError:
+              "Something went wrong adding this item. Please check your connection and try again.",
+          });
         } finally {
           set({ isLoading: false });
         }
