@@ -437,7 +437,16 @@ function AuthPage() {
               placeholder="Phone (e.g. +911234567890)"
               value={phone}
               disabled={otpSent}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => {
+                let v = e.target.value.replace(/[^\d+]/g, "");
+                // Auto-prefix +91 for Indian numbers entered without a country code
+                if (v && !v.startsWith("+")) {
+                  // Strip a leading 0 if user typed e.g. 0xxxxxxxxxx
+                  if (v.startsWith("0")) v = v.slice(1);
+                  v = "+91" + v;
+                }
+                setPhone(v);
+              }}
               className="w-full px-4 py-2.5 rounded-md bg-secondary border border-border focus:border-primary outline-none text-sm disabled:opacity-60"
             />
             {otpSent && smsStatus !== "idle" && (
