@@ -191,6 +191,8 @@ function Index() {
   }
 
   async function handleAddToCart(product: ShopifyProduct) {
+    const variantId = product.node.variants.edges[0]?.node?.id ?? null;
+    void logProductClick("add_to_cart", product.node.id, variantId);
     const ok = await addProductToCart(product);
     if (ok) toast.success(`${product.node.title} added to cart`);
   }
