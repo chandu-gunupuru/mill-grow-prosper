@@ -170,11 +170,17 @@ function Index() {
     toast.success(`${product.node.title} added to cart`);
   }
 
-  function checkout() {
+  async function checkout() {
     const url = getCheckoutUrl();
-    if (!url) return;
-    window.open(url, "_blank");
+    if (!url) {
+      toast.error("Checkout link is missing. Please try adding the item again or contact us.");
+      return;
+    }
     setCartOpen(false);
+    const popup = window.open(url, "_blank");
+    if (!popup || popup.closed) {
+      window.location.href = url;
+    }
   }
 
 
