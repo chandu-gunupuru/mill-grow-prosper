@@ -4,6 +4,7 @@ import {
   CART_QUERY,
   addLineToShopifyCart,
   createShopifyCart,
+  formatCheckoutUrl,
   removeLineFromShopifyCart,
   storefrontApiRequest,
   updateShopifyCartLine,
@@ -165,7 +166,7 @@ export const useCartStore = create<CartStore>()(
           if (!cart || cart.totalQuantity === 0) {
             clearCart();
           } else if (cart.checkoutUrl) {
-            set({ checkoutUrl: cart.checkoutUrl });
+            set({ checkoutUrl: formatCheckoutUrl(cart.checkoutUrl) });
           }
         } catch (error) {
           console.error("Failed to sync cart with Shopify:", error);
