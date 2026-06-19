@@ -299,14 +299,14 @@ function Index() {
               <a key={i} href={`#${i.toLowerCase().replace(" ","-")}`} className="text-foreground/80 hover:text-primary transition-colors">{i}</a>
             ))}
             {user && (
-              <span className="flex items-center gap-1.5 text-sm font-semibold text-primary">
+              <Link to="/admin/orders" className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-primary/80 transition-colors">
                 {user.user_metadata?.avatar_url ? (
                   <img src={user.user_metadata.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover border border-primary/20" />
                 ) : (
                   <UserIcon className="w-4 h-4" />
                 )}
                 {user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0]}
-              </span>
+              </Link>
             )}
           </nav>
           <div className="hidden md:flex items-center gap-3">
