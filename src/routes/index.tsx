@@ -227,6 +227,7 @@ function Index() {
     // touched, so the cart badge does not increment.
     const variant = product.node.variants.edges[0]?.node;
     if (!variant) return;
+    void logProductClick("buy_now", product.node.id, variant.id);
     setBuyingId(product.node.id);
     try {
       const result = await createShopifyCart(variant.id, 1);
