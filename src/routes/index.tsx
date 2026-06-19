@@ -11,7 +11,7 @@ import {
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { sendQuoteInquiry } from "@/lib/inquiry.functions";
-import { fetchShopifyProducts, type ShopifyProduct } from "@/lib/shopify";
+import { fetchShopifyProducts, createShopifyCart, type ShopifyProduct } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
 import { useCartSync } from "@/hooks/useCartSync";
 import { useAuth } from "@/hooks/useAuth";
@@ -217,13 +217,40 @@ function Index() {
     return true;
   }
 
+  const [buyingId, setBuyingId] = useState<string | null>(null);
   async function buyNow(product: ShopifyProduct) {
-    // Buy Now goes straight to checkout — no "added to cart" toast.
-    const ok = await addProductToCart(product);
-    if (!ok) return;
-    const checkoutOk = checkout();
-    if (!checkoutOk) setCartOpen(true);
+    // Buy Now is a direct checkout: create a one-off Shopify cart for just
+    // this item and open its checkoutUrl. The user's persistent cart is NOT
+    // touched, so the cart badge does not increment.
+    const variant = product.node.variants.edges[0]?.node;
+    if (!variant) return;
+    setBuyingId(product.node.id);
+    try {
+      const result = await createShopifyCart(variant.id, 1);
+      if (!result?.checkoutUrl) {
+        setBlockedUrl(null);
+        setCheckoutError("Could not start checkout. Please try again.");
+        setCartOpen(true);
+        return;
+      }
+      const opened = openShopifyCheckout(result.checkoutUrl);
+      if (!opened.ok) {
+        if (opened.reason === "popup_blocked") {
+          setBlockedUrl(result.checkoutUrl);
+          setCheckoutError(
+            "Your browser blocked the checkout window. Click the link below to continue.",
+          );
+        } else {
+          setBlockedUrl(null);
+          setCheckoutError("Could not open checkout window.");
+        }
+        setCartOpen(true);
+      }
+    } finally {
+      setBuyingId(null);
+    }
   }
+
 
 
 
@@ -464,18 +491,19 @@ function Index() {
                       <div className="mt-4 flex flex-col gap-2">
                         <button
                           onClick={() => handleAddToCart(p)}
-                          disabled={isLoading || !variant?.availableForSale}
+                          disabled={isLoading || buyingId !== null || !variant?.availableForSale}
                           className="w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2.5 rounded-md font-semibold hover:bg-gold hover:text-primary transition disabled:opacity-60 disabled:cursor-not-allowed"
                         >
                           {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><ShoppingCart className="w-4 h-4" /> Add to Cart</>}
                         </button>
                         <button
                           onClick={() => buyNow(p)}
-                          disabled={isLoading || !variant?.availableForSale}
+                          disabled={isLoading || buyingId !== null || !variant?.availableForSale}
                           className="w-full inline-flex items-center justify-center gap-2 bg-gradient-gold text-primary py-2.5 rounded-md font-bold shadow-gold hover:scale-[1.01] transition disabled:opacity-60 disabled:cursor-not-allowed"
                         >
-                          Buy Now <ArrowRight className="w-4 h-4" />
+                          {buyingId === p.node.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Buy Now <ArrowRight className="w-4 h-4" /></>}
                         </button>
+
                       </div>
                     </div>
                   </motion.div>
