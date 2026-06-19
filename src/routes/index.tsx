@@ -712,6 +712,17 @@ function Index() {
                 </button>
               </div>
 
+              {checkoutError && (
+                <div className="mx-5 mt-4 flex items-start gap-3 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive" role="alert">
+                  <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">{checkoutError}</div>
+                  <button onClick={() => setCheckoutError(null)} aria-label="Dismiss error" className="text-destructive/70 hover:text-destructive">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+
+
               <div className="flex-1 overflow-y-auto p-5">
                 {items.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-center gap-3 py-20">
