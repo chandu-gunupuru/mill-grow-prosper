@@ -418,6 +418,7 @@ function Index() {
                 <LogIn className="w-4 h-4" /> Login
               </Link>
             )}
+            <ThemeToggle />
           </div>
           <div className="flex md:hidden items-center gap-2">
             {user && (
