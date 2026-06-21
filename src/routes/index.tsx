@@ -442,7 +442,6 @@ function Index() {
             <button onClick={() => setNavOpen(!navOpen)} aria-label="Toggle menu">
               {navOpen ? <X /> : <Menu />}
             </button>
-            <ThemeToggle />
           </div>
         </div>
         {navOpen && (
