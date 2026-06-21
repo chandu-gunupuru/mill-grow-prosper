@@ -20,6 +20,26 @@ function applyThemeClass(theme: Theme) {
   document.documentElement.classList.toggle("dark", theme === "dark");
 }
 
+const THEME_TRANSITION_CLASS = "theme-transition";
+const THEME_TRANSITION_DURATION = 350;
+
+function prefersReducedMotion() {
+  return typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function enableThemeTransition(): boolean {
+  if (typeof document === "undefined" || prefersReducedMotion()) return false;
+  document.documentElement.classList.add(THEME_TRANSITION_CLASS);
+  return true;
+}
+
+function disableThemeTransition() {
+  if (typeof document === "undefined") return;
+  document.documentElement.classList.remove(THEME_TRANSITION_CLASS);
+}
+
+let transitionTimer: ReturnType<typeof setTimeout> | null = null;
+
 export function useTheme() {
   const [theme, setThemeState] = useState<Theme>(getInitialTheme);
   const [mounted, setMounted] = useState(false);
