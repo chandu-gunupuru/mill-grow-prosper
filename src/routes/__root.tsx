@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { ScrollArrows } from "../components/ScrollArrows";
+import { LogoIntro } from "../components/LogoIntro";
 
 function NotFoundComponent() {
   return (
@@ -130,8 +131,11 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      {/* Logo intro plays once per session on first website open. */}
+      <LogoIntro>
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+      </LogoIntro>
       <ScrollArrows />
     </QueryClientProvider>
   );
