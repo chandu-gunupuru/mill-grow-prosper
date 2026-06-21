@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   Loader2,
   ShieldAlert,
