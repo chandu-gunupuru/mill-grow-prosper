@@ -99,8 +99,8 @@ export function LogoIntro({ children }: LogoIntroProps) {
                   opacity: [0, 1, 1],
                   y: [60, 0, 0],
                   transition: {
-                    duration: 2.4,
-                    times: [0, 0.35, 0.55],
+                    duration: 20,
+                    times: [0, 0.1, 0.2],
                     ease: [0.22, 1, 0.36, 1],
                   },
                 },
