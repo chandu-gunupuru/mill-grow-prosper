@@ -50,12 +50,17 @@ export function useTheme() {
   }, [theme]);
 
   const setTheme = (next: Theme) => {
+    const willTransition = enableThemeTransition();
     try {
       window.localStorage.setItem(STORAGE_KEY, next);
     } catch {
       // ignore storage errors (e.g. private mode)
     }
     setThemeState(next);
+    if (willTransition) {
+      if (transitionTimer) clearTimeout(transitionTimer);
+      transitionTimer = setTimeout(disableThemeTransition, THEME_TRANSITION_DURATION);
+    }
   };
 
   const toggleTheme = () => {
