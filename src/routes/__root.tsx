@@ -131,8 +131,11 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      {/* Logo intro plays once per session on first website open. */}
+      <LogoIntro>
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+      </LogoIntro>
       <ScrollArrows />
     </QueryClientProvider>
   );
