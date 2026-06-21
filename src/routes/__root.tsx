@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { ScrollArrows } from "../components/ScrollArrows";
+import { LogoIntro } from "../components/LogoIntro";
 
 function NotFoundComponent() {
   return (
