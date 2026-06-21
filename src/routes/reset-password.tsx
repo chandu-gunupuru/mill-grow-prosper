@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Loader2, Leaf, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "@tanstack/react-router";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const Route = createFileRoute("/reset-password")({
   head: () => ({ meta: [{ title: "Reset password — Gayathri Modern Rice Mill" }] }),
