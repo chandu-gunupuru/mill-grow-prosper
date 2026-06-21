@@ -18,11 +18,10 @@ export function LogoIntro({ children }: LogoIntroProps) {
     setMounted(true);
 
     // Show intro once per browser session, or if the user cleared storage.
-    const seen = false;
-    // const seen =
-    //   typeof window !== "undefined" &&
-    //   (window.sessionStorage.getItem(STORAGE_KEY) === "1" ||
-    //     document.body.hasAttribute(SESSION_ATTR));
+    const seen =
+      typeof window !== "undefined" &&
+      (window.sessionStorage.getItem(STORAGE_KEY) === "1" ||
+        document.body.hasAttribute(SESSION_ATTR));
 
     if (seen) {
       setShowIntro(false);
@@ -30,10 +29,9 @@ export function LogoIntro({ children }: LogoIntroProps) {
       return;
     }
 
-    const prefersReducedMotion = false;
-    // const prefersReducedMotion =
-    //   typeof window !== "undefined" &&
-    //   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     if (prefersReducedMotion) {
       finishIntro();
