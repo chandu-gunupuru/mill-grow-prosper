@@ -6,42 +6,45 @@ const STORAGE_KEY = "theme";
 
 function getInitialTheme(): Theme {
   if (typeof window === "undefined") return "light";
-  const stored = window.localStorage.getItem(STORAGE_KEY) as Theme | null;
-  if (stored === "light" || stored === "dark") return stored;
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  try {
+    const stored = window.localStorage.getItem(STORAGE_KEY) as Theme | null;
+    if (stored === "light" || stored === "dark") return stored;
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  } catch {
+    return "light";
+  }
+}
+
+function applyThemeClass(theme: Theme) {
+  if (typeof document === "undefined") return;
+  document.documentElement.classList.toggle("dark", theme === "dark");
 }
 
 export function useTheme() {
-  const [theme, setTheme] = useState<Theme>("light");
+  const [theme, setThemeState] = useState<Theme>(getInitialTheme);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const initial = getInitialTheme();
-    setTheme(initial);
-    document.documentElement.classList.toggle("dark", initial === "dark");
+    applyThemeClass(theme);
     setMounted(true);
-  }, []);
+  }, [theme]);
+
+  const setTheme = (next: Theme) => {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, next);
+    } catch {
+      // ignore storage errors (e.g. private mode)
+    }
+    setThemeState(next);
+  };
 
   const toggleTheme = () => {
-    setTheme((current) => {
-      const next = current === "light" ? "dark" : "light";
-      window.localStorage.setItem(STORAGE_KEY, next);
-      document.documentElement.classList.toggle("dark", next === "dark");
-      return next;
-    });
+    setTheme(theme === "light" ? "dark" : "light");
   };
 
-  const setLight = () => {
-    window.localStorage.setItem(STORAGE_KEY, "light");
-    document.documentElement.classList.remove("dark");
-    setTheme("light");
-  };
-
-  const setDark = () => {
-    window.localStorage.setItem(STORAGE_KEY, "dark");
-    document.documentElement.classList.add("dark");
-    setTheme("dark");
-  };
+  const setLight = () => setTheme("light");
+  const setDark = () => setTheme("dark");
 
   return { theme, mounted, toggleTheme, setLight, setDark };
 }
+

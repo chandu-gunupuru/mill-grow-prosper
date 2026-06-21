@@ -78,6 +78,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "color-scheme", content: "light dark" },
       { title: "Gayathri Modern Rice Mill — Premium Rice Manufacturer & Wholesale Supplier" },
       { name: "description", content: "Gayathri Modern Rice Mill manufactures and supplies premium Sona Masoori, Basmati, Steam & Raw rice in bulk to wholesalers, exporters, hotels and distributors." },
       { name: "author", content: "Gayathri Modern Rice Mill" },
@@ -99,7 +100,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     scripts: [
       {
         type: "text/javascript",
-        children: `(function(){try{var t=localStorage.getItem("theme");var d=t==="dark"||(!t&&window.matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.classList.toggle("dark",d);}catch(e){}})();`,
+        children: `(function(){try{var t=localStorage.getItem("theme");var d=t==="dark"||(!t&&window.matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.classList.toggle("dark",d);var m=document.querySelector('meta[name="color-scheme"]');if(m)m.content=d?"dark light":"light dark";var p=window.matchMedia("(prefers-color-scheme: dark)");if(!t)p.addEventListener?p.addEventListener("change",function(e){document.documentElement.classList.toggle("dark",e.matches);var n=document.querySelector('meta[name="color-scheme"]');if(n)n.content=e.matches?"dark light":"light dark";}):p.addListener&&p.addListener(function(e){document.documentElement.classList.toggle("dark",e.matches);});}catch(e){}})();`,
       },
     ],
   }),
@@ -112,7 +113,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
