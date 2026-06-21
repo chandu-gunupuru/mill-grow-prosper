@@ -99,7 +99,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     scripts: [
       {
         type: "text/javascript",
-        children: `(function(){try{var t=localStorage.getItem("theme");var d=t==="dark"||(!t&&window.matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.classList.toggle("dark",d);}catch(e){}})();`,
+        children: `(function(){try{var t=localStorage.getItem("theme");var d=t==="dark"||(!t&&window.matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.classList.toggle("dark",d);var m=document.querySelector('meta[name="color-scheme"]');if(m)m.content=d?"dark light":"light dark";var p=window.matchMedia("(prefers-color-scheme: dark)");if(!t)p.addEventListener?p.addEventListener("change",function(e){document.documentElement.classList.toggle("dark",e.matches);var n=document.querySelector('meta[name="color-scheme"]');if(n)n.content=e.matches?"dark light":"light dark";}):p.addListener&&p.addListener(function(e){document.documentElement.classList.toggle("dark",e.matches);});}catch(e){}})();`,
       },
     ],
   }),
