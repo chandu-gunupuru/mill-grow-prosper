@@ -18,7 +18,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "@tanstack/react-router";
 import { LogIn, LogOut, User as UserIcon, Settings, LayoutDashboard, ChevronRight } from "lucide-react";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { openShopifyCheckout, getOpenInSameTab, setOpenInSameTab } from "@/lib/checkout";
 import { getStoreStatus } from "@/lib/store-status.functions";
