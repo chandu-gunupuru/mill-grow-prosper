@@ -4,6 +4,16 @@ type Theme = "light" | "dark";
 
 const STORAGE_KEY = "theme";
 
+function hasStoredTheme(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+    return stored === "light" || stored === "dark";
+  } catch {
+    return false;
+  }
+}
+
 function getInitialTheme(): Theme {
   if (typeof window === "undefined") return "light";
   try {
@@ -49,6 +59,18 @@ export function useTheme() {
     setMounted(true);
   }, [theme]);
 
+  // Follow system preference until the user makes an explicit choice.
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const mql = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleChange = (e: MediaQueryListEvent) => {
+      if (hasStoredTheme()) return;
+      setThemeState(e.matches ? "dark" : "light");
+    };
+    mql.addEventListener?.("change", handleChange);
+    return () => mql.removeEventListener?.("change", handleChange);
+  }, []);
+
   const setTheme = (next: Theme) => {
     const willTransition = enableThemeTransition();
     try {
@@ -72,4 +94,3 @@ export function useTheme() {
 
   return { theme, mounted, toggleTheme, setLight, setDark };
 }
-
