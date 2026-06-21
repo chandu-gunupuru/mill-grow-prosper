@@ -275,7 +275,21 @@ function AuthPage() {
 
 
   return (
-    <div className="min-h-screen grid place-items-center bg-background px-6 py-12">
+    <div className="min-h-screen grid place-items-center bg-background px-6 py-12 pt-24 md:pt-28">
+      <header className="fixed top-0 inset-x-0 z-50 border-b border-border bg-background/80 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 h-16">
+          <Link to="/" className="flex items-center gap-2">
+            <div className="w-9 h-9 rounded-md bg-gradient-gold grid place-items-center shadow-gold">
+              <Leaf className="w-5 h-5 text-primary" />
+            </div>
+            <div className="leading-tight">
+              <div className="font-display font-bold text-primary">Gayathri</div>
+              <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Modern Rice Mill</div>
+            </div>
+          </Link>
+          <ThemeToggle />
+        </div>
+      </header>
       <div className="w-full max-w-md bg-card border border-border rounded-xl p-8 shadow-lg">
         <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition mb-4">
           <ArrowLeft className="w-4 h-4" />
