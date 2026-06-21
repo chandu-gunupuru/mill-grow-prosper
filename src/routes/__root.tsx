@@ -12,7 +12,6 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { ScrollArrows } from "../components/ScrollArrows";
-import { ThemeToggle } from "../components/ThemeToggle";
 
 function NotFoundComponent() {
   return (
@@ -97,6 +96,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" },
     ],
+    scripts: [
+      {
+        type: "text/javascript",
+        children: `(function(){try{var t=localStorage.getItem("theme");var d=t==="dark"||(!t&&window.matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.classList.toggle("dark",d);}catch(e){}})();`,
+      },
+    ],
   }),
 
   shellComponent: RootShell,
@@ -126,7 +131,6 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
-      <ThemeToggle className="fixed top-3.5 right-3 md:right-4 z-[60]" />
       <ScrollArrows />
     </QueryClientProvider>
   );

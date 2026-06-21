@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   Loader2,
   ShieldAlert,
@@ -80,18 +81,21 @@ function AdminOrdersPage() {
               </h1>
             </div>
           </div>
-          {isAdmin && (
-            <button
-              onClick={() => ordersQuery.refetch()}
-              disabled={ordersQuery.isFetching}
-              className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-3 py-2 text-sm font-medium hover:border-primary disabled:opacity-60"
-            >
-              <RefreshCw
-                className={`h-4 w-4 ${ordersQuery.isFetching ? "animate-spin" : ""}`}
-              />
-              Refresh
-            </button>
-          )}
+          <div className="flex items-center gap-2">
+            {isAdmin && (
+              <button
+                onClick={() => ordersQuery.refetch()}
+                disabled={ordersQuery.isFetching}
+                className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-3 py-2 text-sm font-medium hover:border-primary disabled:opacity-60"
+              >
+                <RefreshCw
+                  className={`h-4 w-4 ${ordersQuery.isFetching ? "animate-spin" : ""}`}
+                />
+                Refresh
+              </button>
+            )}
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 

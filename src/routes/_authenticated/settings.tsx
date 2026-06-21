@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Loader2, Save, Building2, Phone, Bell, CheckCircle2, AlertCircle } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
@@ -106,15 +107,18 @@ function SettingsPage() {
     <div className="min-h-screen bg-background">
       <Toaster richColors position="top-center" />
       <header className="sticky top-0 z-10 border-b border-border bg-background/80 backdrop-blur">
-        <div className="mx-auto flex max-w-3xl items-center gap-3 px-6 py-4">
-          <Link
-            to="/"
-            className="grid h-9 w-9 place-items-center rounded-md hover:bg-secondary"
-            aria-label="Back to site"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
-          <h1 className="font-display text-xl font-bold text-primary">Settings</h1>
+        <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-4">
+          <div className="flex items-center gap-3">
+            <Link
+              to="/"
+              className="grid h-9 w-9 place-items-center rounded-md hover:bg-secondary"
+              aria-label="Back to site"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+            <h1 className="font-display text-xl font-bold text-primary">Settings</h1>
+          </div>
+          <ThemeToggle />
         </div>
       </header>
 
