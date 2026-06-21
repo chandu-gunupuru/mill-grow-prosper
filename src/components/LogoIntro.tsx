@@ -90,26 +90,31 @@ export function LogoIntro({ children }: LogoIntroProps) {
           >
             <motion.div
               className="flex cursor-default flex-col items-center"
-              initial={{ scale: 0.6, opacity: 0, y: 60 }}
-              animate={{
-                scale: [0.6, 1.05, 1],
-                opacity: [0, 1, 1],
-                y: [60, 0, 0],
+              variants={{
+                hidden: { scale: 0.6, opacity: 0, y: 60 },
+                bloom: {
+                  scale: [0.6, 1.05, 1],
+                  opacity: [0, 1, 1],
+                  y: [60, 0, 0],
+                  transition: {
+                    duration: 2.4,
+                    times: [0, 0.35, 0.55],
+                    ease: [0.22, 1, 0.36, 1],
+                  },
+                },
+                exit: {
+                  scale: 1.15,
+                  opacity: 0,
+                  y: -120,
+                  transition: {
+                    duration: 0.7,
+                    ease: "easeIn",
+                  },
+                },
               }}
-              exit={{
-                scale: 1.15,
-                opacity: 0,
-                y: -120,
-              }}
-              transition={{
-                duration: 2.4,
-                times: [0, 0.35, 0.55],
-                ease: [0.22, 1, 0.36, 1],
-              }}
-              exitTransition={{
-                duration: 0.7,
-                ease: "easeIn",
-              }}
+              initial="hidden"
+              animate="bloom"
+              exit="exit"
               onAnimationComplete={finishIntro}
               onClick={(e) => e.stopPropagation()}
             >
