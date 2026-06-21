@@ -105,7 +105,10 @@ export function LogoIntro({ children }: LogoIntroProps) {
                 duration: 2.4,
                 times: [0, 0.35, 0.55],
                 ease: [0.22, 1, 0.36, 1],
-                exit: { duration: 0.7, ease: "easeIn" },
+              }}
+              exitTransition={{
+                duration: 0.7,
+                ease: "easeIn",
               }}
               onAnimationComplete={finishIntro}
               onClick={(e) => e.stopPropagation()}
