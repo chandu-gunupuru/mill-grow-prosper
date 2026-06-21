@@ -78,6 +78,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "color-scheme", content: "light dark" },
       { title: "Gayathri Modern Rice Mill — Premium Rice Manufacturer & Wholesale Supplier" },
       { name: "description", content: "Gayathri Modern Rice Mill manufactures and supplies premium Sona Masoori, Basmati, Steam & Raw rice in bulk to wholesalers, exporters, hotels and distributors." },
       { name: "author", content: "Gayathri Modern Rice Mill" },
