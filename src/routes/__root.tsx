@@ -125,7 +125,6 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
-      <ThemeToggle className="fixed top-3.5 right-3 md:right-4 z-[60]" />
       <ScrollArrows />
     </QueryClientProvider>
   );
