@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Loader2, Leaf, ArrowLeft, Mail, Phone, CheckCircle2, AlertTriangle, Clock } from "lucide-react";
+import { Loader2, Leaf, ArrowLeft, Mail, Phone, CheckCircle2, AlertTriangle, Clock, RotateCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/useAuth";
@@ -106,27 +106,70 @@ function AuthPage() {
     }
   };
 
-  const handleGoogle = async () => {
+  const MAX_GOOGLE_AUTO_RETRIES = 2;
+  const GOOGLE_TIMEOUT_MS = 12000;
+  const [googleError, setGoogleError] = useState<string | null>(null);
+  const [googleRetryCount, setGoogleRetryCount] = useState(0);
+  const [googleAutoRetrying, setGoogleAutoRetrying] = useState(false);
+
+  const runGoogleSignIn = async (attempt: number): Promise<void> => {
     setBusy(true);
+    setGoogleError(null);
+
+    let timedOut = false;
+    const timeout = new Promise<{ timeout: true }>((resolve) => {
+      window.setTimeout(() => {
+        timedOut = true;
+        resolve({ timeout: true });
+      }, GOOGLE_TIMEOUT_MS);
+    });
+
     try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
-      });
-      if (result.error) {
-        toast.error(result.error.message || "Google sign-in failed");
-        setBusy(false);
-        return;
+      const result = await Promise.race([
+        lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin }),
+        timeout,
+      ]);
+
+      if ("timeout" in result) {
+        throw new Error(
+          "Google didn't respond in time. This is usually a pop-up blocker, a slow network, or a third-party cookie block.",
+        );
       }
+      if (result.error) throw new Error(result.error.message || "Google sign-in failed");
       // Browser is being redirected to Google — keep the spinner up
       if (result.redirected) return;
-      // Tokens received in-place; do a hard replace so the home page
-      // mounts with the fresh session instead of flashing logged-out UI.
+
       toast.success("Signed in!");
       window.location.replace("/");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Google sign-in failed");
+      const message = err instanceof Error ? err.message : "Google sign-in failed";
+
+      // Auto re-attempt for transient failures (timeout / network)
+      const isTransient =
+        timedOut ||
+        /network|timeout|timed out|fetch|load failed|temporarily/i.test(message);
+
+      if (isTransient && attempt < MAX_GOOGLE_AUTO_RETRIES) {
+        setGoogleAutoRetrying(true);
+        setGoogleRetryCount(attempt + 1);
+        toast.message(`Retrying Google sign-in (${attempt + 1}/${MAX_GOOGLE_AUTO_RETRIES})…`);
+        const backoff = 800 * (attempt + 1);
+        await new Promise((r) => window.setTimeout(r, backoff));
+        setGoogleAutoRetrying(false);
+        return runGoogleSignIn(attempt + 1);
+      }
+
+      setGoogleError(message);
       setBusy(false);
+      toast.error(message, {
+        action: { label: "Retry", onClick: () => runGoogleSignIn(0) },
+      });
     }
+  };
+
+  const handleGoogle = () => {
+    setGoogleRetryCount(0);
+    void runGoogleSignIn(0);
   };
   const classifyPhoneError = (raw: string, stage: "send" | "verify") => {
     const m = raw.toLowerCase();
