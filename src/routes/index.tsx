@@ -468,7 +468,15 @@ function Index() {
               <span className="relative inline-flex">
                 <ShoppingCart className="w-5 h-5" />
                 {cartCount > 0 && (
-                  <span className="absolute -top-2 -right-2.5 text-primary text-[11px] font-bold leading-none tabular-nums tracking-tight">{cartCount > 99 ? "99+" : cartCount}</span>
+                  <motion.span
+                    key={cartCount}
+                    initial={{ scale: 1.4, opacity: 0.6 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 18 }}
+                    className="absolute -top-2 -right-2.5 text-primary text-[11px] font-bold leading-none tabular-nums tracking-tight"
+                  >
+                    {cartCount > 99 ? "99+" : cartCount}
+                  </motion.span>
                 )}
               </span>
             </button>
