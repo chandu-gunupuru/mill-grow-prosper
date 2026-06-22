@@ -17,10 +17,10 @@ export function LogoIntro({ children }: LogoIntroProps) {
   useEffect(() => {
     setMounted(true);
 
-    // Show intro once per browser session, or if the user cleared storage.
+    // Show intro only on the very first visit (persisted across sessions).
     const seen =
       typeof window !== "undefined" &&
-      (window.sessionStorage.getItem(STORAGE_KEY) === "1" ||
+      (window.localStorage.getItem(STORAGE_KEY) === "1" ||
         document.body.hasAttribute(SESSION_ATTR));
 
     if (seen) {
