@@ -21,13 +21,18 @@ export function LogoIntro({ children }: LogoIntroProps) {
   useEffect(() => {
     setMounted(true);
 
+    const onHome =
+      typeof window === "undefined" || window.location.pathname === "/";
+
     const seen =
       typeof window !== "undefined" &&
       (introHasPlayed ||
         window.localStorage.getItem(STORAGE_KEY) === "1" ||
         document.body.hasAttribute(SESSION_ATTR));
 
-    if (seen) {
+    // Only play the intro on the home page; on any other route (e.g. /auth)
+    // skip immediately so it can't block the page UI.
+    if (seen || !onHome) {
       setShowIntro(false);
       setContentVisible(true);
       return;
