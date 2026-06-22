@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "motion/react";
 import {
   Phone, Mail, MapPin, MessageCircle, Award, Truck, Sparkles, ShieldCheck,
   Factory, Leaf, Package, CheckCircle2, Star, ArrowRight, ArrowLeft, Menu, X, Download,
-  ShoppingCart, Plus, Minus, Trash2, Loader2, ExternalLink, AlertCircle, Bell,
+  ShoppingCart, Plus, Minus, Trash2, Loader2, ExternalLink, AlertCircle, Bell, CheckSquare, Square,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
@@ -162,6 +162,8 @@ function Index() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [accountCenterOpen, setAccountCenterOpen] = useState(false);
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const touchStartX = useRef(0);
   const [form, setForm] = useState({ name: "", company: "", email: "", phone: "", product: "Sona Masoori Rice", qty: "", message: "" });
   const [sending, setSending] = useState(false);
@@ -1124,23 +1126,47 @@ function Index() {
                   <h3 className="font-bold text-lg text-primary truncate">Your Cart ({cartCount})</h3>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
-                  {items.length > 0 && (
+                  {items.length > 0 && !selectMode && (
                     <button
-                      onClick={async () => {
-                        if (!window.confirm("Remove all items from your cart?")) return;
-                        const variantIds = items.map((i) => i.variantId);
-                        for (const id of variantIds) {
-                          await removeItem(id);
-                        }
-                        toast.success("Cart cleared");
-                      }}
-                      disabled={isLoading || isSyncing}
-                      aria-label="Clear cart"
-                      title="Clear cart"
-                      className="inline-flex items-center gap-1.5 px-2.5 h-9 rounded-md text-xs font-semibold text-destructive hover:bg-destructive/10 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                      onClick={() => { setSelectMode(true); setSelectedIds(new Set()); }}
+                      className="inline-flex items-center gap-1.5 px-2.5 h-9 rounded-md text-xs font-semibold text-primary hover:bg-primary/10 transition"
                     >
-                      <Trash2 className="w-4 h-4" /> Clear all
+                      <CheckSquare className="w-4 h-4" /> Select
                     </button>
+                  )}
+                  {items.length > 0 && selectMode && (
+                    <>
+                      <button
+                        onClick={() => {
+                          if (selectedIds.size === items.length) setSelectedIds(new Set());
+                          else setSelectedIds(new Set(items.map((i) => i.variantId)));
+                        }}
+                        className="inline-flex items-center gap-1.5 px-2.5 h-9 rounded-md text-xs font-semibold text-primary hover:bg-primary/10 transition"
+                      >
+                        {selectedIds.size === items.length ? "Unselect" : "Select all"}
+                      </button>
+                      <button
+                        onClick={async () => {
+                          if (selectedIds.size === 0) return;
+                          if (!window.confirm(`Remove ${selectedIds.size} item(s) from your cart?`)) return;
+                          const ids = Array.from(selectedIds);
+                          for (const id of ids) await removeItem(id);
+                          setSelectedIds(new Set());
+                          setSelectMode(false);
+                          toast.success("Selected items removed");
+                        }}
+                        disabled={isLoading || isSyncing || selectedIds.size === 0}
+                        className="inline-flex items-center gap-1.5 px-2.5 h-9 rounded-md text-xs font-semibold text-destructive hover:bg-destructive/10 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                      >
+                        <Trash2 className="w-4 h-4" /> Remove ({selectedIds.size})
+                      </button>
+                      <button
+                        onClick={() => { setSelectMode(false); setSelectedIds(new Set()); }}
+                        className="inline-flex items-center px-2.5 h-9 rounded-md text-xs font-semibold text-muted-foreground hover:bg-secondary transition"
+                      >
+                        Cancel
+                      </button>
+                    </>
                   )}
                   <button onClick={() => setCartOpen(false)} aria-label="Close cart" className="w-9 h-9 grid place-items-center rounded-md hover:bg-secondary">
                     <X className="w-5 h-5" />
@@ -1176,6 +1202,22 @@ function Index() {
                       const lineTotal = parseFloat(item.price.amount) * item.quantity;
                       return (
                         <div key={item.variantId} className="flex gap-3 p-3 rounded-lg border border-border bg-card">
+                          {selectMode && (
+                            <button
+                              onClick={() => {
+                                setSelectedIds((prev) => {
+                                  const next = new Set(prev);
+                                  if (next.has(item.variantId)) next.delete(item.variantId);
+                                  else next.add(item.variantId);
+                                  return next;
+                                });
+                              }}
+                              aria-label={selectedIds.has(item.variantId) ? "Unselect item" : "Select item"}
+                              className="self-center text-primary"
+                            >
+                              {selectedIds.has(item.variantId) ? <CheckSquare className="w-5 h-5" /> : <Square className="w-5 h-5 text-muted-foreground" />}
+                            </button>
+                          )}
                           {img && <img src={img.url} alt={item.product.node.title} width={80} height={80} loading="lazy" className="w-20 h-20 rounded-md object-cover bg-cream" />}
                           <div className="flex-1 min-w-0">
                             <div className="font-semibold text-sm text-primary truncate">{item.product.node.title}</div>
@@ -1189,7 +1231,9 @@ function Index() {
                               <div className="font-bold text-primary">{symbol}{lineTotal.toFixed(0)}</div>
                             </div>
                           </div>
-                          <button onClick={() => removeItem(item.variantId)} aria-label="Remove" className="text-muted-foreground hover:text-destructive self-start"><Trash2 className="w-4 h-4" /></button>
+                          {!selectMode && (
+                            <button onClick={() => removeItem(item.variantId)} aria-label="Remove" className="text-muted-foreground hover:text-destructive self-start"><Trash2 className="w-4 h-4" /></button>
+                          )}
                         </div>
                       );
                     })}
