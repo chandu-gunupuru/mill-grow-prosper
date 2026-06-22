@@ -95,9 +95,17 @@ function HelpCenter() {
     }
   }
 
-  const waLink = `https://wa.me/${WHATSAPP.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
-    "Hello Gayathri Rice Mill, I need help with ",
-  )}`;
+  const greeting = form.name.trim() ? `Hello, I'm ${form.name.trim()}.` : "Hello Gayathri Rice Mill,";
+  const topic = form.category || "support";
+  const body = form.message.trim()
+    ? form.message.trim()
+    : `I need help with ${topic.toLowerCase()}.`;
+  const waText = `${greeting} ${body}`;
+  const waLink = `https://wa.me/${WHATSAPP.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(waText)}`;
+  const telLink = `tel:${PHONE.replace(/[^0-9+]/g, "")}`;
+  const mailSubject = `Help Center — ${topic}`;
+  const mailBody = `${greeting}\n\n${body}\n\n${form.phone ? `Phone: ${form.phone}\n` : ""}${form.email ? `Email: ${form.email}` : ""}`.trim();
+  const mailLink = `mailto:${EMAIL}?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
 
   return (
     <div className="min-h-screen bg-background">
