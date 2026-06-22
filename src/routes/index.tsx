@@ -449,8 +449,10 @@ function Index() {
               aria-label="View notifications"
               className="relative w-10 h-10 grid place-items-center"
             >
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-gold ring-2 ring-background" aria-hidden="true" />
+              <span className="relative inline-flex">
+                <Bell className="w-5 h-5" />
+                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-gold ring-2 ring-background" aria-hidden="true" />
+              </span>
             </button>
             <button onClick={() => setCartOpen(true)} aria-label="Open cart" className="relative w-10 h-10 grid place-items-center">
               <ShoppingCart className="w-5 h-5" />
