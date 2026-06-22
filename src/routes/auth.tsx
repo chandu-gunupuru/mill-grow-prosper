@@ -39,7 +39,7 @@ function AuthPage() {
   const cooldownFor = (attemptCount: number) => [30, 60, 120, 180][Math.min(attemptCount - 1, 3)] ?? 180;
 
   useEffect(() => {
-    if (user) navigate({ to: "/" });
+    if (user) navigate({ to: "/", replace: true });
   }, [user, navigate]);
 
   // Tick the cooldown every second; flip to "delayed" only once the cooldown expires
@@ -108,16 +108,25 @@ function AuthPage() {
 
   const handleGoogle = async () => {
     setBusy(true);
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) {
-      toast.error(result.error.message || "Google sign-in failed");
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) {
+        toast.error(result.error.message || "Google sign-in failed");
+        setBusy(false);
+        return;
+      }
+      // Browser is being redirected to Google — keep the spinner up
+      if (result.redirected) return;
+      // Tokens received in-place; do a hard replace so the home page
+      // mounts with the fresh session instead of flashing logged-out UI.
+      toast.success("Signed in!");
+      window.location.replace("/");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Google sign-in failed");
       setBusy(false);
-      return;
     }
-    if (result.redirected) return;
-    navigate({ to: "/" });
   };
   const classifyPhoneError = (raw: string, stage: "send" | "verify") => {
     const m = raw.toLowerCase();
