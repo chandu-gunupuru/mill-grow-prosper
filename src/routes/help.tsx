@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import { sendQuoteInquiry } from "@/lib/inquiry.functions";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { HelpFAQ } from "@/components/HelpFAQ";
+import { LiveChatWidget } from "@/components/LiveChatWidget";
 
 const WHATSAPP = "+919398553951";
 const PHONE = "+91 93985 53951";
@@ -212,9 +214,11 @@ function HelpCenter() {
         </div>
       </section>
 
+      <HelpFAQ />
+
       <main className="mx-auto grid max-w-5xl gap-8 px-6 py-10 md:grid-cols-[1.4fr_1fr]">
         {/* Form */}
-        <section className="rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8">
+        <section id="help-form" className="rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8">
           <div className="flex items-center gap-3">
             <div className="grid h-10 w-10 place-items-center rounded-full bg-primary/10">
               <LifeBuoy className="h-5 w-5 text-primary" />
