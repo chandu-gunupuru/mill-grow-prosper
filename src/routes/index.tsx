@@ -27,6 +27,7 @@ import { ProfileModal } from "@/components/ProfileModal";
 
 
 import paddyField from "@/assets/paddy-field.jpg?w=900&format=webp&quality=72&imagetools";
+import heroMill from "@/assets/hero-mill.jpg?w=1600&format=webp&quality=72&imagetools";
 import warehouse from "@/assets/warehouse.jpg?w=1200&format=webp&quality=72&imagetools";
 import machinery from "@/assets/machinery.jpg?w=1600&format=webp&quality=65&imagetools";
 import riceSona from "@/assets/rice-sona.jpg?w=800&format=webp&quality=72&imagetools";
