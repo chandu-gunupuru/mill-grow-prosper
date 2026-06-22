@@ -44,10 +44,19 @@ export const claimFirstAdmin = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const { error } = await context.supabase.rpc("claim_first_admin");
     if (error) {
-      throw new Error(error.message || "Could not claim admin role.");
+      const msg = error.message || "Could not claim admin role.";
+      const alreadyExists = /admin already exists/i.test(msg);
+      return {
+        ok: false as const,
+        alreadyExists,
+        message: alreadyExists
+          ? "An admin already exists. Ask an existing admin to grant you the role."
+          : msg,
+      };
     }
     return { ok: true as const };
   });
+
 
 /** Admin-only: fetch recent Shopify orders via Shopify Admin API. */
 export const listShopifyOrders = createServerFn({ method: "GET" })
