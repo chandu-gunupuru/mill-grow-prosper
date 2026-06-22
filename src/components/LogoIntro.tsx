@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, type KeyboardEvent } from "react";
 import { motion } from "motion/react";
 import { Logo } from "./Logo";
 
-const STORAGE_KEY = "gmrm_intro_seen";
+const STORAGE_KEY = "gmrm_intro_seen_v2";
 const SESSION_ATTR = "data-intro-shown";
 
 // Module-level guard: prevents a second play within the same page load
