@@ -12,6 +12,15 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
+function getPopupHelpUrl(): string {
+  if (typeof navigator === "undefined") return "https://support.google.com/chrome/answer/95472";
+  const ua = navigator.userAgent.toLowerCase();
+  if (/edg\//.test(ua)) return "https://support.microsoft.com/en-us/microsoft-edge/block-pop-ups-in-microsoft-edge-1d8ba4f8-f385-9a0b-e944-aa47339b6bb5";
+  if (/firefox/.test(ua)) return "https://support.mozilla.org/en-US/kb/pop-blocker-settings-exceptions-troubleshooting";
+  if (/safari/.test(ua) && !/chrome|crios|chromium/.test(ua)) return "https://support.apple.com/guide/safari/block-pop-ups-sfri40696/mac";
+  return "https://support.google.com/chrome/answer/95472";
+}
+
 function AuthPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
