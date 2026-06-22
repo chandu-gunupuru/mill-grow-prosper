@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Loader2, Leaf, ArrowLeft, Mail, Phone, CheckCircle2, AlertTriangle, Clock, RotateCw, ShieldAlert, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -127,6 +127,7 @@ function AuthPage() {
   const [googleError, setGoogleError] = useState<string | null>(null);
   const [googleErrorKind, setGoogleErrorKind] = useState<GoogleErrorKind | null>(null);
   const [googleTakingLong, setGoogleTakingLong] = useState(false);
+  const googleAttemptRef = useRef(0);
   const googlePopupBlocked = googleErrorKind === "popup_blocked";
 
   const classifyGoogleError = (raw: string): GoogleErrorKind => {
@@ -198,19 +199,23 @@ function AuthPage() {
     setGoogleErrorKind(null);
     setGoogleTakingLong(false);
     setBusy(true);
+    const attemptId = googleAttemptRef.current + 1;
+    googleAttemptRef.current = attemptId;
 
     // Soft status only: OAuth can take longer than 15s while the user chooses
     // an account. Do not mark it as failed unless the auth provider returns an
     // actual error, otherwise users see a false timeout while sign-in is still working.
     let settled = false;
     const longWaitNotice = window.setTimeout(() => {
-      if (!settled) setGoogleTakingLong(true);
+      if (settled || googleAttemptRef.current !== attemptId) return;
+      setGoogleTakingLong(true);
+      setBusy(false);
     }, 15000);
 
     lovable.auth
       .signInWithOAuth("google", { redirect_uri: window.location.origin })
       .then((result) => {
-        if (settled) return;
+        if (settled || googleAttemptRef.current !== attemptId) return;
         settled = true;
         window.clearTimeout(longWaitNotice);
         setGoogleTakingLong(false);
@@ -224,7 +229,7 @@ function AuthPage() {
         window.location.replace("/");
       })
       .catch((err) => {
-        if (settled) return;
+        if (settled || googleAttemptRef.current !== attemptId) return;
         settled = true;
         window.clearTimeout(longWaitNotice);
         setGoogleTakingLong(false);
