@@ -370,18 +370,18 @@ function Index() {
                     if (diff > 80) setAccountOpen(false);
                   }}
                 >
-                  <SheetHeader>
+                  <SheetHeader className="shrink-0 border-b border-border px-6 py-4">
                     <SheetTitle className="flex items-center gap-3">
                       {user.user_metadata?.avatar_url ? (
-                        <img src={user.user_metadata.avatar_url} alt="" className="w-10 h-10 rounded-full object-cover border border-primary/20" />
+                        <img src={user.user_metadata.avatar_url} alt="" className="w-10 h-10 shrink-0 rounded-full object-cover border border-primary/20" />
                       ) : (
-                        <div className="w-10 h-10 rounded-full bg-primary/10 grid place-items-center">
+                        <div className="w-10 h-10 shrink-0 rounded-full bg-primary/10 grid place-items-center">
                           <UserIcon className="w-5 h-5 text-primary" />
                         </div>
                       )}
-                      <div className="text-left">
-                        <div className="text-base font-semibold">{user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0]}</div>
-                        <div className="text-xs text-muted-foreground font-normal">{user.email}</div>
+                      <div className="min-w-0 text-left">
+                        <div className="truncate text-base font-semibold">{user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0]}</div>
+                        <div className="truncate text-xs text-muted-foreground font-normal">{user.email}</div>
                       </div>
                     </SheetTitle>
                   </SheetHeader>
