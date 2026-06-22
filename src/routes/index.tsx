@@ -17,7 +17,7 @@ import { useCartSync } from "@/hooks/useCartSync";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "@tanstack/react-router";
-import { LogIn, LogOut, User as UserIcon, Settings, LayoutDashboard, ChevronRight, ShoppingBag, LifeBuoy, MapPinned, Languages, BellRing, Star as StarIcon } from "lucide-react";
+import { LogIn, LogOut, User as UserIcon, Settings, UserCog, ChevronRight, ShoppingBag, LifeBuoy, MapPinned, Languages, BellRing, Star as StarIcon } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { openShopifyCheckout, getOpenInSameTab, setOpenInSameTab } from "@/lib/checkout";
@@ -161,6 +161,7 @@ function Index() {
   const [cartOpen, setCartOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
+  const [accountCenterOpen, setAccountCenterOpen] = useState(false);
   const touchStartX = useRef(0);
   const [form, setForm] = useState({ name: "", company: "", email: "", phone: "", product: "Sona Masoori Rice", qty: "", message: "" });
   const [sending, setSending] = useState(false);
@@ -406,16 +407,15 @@ function Index() {
                       </button>
                     </motion.div>
                     <motion.div variants={{ hidden: { opacity: 0, x: 30 }, visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 300, damping: 24 } } }}>
-                      <Link
-                        to="/admin/orders"
-                        onClick={() => setAccountOpen(false)}
+                      <button
+                        onClick={() => setAccountCenterOpen(true)}
                         className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors"
                       >
                         <span className="flex items-center gap-3">
-                          <LayoutDashboard className="w-4 h-4 text-muted-foreground" /> Admin
+                          <UserCog className="w-4 h-4 text-muted-foreground" /> Account Center
                         </span>
                         <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                      </Link>
+                      </button>
                     </motion.div>
                     <motion.div variants={{ hidden: { opacity: 0, x: 30 }, visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 300, damping: 24 } } }}>
                       <Link
@@ -444,58 +444,6 @@ function Index() {
                     <motion.div variants={{ hidden: { opacity: 0, x: 30 }, visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 300, damping: 24 } } }}>
                       <Link
                         to="/settings"
-                        hash="addresses"
-                        onClick={() => setAccountOpen(false)}
-                        className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors"
-                      >
-                        <span className="flex items-center gap-3">
-                          <MapPinned className="w-4 h-4 text-muted-foreground" /> Saved Addresses
-                        </span>
-                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                      </Link>
-                    </motion.div>
-                    <motion.div variants={{ hidden: { opacity: 0, x: 30 }, visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 300, damping: 24 } } }}>
-                      <Link
-                        to="/settings"
-                        hash="language"
-                        onClick={() => setAccountOpen(false)}
-                        className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors"
-                      >
-                        <span className="flex items-center gap-3">
-                          <Languages className="w-4 h-4 text-muted-foreground" /> Language
-                        </span>
-                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                      </Link>
-                    </motion.div>
-                    <motion.div variants={{ hidden: { opacity: 0, x: 30 }, visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 300, damping: 24 } } }}>
-                      <Link
-                        to="/settings"
-                        hash="notifications"
-                        onClick={() => setAccountOpen(false)}
-                        className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors"
-                      >
-                        <span className="flex items-center gap-3">
-                          <BellRing className="w-4 h-4 text-muted-foreground" /> Notifications
-                        </span>
-                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                      </Link>
-                    </motion.div>
-                    <motion.div variants={{ hidden: { opacity: 0, x: 30 }, visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 300, damping: 24 } } }}>
-                      <Link
-                        to="/settings"
-                        hash="reviews"
-                        onClick={() => setAccountOpen(false)}
-                        className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors"
-                      >
-                        <span className="flex items-center gap-3">
-                          <StarIcon className="w-4 h-4 text-muted-foreground" /> My Reviews
-                        </span>
-                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                      </Link>
-                    </motion.div>
-                    <motion.div variants={{ hidden: { opacity: 0, x: 30 }, visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 300, damping: 24 } } }}>
-                      <Link
-                        to="/settings"
                         onClick={() => setAccountOpen(false)}
                         className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors"
                       >
@@ -518,6 +466,41 @@ function Index() {
                       </button>
                     </motion.div>
                   </motion.div>
+                </SheetContent>
+              </Sheet>
+            )}
+            {user && (
+              <Sheet open={accountCenterOpen} onOpenChange={setAccountCenterOpen}>
+                <SheetContent side="right" className="w-80 sm:max-w-sm">
+                  <SheetHeader>
+                    <SheetTitle className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 grid place-items-center">
+                        <UserCog className="w-5 h-5 text-primary" />
+                      </div>
+                      <div className="text-left">
+                        <div className="text-base font-semibold">Account Center</div>
+                        <div className="text-xs text-muted-foreground font-normal">Manage your preferences</div>
+                      </div>
+                    </SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-8 flex flex-col gap-2">
+                    <Link to="/settings" hash="addresses" onClick={() => setAccountCenterOpen(false)} className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors">
+                      <span className="flex items-center gap-3"><MapPinned className="w-4 h-4 text-muted-foreground" /> Saved Addresses</span>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                    </Link>
+                    <Link to="/settings" hash="language" onClick={() => setAccountCenterOpen(false)} className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors">
+                      <span className="flex items-center gap-3"><Languages className="w-4 h-4 text-muted-foreground" /> Language</span>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                    </Link>
+                    <Link to="/settings" hash="notifications" onClick={() => setAccountCenterOpen(false)} className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors">
+                      <span className="flex items-center gap-3"><BellRing className="w-4 h-4 text-muted-foreground" /> Notifications</span>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                    </Link>
+                    <Link to="/settings" hash="reviews" onClick={() => setAccountCenterOpen(false)} className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors">
+                      <span className="flex items-center gap-3"><StarIcon className="w-4 h-4 text-muted-foreground" /> My Reviews</span>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                    </Link>
+                  </div>
                 </SheetContent>
               </Sheet>
             )}
