@@ -119,7 +119,44 @@ const gallery = [
   { img: millPacking, alt: "Automated rice packaging line" },
 ];
 
+const MILL_SLIDES = [
+  { src: millInterior, alt: "Inside the rice mill — modern processing line" },
+  { src: machinery, alt: "Precision milling machinery in operation" },
+  { src: millPacking, alt: "Automated rice packing station" },
+  { src: millLab, alt: "Quality control lab testing rice samples" },
+  { src: millWarehouse, alt: "Warehouse stacked with finished rice bags" },
+  { src: millAerial, alt: "Aerial view of the rice mill facility" },
+];
+
+function HeroMillSlideshow() {
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setI((p) => (p + 1) % MILL_SLIDES.length), 5000);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
+      <AnimatePresence mode="sync">
+        <motion.img
+          key={i}
+          src={MILL_SLIDES[i].src}
+          alt={MILL_SLIDES[i].alt}
+          className="absolute inset-0 w-full h-full object-cover"
+          initial={{ opacity: 0, scale: 1.05 }}
+          animate={{ opacity: 1, scale: 1.18 }}
+          exit={{ opacity: 0 }}
+          transition={{
+            opacity: { duration: 1.4, ease: "easeInOut" },
+            scale: { duration: 6.4, ease: "linear" },
+          }}
+        />
+      </AnimatePresence>
+    </div>
+  );
+}
+
 function Index() {
+
   const [navOpen, setNavOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
