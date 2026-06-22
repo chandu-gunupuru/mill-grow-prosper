@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { ScrollArrows } from "../components/ScrollArrows";
 import { LogoIntro } from "../components/LogoIntro";
+import { LanguageProvider } from "../hooks/useLanguage";
 
 function NotFoundComponent() {
   return (
@@ -131,12 +132,14 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Logo intro plays once per session on first website open. */}
-      <LogoIntro>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-      </LogoIntro>
-      <ScrollArrows />
+      <LanguageProvider>
+        {/* Logo intro plays once per session on first website open. */}
+        <LogoIntro>
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+        </LogoIntro>
+        <ScrollArrows />
+      </LanguageProvider>
     </QueryClientProvider>
   );
 }
