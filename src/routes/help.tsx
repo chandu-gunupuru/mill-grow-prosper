@@ -133,6 +133,62 @@ function HelpCenter() {
         </div>
       </header>
 
+      <section className="mx-auto max-w-5xl px-6 pt-8">
+        <div className="rounded-2xl border border-border bg-gradient-to-br from-primary/5 via-card to-card p-5 shadow-sm sm:p-6">
+          <div className="flex flex-wrap items-end justify-between gap-2">
+            <div className="min-w-0">
+              <h2 className="font-display text-lg font-bold text-primary sm:text-xl">
+                Need help right now?
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Reach our team instantly — pick the option that works best for you.
+              </p>
+            </div>
+            <span className="text-xs text-muted-foreground">Mon–Sat · 9 AM – 7 PM IST</span>
+          </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-3">
+            <a
+              href={telLink}
+              className="group flex items-center gap-3 rounded-xl border border-border bg-background p-4 hover:border-primary hover:shadow-md transition"
+            >
+              <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+                <Phone className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-xs text-muted-foreground">Click to call</div>
+                <div className="truncate font-semibold text-primary">{PHONE}</div>
+              </div>
+            </a>
+            <a
+              href={waLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex items-center gap-3 rounded-xl border border-border bg-background p-4 hover:border-primary hover:shadow-md transition"
+            >
+              <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-green-500/10 text-green-600 dark:text-green-400">
+                <MessageCircle className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-xs text-muted-foreground">WhatsApp message</div>
+                <div className="truncate font-semibold text-primary">Chat on WhatsApp</div>
+              </div>
+            </a>
+            <a
+              href={mailLink}
+              className="group flex items-center gap-3 rounded-xl border border-border bg-background p-4 hover:border-primary hover:shadow-md transition"
+            >
+              <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+                <Mail className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-xs text-muted-foreground">Send email</div>
+                <div className="truncate font-semibold text-primary">{EMAIL}</div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </section>
+
       <main className="mx-auto grid max-w-5xl gap-8 px-6 py-10 md:grid-cols-[1.4fr_1fr]">
         {/* Form */}
         <section className="rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8">
