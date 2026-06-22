@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, type KeyboardEvent } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 import { Logo } from "./Logo";
 
 const STORAGE_KEY = "gmrm_intro_seen";
