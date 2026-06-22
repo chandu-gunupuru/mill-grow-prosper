@@ -17,10 +17,10 @@ export function LogoIntro({ children }: LogoIntroProps) {
   useEffect(() => {
     setMounted(true);
 
-    // Show intro once per browser session, or if the user cleared storage.
+    // Show intro only on the very first visit (persisted across sessions).
     const seen =
       typeof window !== "undefined" &&
-      (window.sessionStorage.getItem(STORAGE_KEY) === "1" ||
+      (window.localStorage.getItem(STORAGE_KEY) === "1" ||
         document.body.hasAttribute(SESSION_ATTR));
 
     if (seen) {
@@ -44,7 +44,7 @@ export function LogoIntro({ children }: LogoIntroProps) {
   const finishIntro = useCallback(() => {
     setShowIntro(false);
     if (typeof window !== "undefined") {
-      window.sessionStorage.setItem(STORAGE_KEY, "1");
+      window.localStorage.setItem(STORAGE_KEY, "1");
       document.body.setAttribute(SESSION_ATTR, "true");
     }
     // Small delay before fading the page in so the overlay is gone first.
