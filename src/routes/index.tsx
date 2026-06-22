@@ -393,7 +393,7 @@ function Index() {
                       hidden: { opacity: 0 },
                       visible: { opacity: 1, transition: { staggerChildren: 0.06, delayChildren: 0.1 } },
                     }}
-                    className="mt-8 flex flex-col gap-2"
+                    className="mt-0 flex flex-1 flex-col gap-2 overflow-y-auto overscroll-contain px-4 py-4 pb-[env(safe-area-inset-bottom)]"
                   >
                     <motion.div variants={{ hidden: { opacity: 0, x: 30 }, visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 300, damping: 24 } } }}>
                       <button
