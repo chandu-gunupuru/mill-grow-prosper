@@ -1126,23 +1126,47 @@ function Index() {
                   <h3 className="font-bold text-lg text-primary truncate">Your Cart ({cartCount})</h3>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
-                  {items.length > 0 && (
+                  {items.length > 0 && !selectMode && (
                     <button
-                      onClick={async () => {
-                        if (!window.confirm("Remove all items from your cart?")) return;
-                        const variantIds = items.map((i) => i.variantId);
-                        for (const id of variantIds) {
-                          await removeItem(id);
-                        }
-                        toast.success("Cart cleared");
-                      }}
-                      disabled={isLoading || isSyncing}
-                      aria-label="Clear cart"
-                      title="Clear cart"
-                      className="inline-flex items-center gap-1.5 px-2.5 h-9 rounded-md text-xs font-semibold text-destructive hover:bg-destructive/10 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                      onClick={() => { setSelectMode(true); setSelectedIds(new Set()); }}
+                      className="inline-flex items-center gap-1.5 px-2.5 h-9 rounded-md text-xs font-semibold text-primary hover:bg-primary/10 transition"
                     >
-                      <Trash2 className="w-4 h-4" /> Clear all
+                      <CheckSquare className="w-4 h-4" /> Select
                     </button>
+                  )}
+                  {items.length > 0 && selectMode && (
+                    <>
+                      <button
+                        onClick={() => {
+                          if (selectedIds.size === items.length) setSelectedIds(new Set());
+                          else setSelectedIds(new Set(items.map((i) => i.variantId)));
+                        }}
+                        className="inline-flex items-center gap-1.5 px-2.5 h-9 rounded-md text-xs font-semibold text-primary hover:bg-primary/10 transition"
+                      >
+                        {selectedIds.size === items.length ? "Unselect" : "Select all"}
+                      </button>
+                      <button
+                        onClick={async () => {
+                          if (selectedIds.size === 0) return;
+                          if (!window.confirm(`Remove ${selectedIds.size} item(s) from your cart?`)) return;
+                          const ids = Array.from(selectedIds);
+                          for (const id of ids) await removeItem(id);
+                          setSelectedIds(new Set());
+                          setSelectMode(false);
+                          toast.success("Selected items removed");
+                        }}
+                        disabled={isLoading || isSyncing || selectedIds.size === 0}
+                        className="inline-flex items-center gap-1.5 px-2.5 h-9 rounded-md text-xs font-semibold text-destructive hover:bg-destructive/10 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                      >
+                        <Trash2 className="w-4 h-4" /> Remove ({selectedIds.size})
+                      </button>
+                      <button
+                        onClick={() => { setSelectMode(false); setSelectedIds(new Set()); }}
+                        className="inline-flex items-center px-2.5 h-9 rounded-md text-xs font-semibold text-muted-foreground hover:bg-secondary transition"
+                      >
+                        Cancel
+                      </button>
+                    </>
                   )}
                   <button onClick={() => setCartOpen(false)} aria-label="Close cart" className="w-9 h-9 grid place-items-center rounded-md hover:bg-secondary">
                     <X className="w-5 h-5" />
