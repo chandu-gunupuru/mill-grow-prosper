@@ -27,6 +27,7 @@ import { ProfileModal } from "@/components/ProfileModal";
 
 
 import paddyField from "@/assets/paddy-field.jpg?w=900&format=webp&quality=72&imagetools";
+import heroMill from "@/assets/hero-mill.jpg?w=1600&format=webp&quality=72&imagetools";
 import warehouse from "@/assets/warehouse.jpg?w=1200&format=webp&quality=72&imagetools";
 import machinery from "@/assets/machinery.jpg?w=1600&format=webp&quality=65&imagetools";
 import riceSona from "@/assets/rice-sona.jpg?w=800&format=webp&quality=72&imagetools";
@@ -536,8 +537,18 @@ function Index() {
 
       {/* HERO */}
       <section id="top" className="relative min-h-screen flex items-center pt-16 overflow-hidden bg-primary">
-        {/* Animated brand backdrop — replaces the static photo */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,oklch(0.35_0.06_60_/_0.9),transparent_60%),radial-gradient(circle_at_80%_30%,oklch(0.55_0.14_70_/_0.45),transparent_55%),radial-gradient(circle_at_50%_90%,oklch(0.25_0.04_60_/_0.95),transparent_60%)]" aria-hidden="true" />
+        {/* Animated mill photo backdrop — slow ken-burns pan/zoom */}
+        <motion.img
+          src={heroMill}
+          alt="Gayathri Modern Rice Mill exterior"
+          className="absolute inset-0 w-full h-full object-cover"
+          initial={{ scale: 1.05, x: 0, y: 0 }}
+          animate={{ scale: [1.05, 1.18, 1.05], x: [0, -20, 0], y: [0, -10, 0] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+          aria-hidden="true"
+        />
+        {/* Color wash on top of photo */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,oklch(0.25_0.06_60_/_0.85),transparent_60%),radial-gradient(circle_at_80%_30%,oklch(0.55_0.14_70_/_0.35),transparent_55%),radial-gradient(circle_at_50%_90%,oklch(0.20_0.04_60_/_0.9),transparent_60%)]" aria-hidden="true" />
 
         {/* Slow drifting gold orbs */}
         <motion.div
