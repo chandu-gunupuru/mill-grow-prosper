@@ -537,16 +537,9 @@ function Index() {
 
       {/* HERO */}
       <section id="top" className="relative min-h-screen flex items-center pt-16 overflow-hidden bg-primary">
-        {/* Animated mill photo backdrop — slow ken-burns pan/zoom */}
-        <motion.img
-          src={heroMill}
-          alt="Gayathri Modern Rice Mill exterior"
-          className="absolute inset-0 w-full h-full object-cover"
-          initial={{ scale: 1.05, x: 0, y: 0 }}
-          animate={{ scale: [1.05, 1.18, 1.05], x: [0, -20, 0], y: [0, -10, 0] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-          aria-hidden="true"
-        />
+        {/* Inside-the-mill cycling slideshow — crossfade + ken-burns */}
+        <HeroMillSlideshow />
+
         {/* Color wash on top of photo */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,oklch(0.25_0.06_60_/_0.85),transparent_60%),radial-gradient(circle_at_80%_30%,oklch(0.55_0.14_70_/_0.35),transparent_55%),radial-gradient(circle_at_50%_90%,oklch(0.20_0.04_60_/_0.9),transparent_60%)]" aria-hidden="true" />
 
