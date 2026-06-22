@@ -5,6 +5,10 @@ import { Logo } from "./Logo";
 const STORAGE_KEY = "gmrm_intro_seen";
 const SESSION_ATTR = "data-intro-shown";
 
+// Module-level guard: prevents a second play within the same page load
+// (e.g. React StrictMode double-invoking effects, or remounts).
+let introHasPlayed = false;
+
 interface LogoIntroProps {
   children: React.ReactNode;
 }
@@ -17,16 +21,23 @@ export function LogoIntro({ children }: LogoIntroProps) {
   useEffect(() => {
     setMounted(true);
 
-    // Show intro only on the very first visit (persisted across sessions).
     const seen =
       typeof window !== "undefined" &&
-      (window.localStorage.getItem(STORAGE_KEY) === "1" ||
+      (introHasPlayed ||
+        window.localStorage.getItem(STORAGE_KEY) === "1" ||
         document.body.hasAttribute(SESSION_ATTR));
 
     if (seen) {
       setShowIntro(false);
       setContentVisible(true);
       return;
+    }
+
+    // Claim the intro slot synchronously so a second effect run can't replay it.
+    introHasPlayed = true;
+    if (typeof window !== "undefined") {
+      document.body.setAttribute(SESSION_ATTR, "true");
+      window.localStorage.setItem(STORAGE_KEY, "1");
     }
 
     const prefersReducedMotion =
