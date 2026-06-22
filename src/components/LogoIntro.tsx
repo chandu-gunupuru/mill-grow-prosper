@@ -53,15 +53,13 @@ export function LogoIntro({ children }: LogoIntroProps) {
   }, []);
 
   const finishIntro = useCallback(() => {
-    setShowIntro(false);
     if (typeof window !== "undefined") {
       window.localStorage.setItem(STORAGE_KEY, "1");
       document.body.setAttribute(SESSION_ATTR, "true");
     }
-    // Small delay before fading the page in so the overlay is gone first.
-    requestAnimationFrame(() => {
-      setContentVisible(true);
-    });
+    // Reveal the site immediately, then unmount the overlay in the same tick.
+    setContentVisible(true);
+    setShowIntro(false);
   }, []);
 
   const handleSkip = useCallback(() => {
