@@ -31,7 +31,7 @@ function applyThemeClass(theme: Theme) {
 }
 
 const THEME_TRANSITION_CLASS = "theme-transition";
-const THEME_TRANSITION_DURATION = 350;
+const THEME_TRANSITION_DURATION = 500;
 
 function prefersReducedMotion() {
   return typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
