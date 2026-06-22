@@ -51,12 +51,17 @@ function AdminOrdersPage() {
 
   const claimMutation = useMutation({
     mutationFn: () => claimFn(),
-    onSuccess: () => {
-      toast.success("You're now an admin.");
-      adminQuery.refetch();
+    onSuccess: (res) => {
+      if (res.ok) {
+        toast.success("You're now an admin.");
+        adminQuery.refetch();
+      } else {
+        toast.error(res.message);
+      }
     },
     onError: (err: Error) => toast.error(err.message),
   });
+
 
   return (
     <div className="min-h-screen bg-background">
