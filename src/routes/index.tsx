@@ -408,7 +408,7 @@ function Index() {
                     </motion.div>
                     <motion.div variants={{ hidden: { opacity: 0, x: 30 }, visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 300, damping: 24 } } }}>
                       <button
-                        onClick={() => setAccountCenterOpen(true)}
+                        onClick={() => { setAccountOpen(false); setAccountCenterOpen(true); }}
                         className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors"
                       >
                         <span className="flex items-center gap-3">
