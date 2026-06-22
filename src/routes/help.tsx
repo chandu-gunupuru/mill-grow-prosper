@@ -456,6 +456,14 @@ function HelpCenter() {
           </div>
         </SheetContent>
       </Sheet>
+
+      <LiveChatWidget
+        phone={PHONE}
+        email={EMAIL}
+        waLink={waLink}
+        telLink={telLink}
+        mailLink={mailLink}
+      />
     </div>
   );
 }
