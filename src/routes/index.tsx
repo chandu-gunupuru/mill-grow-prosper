@@ -407,6 +407,14 @@ function Index() {
                 </SheetContent>
               </Sheet>
             )}
+            <button
+              onClick={() => toast.info("No new notifications", { description: "You're all caught up." })}
+              aria-label="View notifications"
+              className="relative w-11 h-11 rounded-md border border-border bg-card grid place-items-center hover:border-primary hover:text-primary transition"
+            >
+              <Bell className="w-5 h-5" />
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-gold ring-2 ring-background" aria-hidden="true" />
+            </button>
             <button onClick={() => setCartOpen(true)} aria-label="Open cart" className="relative w-11 h-11 rounded-md border border-border bg-card grid place-items-center hover:border-primary hover:text-primary transition">
               <ShoppingCart className="w-5 h-5" />
               {cartCount > 0 && (
