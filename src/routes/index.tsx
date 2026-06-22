@@ -421,7 +421,7 @@ function Index() {
               <span className="relative inline-flex">
                 <ShoppingCart className="w-5 h-5" />
                 {cartCount > 0 && (
-                  <span className="absolute -top-2 -right-2 text-primary text-[10px] font-bold min-w-[16px] h-[16px] grid place-items-center px-1">{cartCount}</span>
+                  <span className="absolute -top-2 -right-2.5 text-primary text-[11px] md:text-xs font-bold leading-none tabular-nums tracking-tight">{cartCount > 99 ? "99+" : cartCount}</span>
                 )}
               </span>
             </button>
