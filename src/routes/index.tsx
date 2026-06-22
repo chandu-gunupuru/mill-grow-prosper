@@ -602,25 +602,25 @@ function Index() {
           transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", repeatDelay: 1.5 }}
         />
 
-        {/* Rice grains raining from the top */}
-        <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
+        {/* Rice grains raining from the top — reduced count on mobile, disabled for reduced-motion users */}
+        <div className="absolute inset-0 overflow-hidden motion-reduce:hidden" aria-hidden="true">
           {[
-            { left: "5%",  size: 5, delay: 0,   dur: 6 },
-            { left: "12%", size: 4, delay: 1.2, dur: 7 },
-            { left: "20%", size: 6, delay: 0.5, dur: 5.5 },
-            { left: "28%", size: 4, delay: 2.1, dur: 7.5 },
-            { left: "36%", size: 5, delay: 0.9, dur: 6.2 },
-            { left: "44%", size: 6, delay: 2.8, dur: 5.8 },
-            { left: "52%", size: 4, delay: 0.3, dur: 7 },
-            { left: "60%", size: 5, delay: 1.7, dur: 6.5 },
-            { left: "68%", size: 6, delay: 0.6, dur: 5.6 },
-            { left: "76%", size: 4, delay: 2.4, dur: 7.2 },
-            { left: "84%", size: 5, delay: 1.1, dur: 6 },
-            { left: "92%", size: 4, delay: 3,   dur: 6.8 },
+            { left: "5%",  size: 5, delay: 0,   dur: 6,   mobile: true  },
+            { left: "12%", size: 4, delay: 1.2, dur: 7,   mobile: false },
+            { left: "20%", size: 6, delay: 0.5, dur: 5.5, mobile: false },
+            { left: "28%", size: 4, delay: 2.1, dur: 7.5, mobile: true  },
+            { left: "36%", size: 5, delay: 0.9, dur: 6.2, mobile: false },
+            { left: "44%", size: 6, delay: 2.8, dur: 5.8, mobile: false },
+            { left: "52%", size: 4, delay: 0.3, dur: 7,   mobile: true  },
+            { left: "60%", size: 5, delay: 1.7, dur: 6.5, mobile: false },
+            { left: "68%", size: 6, delay: 0.6, dur: 5.6, mobile: false },
+            { left: "76%", size: 4, delay: 2.4, dur: 7.2, mobile: true  },
+            { left: "84%", size: 5, delay: 1.1, dur: 6,   mobile: false },
+            { left: "92%", size: 4, delay: 3,   dur: 6.8, mobile: false },
           ].map((g, i) => (
             <motion.span
               key={i}
-              className="absolute block rounded-full bg-gradient-to-br from-amber-100 to-gold shadow-[0_0_6px_rgba(255,210,120,0.6)]"
+              className={`absolute block rounded-full bg-gradient-to-br from-amber-100 to-gold shadow-[0_0_6px_rgba(255,210,120,0.6)] ${g.mobile ? "" : "hidden md:block"}`}
               style={{
                 left: g.left,
                 top: "-5%",
@@ -643,6 +643,7 @@ function Index() {
             />
           ))}
         </div>
+
 
 
         {/* Foreground readability wash */}
