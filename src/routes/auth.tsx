@@ -106,70 +106,49 @@ function AuthPage() {
     }
   };
 
-  const MAX_GOOGLE_AUTO_RETRIES = 2;
-  const GOOGLE_TIMEOUT_MS = 12000;
   const [googleError, setGoogleError] = useState<string | null>(null);
-  const [googleRetryCount, setGoogleRetryCount] = useState(0);
-  const [googleAutoRetrying, setGoogleAutoRetrying] = useState(false);
+  const [googlePopupBlocked, setGooglePopupBlocked] = useState(false);
 
-  const runGoogleSignIn = async (attempt: number): Promise<void> => {
-    setBusy(true);
-    setGoogleError(null);
-
-    let timedOut = false;
-    const timeout = new Promise<{ timeout: true }>((resolve) => {
-      window.setTimeout(() => {
-        timedOut = true;
-        resolve({ timeout: true });
-      }, GOOGLE_TIMEOUT_MS);
-    });
-
-    try {
-      const result = await Promise.race([
-        lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin }),
-        timeout,
-      ]);
-
-      if ("timeout" in result) {
-        throw new Error(
-          "Google didn't respond in time. This is usually a pop-up blocker, a slow network, or a third-party cookie block.",
-        );
-      }
-      if (result.error) throw new Error(result.error.message || "Google sign-in failed");
-      // Browser is being redirected to Google — keep the spinner up
-      if (result.redirected) return;
-
-      toast.success("Signed in!");
-      window.location.replace("/");
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Google sign-in failed";
-
-      // Auto re-attempt for transient failures (timeout / network)
-      const isTransient =
-        timedOut ||
-        /network|timeout|timed out|fetch|load failed|temporarily/i.test(message);
-
-      if (isTransient && attempt < MAX_GOOGLE_AUTO_RETRIES) {
-        setGoogleAutoRetrying(true);
-        setGoogleRetryCount(attempt + 1);
-        toast.message(`Retrying Google sign-in (${attempt + 1}/${MAX_GOOGLE_AUTO_RETRIES})…`);
-        const backoff = 800 * (attempt + 1);
-        await new Promise((r) => window.setTimeout(r, backoff));
-        setGoogleAutoRetrying(false);
-        return runGoogleSignIn(attempt + 1);
-      }
-
-      setGoogleError(message);
-      setBusy(false);
-      toast.error(message, {
-        action: { label: "Retry", onClick: () => runGoogleSignIn(0) },
-      });
-    }
-  };
-
+  // IMPORTANT: This must be invoked SYNCHRONOUSLY from a user click. Any
+  // `await` / `setTimeout` before calling `signInWithOAuth` makes browsers
+  // treat the resulting window.open as non-user-initiated and block it.
   const handleGoogle = () => {
-    setGoogleRetryCount(0);
-    void runGoogleSignIn(0);
+    setGoogleError(null);
+    setGooglePopupBlocked(false);
+    setBusy(true);
+
+    lovable.auth
+      .signInWithOAuth("google", { redirect_uri: window.location.origin })
+      .then((result) => {
+        if (result.error) {
+          const msg = result.error.message || "Google sign-in failed";
+          const blocked = /popup|pop-up|blocked|window\.open/i.test(msg);
+          setGooglePopupBlocked(blocked);
+          setGoogleError(
+            blocked
+              ? "Your browser blocked the Google sign-in window. Allow pop-ups for this site, then tap Try again."
+              : msg,
+          );
+          setBusy(false);
+          toast.error(blocked ? "Pop-up blocked by your browser" : msg);
+          return;
+        }
+        if (result.redirected) return; // browser is navigating to Google
+        toast.success("Signed in!");
+        window.location.replace("/");
+      })
+      .catch((err) => {
+        const msg = err instanceof Error ? err.message : "Google sign-in failed";
+        const blocked = /popup|pop-up|blocked|window\.open/i.test(msg);
+        setGooglePopupBlocked(blocked);
+        setGoogleError(
+          blocked
+            ? "Your browser blocked the Google sign-in window. Allow pop-ups for this site, then tap Try again."
+            : msg,
+        );
+        setBusy(false);
+        toast.error(blocked ? "Pop-up blocked by your browser" : msg);
+      });
   };
   const classifyPhoneError = (raw: string, stage: "send" | "verify") => {
     const m = raw.toLowerCase();
@@ -378,11 +357,7 @@ function AuthPage() {
                   <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.05l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/>
                 </svg>
               )}
-              {busy
-                ? googleAutoRetrying
-                  ? `Retrying… (${googleRetryCount}/${MAX_GOOGLE_AUTO_RETRIES})`
-                  : "Connecting to Google…"
-                : "Continue with Google"}
+              {busy ? "Connecting to Google…" : "Continue with Google"}
             </button>
 
             {googleError && !busy && (
@@ -392,12 +367,17 @@ function AuthPage() {
                   <div className="min-w-0">
                     <div className="font-semibold">Google sign-in didn't complete</div>
                     <p className="mt-0.5 text-destructive/80 leading-relaxed">{googleError}</p>
+                    {googlePopupBlocked && (
+                      <p className="mt-1.5 text-destructive/70 leading-relaxed">
+                        Tip: look for a blocked pop-up icon in your address bar, choose "Always allow", then tap Try again.
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="mt-2.5 flex flex-wrap gap-2">
                   <button
                     type="button"
-                    onClick={() => runGoogleSignIn(0)}
+                    onClick={handleGoogle}
                     className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:opacity-90"
                   >
                     <RotateCw className="w-3.5 h-3.5" /> Try again
