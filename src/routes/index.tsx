@@ -1116,16 +1116,36 @@ function Index() {
               className="fixed top-0 right-0 bottom-0 z-[61] w-full sm:w-[420px] bg-background shadow-2xl flex flex-col"
             >
               <div className="flex items-center justify-between p-5 border-b border-border">
-                <div className="flex items-center gap-3">
-                  <button onClick={() => setCartOpen(false)} aria-label="Back" className="w-9 h-9 grid place-items-center rounded-md hover:bg-secondary">
+                <div className="flex items-center gap-3 min-w-0">
+                  <button onClick={() => setCartOpen(false)} aria-label="Back" className="w-9 h-9 grid place-items-center rounded-md hover:bg-secondary shrink-0">
                     <ArrowLeft className="w-5 h-5" />
                   </button>
-                  <ShoppingCart className="w-5 h-5 text-primary" />
-                  <h3 className="font-bold text-lg text-primary">Your Cart ({cartCount})</h3>
+                  <ShoppingCart className="w-5 h-5 text-primary shrink-0" />
+                  <h3 className="font-bold text-lg text-primary truncate">Your Cart ({cartCount})</h3>
                 </div>
-                <button onClick={() => setCartOpen(false)} aria-label="Close cart" className="w-9 h-9 grid place-items-center rounded-md hover:bg-secondary">
-                  <X className="w-5 h-5" />
-                </button>
+                <div className="flex items-center gap-1 shrink-0">
+                  {items.length > 0 && (
+                    <button
+                      onClick={async () => {
+                        if (!window.confirm("Remove all items from your cart?")) return;
+                        const variantIds = items.map((i) => i.variantId);
+                        for (const id of variantIds) {
+                          await removeItem(id);
+                        }
+                        toast.success("Cart cleared");
+                      }}
+                      disabled={isLoading || isSyncing}
+                      aria-label="Clear cart"
+                      title="Clear cart"
+                      className="inline-flex items-center gap-1.5 px-2.5 h-9 rounded-md text-xs font-semibold text-destructive hover:bg-destructive/10 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                    >
+                      <Trash2 className="w-4 h-4" /> Clear all
+                    </button>
+                  )}
+                  <button onClick={() => setCartOpen(false)} aria-label="Close cart" className="w-9 h-9 grid place-items-center rounded-md hover:bg-secondary">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
 
               {checkoutError && (
