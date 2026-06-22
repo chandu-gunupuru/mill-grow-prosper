@@ -471,19 +471,19 @@ function Index() {
             )}
             {user && (
               <Sheet open={accountCenterOpen} onOpenChange={setAccountCenterOpen}>
-                <SheetContent side="right" className="w-80 sm:max-w-sm">
-                  <SheetHeader>
+                <SheetContent side="right" className="flex h-full w-[88vw] max-w-sm flex-col gap-0 overflow-hidden p-0 sm:w-80">
+                  <SheetHeader className="shrink-0 border-b border-border px-6 py-4">
                     <SheetTitle className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-primary/10 grid place-items-center">
+                      <div className="w-10 h-10 shrink-0 rounded-full bg-primary/10 grid place-items-center">
                         <UserCog className="w-5 h-5 text-primary" />
                       </div>
-                      <div className="text-left">
-                        <div className="text-base font-semibold">Account Center</div>
-                        <div className="text-xs text-muted-foreground font-normal">Manage your preferences</div>
+                      <div className="min-w-0 text-left">
+                        <div className="truncate text-base font-semibold">Account Center</div>
+                        <div className="truncate text-xs text-muted-foreground font-normal">Manage your preferences</div>
                       </div>
                     </SheetTitle>
                   </SheetHeader>
-                  <div className="mt-8 flex flex-col gap-2">
+                  <div className="flex flex-1 flex-col gap-2 overflow-y-auto overscroll-contain px-4 py-4 pb-[env(safe-area-inset-bottom)]">
                     <Link to="/settings" hash="addresses" onClick={() => setAccountCenterOpen(false)} className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors">
                       <span className="flex items-center gap-3"><MapPinned className="w-4 h-4 text-muted-foreground" /> Saved Addresses</span>
                       <ChevronRight className="w-4 h-4 text-muted-foreground" />
