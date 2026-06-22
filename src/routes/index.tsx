@@ -613,7 +613,7 @@ function Index() {
         {/* Foreground readability wash */}
         <div className="absolute inset-0 bg-gradient-to-r from-primary/70 via-primary/30 to-transparent" aria-hidden="true" />
 
-        <div className="relative max-w-7xl mx-auto px-6 py-20 w-full grid lg:grid-cols-[1.1fr_0.9fr] gap-12 items-center">
+        <div className="relative max-w-7xl mx-auto px-6 py-20 w-full">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="max-w-3xl">
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gold/20 backdrop-blur border border-gold/40 text-gold text-xs font-semibold tracking-wider uppercase">
               <Sparkles className="w-3.5 h-3.5" /> FSSAI · ISO · Export Certified
