@@ -602,43 +602,48 @@ function Index() {
           transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", repeatDelay: 1.5 }}
         />
 
-        {/* Floating rice grains */}
+        {/* Rice grains raining from the top */}
         <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
           {[
-            { left: "8%", size: 14, delay: 0, dur: 11 },
-            { left: "18%", size: 9, delay: 1.5, dur: 13 },
-            { left: "32%", size: 12, delay: 3, dur: 10 },
-            { left: "46%", size: 8, delay: 0.8, dur: 14 },
-            { left: "60%", size: 15, delay: 2.2, dur: 12 },
-            { left: "73%", size: 10, delay: 4, dur: 11 },
-            { left: "86%", size: 13, delay: 1, dur: 13 },
-            { left: "92%", size: 9, delay: 3.5, dur: 15 },
+            { left: "5%",  size: 5, delay: 0,   dur: 6 },
+            { left: "12%", size: 4, delay: 1.2, dur: 7 },
+            { left: "20%", size: 6, delay: 0.5, dur: 5.5 },
+            { left: "28%", size: 4, delay: 2.1, dur: 7.5 },
+            { left: "36%", size: 5, delay: 0.9, dur: 6.2 },
+            { left: "44%", size: 6, delay: 2.8, dur: 5.8 },
+            { left: "52%", size: 4, delay: 0.3, dur: 7 },
+            { left: "60%", size: 5, delay: 1.7, dur: 6.5 },
+            { left: "68%", size: 6, delay: 0.6, dur: 5.6 },
+            { left: "76%", size: 4, delay: 2.4, dur: 7.2 },
+            { left: "84%", size: 5, delay: 1.1, dur: 6 },
+            { left: "92%", size: 4, delay: 3,   dur: 6.8 },
           ].map((g, i) => (
             <motion.span
               key={i}
-              className="absolute block rounded-full bg-gradient-to-br from-gold to-amber-200/80 shadow-[0_0_12px_rgba(255,200,80,0.4)]"
+              className="absolute block rounded-full bg-gradient-to-br from-amber-100 to-gold shadow-[0_0_6px_rgba(255,210,120,0.6)]"
               style={{
                 left: g.left,
-                top: "110%",
+                top: "-5%",
                 width: g.size,
-                height: g.size * 2.2,
-                transform: "rotate(20deg)",
+                height: g.size * 2.4,
+                transform: "rotate(15deg)",
               }}
               animate={{
-                top: ["110%", "-15%"],
-                opacity: [0, 0.85, 0.85, 0],
-                rotate: [20, 35, 12, 25],
+                top: ["-5%", "110%"],
+                opacity: [0, 0.95, 0.95, 0],
+                rotate: [15, -10, 20, -5],
               }}
               transition={{
                 duration: g.dur,
                 delay: g.delay,
                 repeat: Infinity,
-                ease: "easeInOut",
-                times: [0, 0.15, 0.85, 1],
+                ease: "easeIn",
+                times: [0, 0.1, 0.9, 1],
               }}
             />
           ))}
         </div>
+
 
         {/* Foreground readability wash */}
         <div className="absolute inset-0 bg-gradient-to-r from-primary/70 via-primary/30 to-transparent" aria-hidden="true" />
