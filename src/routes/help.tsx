@@ -244,6 +244,9 @@ function HelpCenter() {
             <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
               Or contact us directly
             </h3>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Your topic{form.message.trim() ? " and message" : ""} will be prefilled.
+            </p>
             <div className="mt-4 flex flex-col gap-3">
               <a
                 href={telLink}
