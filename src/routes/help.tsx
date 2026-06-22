@@ -272,7 +272,7 @@ function HelpCenter() {
                 </div>
               </a>
               <a
-                href={`mailto:${EMAIL}`}
+                href={mailLink}
                 className="group flex items-center gap-3 rounded-xl border border-border bg-background p-3 hover:border-primary hover:bg-primary/5 transition"
               >
                 <div className="grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary">
