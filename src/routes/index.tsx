@@ -432,8 +432,8 @@ function Index() {
                       </Link>
                     </motion.div>
                     <motion.div variants={{ hidden: { opacity: 0, x: 30 }, visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 300, damping: 24 } } }}>
-                      <a
-                        href="#contact"
+                      <Link
+                        to="/help"
                         onClick={() => setAccountOpen(false)}
                         className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors"
                       >
@@ -441,7 +441,7 @@ function Index() {
                           <LifeBuoy className="w-4 h-4 text-muted-foreground" /> Help Center
                         </span>
                         <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                      </a>
+                      </Link>
                     </motion.div>
                     <motion.div variants={{ hidden: { opacity: 0, x: 30 }, visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 300, damping: 24 } } }}>
                       <Link
