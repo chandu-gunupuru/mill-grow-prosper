@@ -367,12 +367,17 @@ function AuthPage() {
                   <div className="min-w-0">
                     <div className="font-semibold">Google sign-in didn't complete</div>
                     <p className="mt-0.5 text-destructive/80 leading-relaxed">{googleError}</p>
+                    {googlePopupBlocked && (
+                      <p className="mt-1.5 text-destructive/70 leading-relaxed">
+                        Tip: look for a blocked pop-up icon in your address bar, choose "Always allow", then tap Try again.
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="mt-2.5 flex flex-wrap gap-2">
                   <button
                     type="button"
-                    onClick={() => runGoogleSignIn(0)}
+                    onClick={handleGoogle}
                     className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:opacity-90"
                   >
                     <RotateCw className="w-3.5 h-3.5" /> Try again
