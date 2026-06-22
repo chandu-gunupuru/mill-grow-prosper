@@ -474,7 +474,7 @@ function AuthPage() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => { setGoogleError(null); setGooglePopupBlocked(false); setMethod("email"); }}
+                    onClick={() => { setGoogleError(null); setGoogleErrorKind(null); setMethod("email"); }}
                     className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-secondary"
                   >
                     Use email instead
@@ -483,13 +483,36 @@ function AuthPage() {
               </div>
             )}
 
-            {googleError && !busy && !googlePopupBlocked && (
+            {googleError && !busy && !googlePopupBlocked && googleErrorKind && (
               <div className="mt-3 rounded-md border border-destructive/30 bg-destructive/5 p-3 text-xs">
                 <div className="flex items-start gap-2 text-destructive">
                   <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
-                  <div className="min-w-0">
-                    <div className="font-semibold">Google sign-in didn't complete</div>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-semibold">
+                      {googleErrorKind === "timeout" && "Google sign-in timed out"}
+                      {googleErrorKind === "network" && "Couldn't reach Google"}
+                      {googleErrorKind === "third_party_cookies" && "Third-party cookies are blocked"}
+                      {googleErrorKind === "user_cancelled" && "Sign-in window was closed"}
+                      {googleErrorKind === "provider_error" && "Google rejected the request"}
+                      {googleErrorKind === "unknown" && "Google sign-in didn't complete"}
+                    </div>
                     <p className="mt-0.5 text-destructive/80 leading-relaxed">{googleError}</p>
+                    {googleErrorKind === "third_party_cookies" && (
+                      <a
+                        href={getPopupHelpUrl()}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-1.5 inline-flex items-center gap-1 text-primary font-medium hover:underline"
+                      >
+                        How to allow third-party cookies <ExternalLink className="w-3 h-3" />
+                      </a>
+                    )}
+                    {googleErrorKind === "network" && (
+                      <p className="mt-1 text-destructive/70 leading-relaxed">
+                        Status: {typeof navigator !== "undefined" && navigator.onLine ? "online" : "offline"}.
+                        Try reloading the page once your connection is stable.
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="mt-2.5 flex flex-wrap gap-2">
@@ -502,7 +525,7 @@ function AuthPage() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => { setGoogleError(null); setMethod("email"); }}
+                    onClick={() => { setGoogleError(null); setGoogleErrorKind(null); setMethod("email"); }}
                     className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-secondary"
                   >
                     Use email instead
