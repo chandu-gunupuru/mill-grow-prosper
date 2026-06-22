@@ -1202,6 +1202,22 @@ function Index() {
                       const lineTotal = parseFloat(item.price.amount) * item.quantity;
                       return (
                         <div key={item.variantId} className="flex gap-3 p-3 rounded-lg border border-border bg-card">
+                          {selectMode && (
+                            <button
+                              onClick={() => {
+                                setSelectedIds((prev) => {
+                                  const next = new Set(prev);
+                                  if (next.has(item.variantId)) next.delete(item.variantId);
+                                  else next.add(item.variantId);
+                                  return next;
+                                });
+                              }}
+                              aria-label={selectedIds.has(item.variantId) ? "Unselect item" : "Select item"}
+                              className="self-center text-primary"
+                            >
+                              {selectedIds.has(item.variantId) ? <CheckSquare className="w-5 h-5" /> : <Square className="w-5 h-5 text-muted-foreground" />}
+                            </button>
+                          )}
                           {img && <img src={img.url} alt={item.product.node.title} width={80} height={80} loading="lazy" className="w-20 h-20 rounded-md object-cover bg-cream" />}
                           <div className="flex-1 min-w-0">
                             <div className="font-semibold text-sm text-primary truncate">{item.product.node.title}</div>
@@ -1215,7 +1231,9 @@ function Index() {
                               <div className="font-bold text-primary">{symbol}{lineTotal.toFixed(0)}</div>
                             </div>
                           </div>
-                          <button onClick={() => removeItem(item.variantId)} aria-label="Remove" className="text-muted-foreground hover:text-destructive self-start"><Trash2 className="w-4 h-4" /></button>
+                          {!selectMode && (
+                            <button onClick={() => removeItem(item.variantId)} aria-label="Remove" className="text-muted-foreground hover:text-destructive self-start"><Trash2 className="w-4 h-4" /></button>
+                          )}
                         </div>
                       );
                     })}
