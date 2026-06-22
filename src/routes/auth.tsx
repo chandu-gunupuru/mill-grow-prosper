@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Loader2, Leaf, ArrowLeft, Mail, Phone, CheckCircle2, AlertTriangle, Clock } from "lucide-react";
+import { Loader2, Leaf, ArrowLeft, Mail, Phone, CheckCircle2, AlertTriangle, Clock, RotateCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/useAuth";
@@ -106,27 +106,70 @@ function AuthPage() {
     }
   };
 
-  const handleGoogle = async () => {
+  const MAX_GOOGLE_AUTO_RETRIES = 2;
+  const GOOGLE_TIMEOUT_MS = 12000;
+  const [googleError, setGoogleError] = useState<string | null>(null);
+  const [googleRetryCount, setGoogleRetryCount] = useState(0);
+  const [googleAutoRetrying, setGoogleAutoRetrying] = useState(false);
+
+  const runGoogleSignIn = async (attempt: number): Promise<void> => {
     setBusy(true);
+    setGoogleError(null);
+
+    let timedOut = false;
+    const timeout = new Promise<{ timeout: true }>((resolve) => {
+      window.setTimeout(() => {
+        timedOut = true;
+        resolve({ timeout: true });
+      }, GOOGLE_TIMEOUT_MS);
+    });
+
     try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
-      });
-      if (result.error) {
-        toast.error(result.error.message || "Google sign-in failed");
-        setBusy(false);
-        return;
+      const result = await Promise.race([
+        lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin }),
+        timeout,
+      ]);
+
+      if ("timeout" in result) {
+        throw new Error(
+          "Google didn't respond in time. This is usually a pop-up blocker, a slow network, or a third-party cookie block.",
+        );
       }
+      if (result.error) throw new Error(result.error.message || "Google sign-in failed");
       // Browser is being redirected to Google — keep the spinner up
       if (result.redirected) return;
-      // Tokens received in-place; do a hard replace so the home page
-      // mounts with the fresh session instead of flashing logged-out UI.
+
       toast.success("Signed in!");
       window.location.replace("/");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Google sign-in failed");
+      const message = err instanceof Error ? err.message : "Google sign-in failed";
+
+      // Auto re-attempt for transient failures (timeout / network)
+      const isTransient =
+        timedOut ||
+        /network|timeout|timed out|fetch|load failed|temporarily/i.test(message);
+
+      if (isTransient && attempt < MAX_GOOGLE_AUTO_RETRIES) {
+        setGoogleAutoRetrying(true);
+        setGoogleRetryCount(attempt + 1);
+        toast.message(`Retrying Google sign-in (${attempt + 1}/${MAX_GOOGLE_AUTO_RETRIES})…`);
+        const backoff = 800 * (attempt + 1);
+        await new Promise((r) => window.setTimeout(r, backoff));
+        setGoogleAutoRetrying(false);
+        return runGoogleSignIn(attempt + 1);
+      }
+
+      setGoogleError(message);
       setBusy(false);
+      toast.error(message, {
+        action: { label: "Retry", onClick: () => runGoogleSignIn(0) },
+      });
     }
+  };
+
+  const handleGoogle = () => {
+    setGoogleRetryCount(0);
+    void runGoogleSignIn(0);
   };
   const classifyPhoneError = (raw: string, stage: "send" | "verify") => {
     const m = raw.toLowerCase();
@@ -325,14 +368,50 @@ function AuthPage() {
               disabled={busy}
               className="w-full inline-flex items-center justify-center gap-2 border border-border bg-background hover:bg-secondary text-foreground py-2.5 rounded-md text-sm font-medium transition disabled:opacity-50"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24">
-                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.76h3.56c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.56-2.76c-.99.66-2.25 1.06-3.72 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/>
-                <path fill="#FBBC05" d="M5.84 14.11A6.6 6.6 0 0 1 5.5 12c0-.73.13-1.44.34-2.11V7.05H2.18A11 11 0 0 0 1 12c0 1.77.42 3.45 1.18 4.95l3.66-2.84z"/>
-                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.05l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/>
-              </svg>
-              Continue with Google
+              {busy ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.76h3.56c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.56-2.76c-.99.66-2.25 1.06-3.72 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/>
+                  <path fill="#FBBC05" d="M5.84 14.11A6.6 6.6 0 0 1 5.5 12c0-.73.13-1.44.34-2.11V7.05H2.18A11 11 0 0 0 1 12c0 1.77.42 3.45 1.18 4.95l3.66-2.84z"/>
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.05l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/>
+                </svg>
+              )}
+              {busy
+                ? googleAutoRetrying
+                  ? `Retrying… (${googleRetryCount}/${MAX_GOOGLE_AUTO_RETRIES})`
+                  : "Connecting to Google…"
+                : "Continue with Google"}
             </button>
+
+            {googleError && !busy && (
+              <div className="mt-3 rounded-md border border-destructive/30 bg-destructive/5 p-3 text-xs">
+                <div className="flex items-start gap-2 text-destructive">
+                  <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                  <div className="min-w-0">
+                    <div className="font-semibold">Google sign-in didn't complete</div>
+                    <p className="mt-0.5 text-destructive/80 leading-relaxed">{googleError}</p>
+                  </div>
+                </div>
+                <div className="mt-2.5 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => runGoogleSignIn(0)}
+                    className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:opacity-90"
+                  >
+                    <RotateCw className="w-3.5 h-3.5" /> Try again
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setGoogleError(null); setMethod("email"); }}
+                    className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-secondary"
+                  >
+                    Use email instead
+                  </button>
+                </div>
+              </div>
+            )}
 
             <div className="flex items-center gap-3 my-5">
               <div className="h-px flex-1 bg-border" />
