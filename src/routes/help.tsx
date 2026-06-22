@@ -66,6 +66,18 @@ function HelpCenter() {
   });
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const KEY = "help.contactDrawerShown";
+    if (sessionStorage.getItem(KEY)) return;
+    const t = window.setTimeout(() => {
+      setContactOpen(true);
+      sessionStorage.setItem(KEY, "1");
+    }, 350);
+    return () => window.clearTimeout(t);
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
