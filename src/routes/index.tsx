@@ -469,6 +469,41 @@ function Index() {
                 </SheetContent>
               </Sheet>
             )}
+            {user && (
+              <Sheet open={accountCenterOpen} onOpenChange={setAccountCenterOpen}>
+                <SheetContent side="right" className="w-80 sm:max-w-sm">
+                  <SheetHeader>
+                    <SheetTitle className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 grid place-items-center">
+                        <UserCog className="w-5 h-5 text-primary" />
+                      </div>
+                      <div className="text-left">
+                        <div className="text-base font-semibold">Account Center</div>
+                        <div className="text-xs text-muted-foreground font-normal">Manage your preferences</div>
+                      </div>
+                    </SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-8 flex flex-col gap-2">
+                    <Link to="/settings" hash="addresses" onClick={() => setAccountCenterOpen(false)} className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors">
+                      <span className="flex items-center gap-3"><MapPinned className="w-4 h-4 text-muted-foreground" /> Saved Addresses</span>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                    </Link>
+                    <Link to="/settings" hash="language" onClick={() => setAccountCenterOpen(false)} className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors">
+                      <span className="flex items-center gap-3"><Languages className="w-4 h-4 text-muted-foreground" /> Language</span>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                    </Link>
+                    <Link to="/settings" hash="notifications" onClick={() => setAccountCenterOpen(false)} className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors">
+                      <span className="flex items-center gap-3"><BellRing className="w-4 h-4 text-muted-foreground" /> Notifications</span>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                    </Link>
+                    <Link to="/settings" hash="reviews" onClick={() => setAccountCenterOpen(false)} className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors">
+                      <span className="flex items-center gap-3"><StarIcon className="w-4 h-4 text-muted-foreground" /> My Reviews</span>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                    </Link>
+                  </div>
+                </SheetContent>
+              </Sheet>
+            )}
             <button
               onClick={() => toast.info("No new notifications", { description: "You're all caught up." })}
               aria-label="View notifications"
