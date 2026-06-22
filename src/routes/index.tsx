@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "motion/react";
 import {
   Phone, Mail, MapPin, MessageCircle, Award, Truck, Sparkles, ShieldCheck,
   Factory, Leaf, Package, CheckCircle2, Star, ArrowRight, ArrowLeft, Menu, X, Download,
-  ShoppingCart, Plus, Minus, Trash2, Loader2, ExternalLink, AlertCircle,
+  ShoppingCart, Plus, Minus, Trash2, Loader2, ExternalLink, AlertCircle, Bell,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
@@ -407,6 +407,14 @@ function Index() {
                 </SheetContent>
               </Sheet>
             )}
+            <button
+              onClick={() => toast.info("No new notifications", { description: "You're all caught up." })}
+              aria-label="View notifications"
+              className="relative w-11 h-11 rounded-md border border-border bg-card grid place-items-center hover:border-primary hover:text-primary transition"
+            >
+              <Bell className="w-5 h-5" />
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-gold ring-2 ring-background" aria-hidden="true" />
+            </button>
             <button onClick={() => setCartOpen(true)} aria-label="Open cart" className="relative w-11 h-11 rounded-md border border-border bg-card grid place-items-center hover:border-primary hover:text-primary transition">
               <ShoppingCart className="w-5 h-5" />
               {cartCount > 0 && (
@@ -434,6 +442,14 @@ function Index() {
                 )}
               </button>
             )}
+            <button
+              onClick={() => toast.info("No new notifications", { description: "You're all caught up." })}
+              aria-label="View notifications"
+              className="relative w-10 h-10 grid place-items-center"
+            >
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-gold ring-2 ring-background" aria-hidden="true" />
+            </button>
             <button onClick={() => setCartOpen(true)} aria-label="Open cart" className="relative w-10 h-10 grid place-items-center">
               <ShoppingCart className="w-5 h-5" />
               {cartCount > 0 && (
