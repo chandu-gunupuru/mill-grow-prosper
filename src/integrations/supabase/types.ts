@@ -212,6 +212,7 @@ export type Database = {
           contact_email: string | null
           contact_phone: string | null
           created_at: string
+          language: string
           notify_email: boolean
           notify_marketing: boolean
           notify_sms: boolean
@@ -226,6 +227,7 @@ export type Database = {
           contact_email?: string | null
           contact_phone?: string | null
           created_at?: string
+          language?: string
           notify_email?: boolean
           notify_marketing?: boolean
           notify_sms?: boolean
@@ -240,6 +242,7 @@ export type Database = {
           contact_email?: string | null
           contact_phone?: string | null
           created_at?: string
+          language?: string
           notify_email?: boolean
           notify_marketing?: boolean
           notify_sms?: boolean
