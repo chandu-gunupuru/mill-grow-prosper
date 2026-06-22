@@ -115,31 +115,106 @@ function AuthPage() {
     }
   };
 
+  type GoogleErrorKind =
+    | "popup_blocked"
+    | "timeout"
+    | "network"
+    | "third_party_cookies"
+    | "user_cancelled"
+    | "provider_error"
+    | "unknown";
+
   const [googleError, setGoogleError] = useState<string | null>(null);
-  const [googlePopupBlocked, setGooglePopupBlocked] = useState(false);
+  const [googleErrorKind, setGoogleErrorKind] = useState<GoogleErrorKind | null>(null);
+  const googlePopupBlocked = googleErrorKind === "popup_blocked";
+
+  const classifyGoogleError = (raw: string): GoogleErrorKind => {
+    const m = raw.toLowerCase();
+    if (/pop[- ]?up|window\.open|blocked.*window|window.*blocked/.test(m)) return "popup_blocked";
+    if (/timeout|timed out|deadline/.test(m)) return "timeout";
+    if (/network|fetch failed|load failed|offline|connection|net::|failed to fetch/.test(m)) return "network";
+    if (/cookie|third[- ]?party|storage access|partitioned/.test(m)) return "third_party_cookies";
+    if (/cancel|closed by user|user denied|access_denied|aborted/.test(m)) return "user_cancelled";
+    if (/oauth|provider|google|invalid_grant|invalid_request|server_error|temporarily unavailable/.test(m)) return "provider_error";
+    return "unknown";
+  };
+
+  const friendlyMessage: Record<GoogleErrorKind, string> = {
+    popup_blocked:
+      "Your browser blocked the Google sign-in window. Allow pop-ups for this site, then tap Try again.",
+    timeout:
+      "Google didn't respond in time. Your network may be slow or a pop-up never opened. Try again, or use email.",
+    network:
+      "We couldn't reach Google. Check your internet connection and try again.",
+    third_party_cookies:
+      "Your browser is blocking third-party cookies, which Google sign-in needs. Enable third-party cookies for this site, or use email.",
+    user_cancelled:
+      "You closed the Google sign-in window before finishing. Tap Try again to retry.",
+    provider_error:
+      "Google rejected the sign-in request. Wait a moment and try again, or use email.",
+    unknown:
+      "Something went wrong with Google sign-in. Try again, or use email.",
+  };
+
+  const logGoogleFailure = (kind: GoogleErrorKind, raw: string, source: "result.error" | "rejection" | "watchdog") => {
+    // Console group makes this easy to find in DevTools when debugging.
+    /* eslint-disable no-console */
+    console.group(`[auth] Google sign-in failure (${kind})`);
+    console.warn("kind:", kind);
+    console.warn("source:", source);
+    console.warn("raw message:", raw);
+    console.warn("userAgent:", typeof navigator !== "undefined" ? navigator.userAgent : "n/a");
+    console.warn("cookiesEnabled:", typeof navigator !== "undefined" ? navigator.cookieEnabled : "n/a");
+    console.warn("online:", typeof navigator !== "undefined" ? navigator.onLine : "n/a");
+    console.warn("origin:", typeof window !== "undefined" ? window.location.origin : "n/a");
+    console.warn("timestamp:", new Date().toISOString());
+    console.groupEnd();
+    /* eslint-enable no-console */
+  };
+
+  const showGoogleError = (kind: GoogleErrorKind, raw: string, source: "result.error" | "rejection" | "watchdog") => {
+    logGoogleFailure(kind, raw, source);
+    setGoogleErrorKind(kind);
+    setGoogleError(friendlyMessage[kind]);
+    setBusy(false);
+    const toastTitle: Record<GoogleErrorKind, string> = {
+      popup_blocked: "Pop-up blocked by your browser",
+      timeout: "Google sign-in timed out",
+      network: "Network problem reaching Google",
+      third_party_cookies: "Third-party cookies are blocked",
+      user_cancelled: "Sign-in window was closed",
+      provider_error: "Google rejected the sign-in",
+      unknown: "Google sign-in failed",
+    };
+    toast.error(toastTitle[kind], { description: friendlyMessage[kind] });
+  };
 
   // IMPORTANT: This must be invoked SYNCHRONOUSLY from a user click. Any
   // `await` / `setTimeout` before calling `signInWithOAuth` makes browsers
   // treat the resulting window.open as non-user-initiated and block it.
   const handleGoogle = () => {
     setGoogleError(null);
-    setGooglePopupBlocked(false);
+    setGoogleErrorKind(null);
     setBusy(true);
+
+    // Soft watchdog: if nothing resolves in 15s, surface a timeout. We do NOT
+    // re-call signInWithOAuth from here — that would lose the user gesture.
+    let settled = false;
+    const watchdog = window.setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      showGoogleError("timeout", "Google sign-in did not resolve within 15s", "watchdog");
+    }, 15000);
 
     lovable.auth
       .signInWithOAuth("google", { redirect_uri: window.location.origin })
       .then((result) => {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(watchdog);
         if (result.error) {
-          const msg = result.error.message || "Google sign-in failed";
-          const blocked = /popup|pop-up|blocked|window\.open/i.test(msg);
-          setGooglePopupBlocked(blocked);
-          setGoogleError(
-            blocked
-              ? "Your browser blocked the Google sign-in window. Allow pop-ups for this site, then tap Try again."
-              : msg,
-          );
-          setBusy(false);
-          toast.error(blocked ? "Pop-up blocked by your browser" : msg);
+          const raw = result.error.message || "Google sign-in failed";
+          showGoogleError(classifyGoogleError(raw), raw, "result.error");
           return;
         }
         if (result.redirected) return; // browser is navigating to Google
@@ -147,18 +222,14 @@ function AuthPage() {
         window.location.replace("/");
       })
       .catch((err) => {
-        const msg = err instanceof Error ? err.message : "Google sign-in failed";
-        const blocked = /popup|pop-up|blocked|window\.open/i.test(msg);
-        setGooglePopupBlocked(blocked);
-        setGoogleError(
-          blocked
-            ? "Your browser blocked the Google sign-in window. Allow pop-ups for this site, then tap Try again."
-            : msg,
-        );
-        setBusy(false);
-        toast.error(blocked ? "Pop-up blocked by your browser" : msg);
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(watchdog);
+        const raw = err instanceof Error ? err.message : String(err ?? "Google sign-in failed");
+        showGoogleError(classifyGoogleError(raw), raw, "rejection");
       });
   };
+
   const classifyPhoneError = (raw: string, stage: "send" | "verify") => {
     const m = raw.toLowerCase();
     // delivery / provider failures from the SMS gateway
@@ -403,7 +474,7 @@ function AuthPage() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => { setGoogleError(null); setGooglePopupBlocked(false); setMethod("email"); }}
+                    onClick={() => { setGoogleError(null); setGoogleErrorKind(null); setMethod("email"); }}
                     className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-secondary"
                   >
                     Use email instead
@@ -412,13 +483,36 @@ function AuthPage() {
               </div>
             )}
 
-            {googleError && !busy && !googlePopupBlocked && (
+            {googleError && !busy && !googlePopupBlocked && googleErrorKind && (
               <div className="mt-3 rounded-md border border-destructive/30 bg-destructive/5 p-3 text-xs">
                 <div className="flex items-start gap-2 text-destructive">
                   <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
-                  <div className="min-w-0">
-                    <div className="font-semibold">Google sign-in didn't complete</div>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-semibold">
+                      {googleErrorKind === "timeout" && "Google sign-in timed out"}
+                      {googleErrorKind === "network" && "Couldn't reach Google"}
+                      {googleErrorKind === "third_party_cookies" && "Third-party cookies are blocked"}
+                      {googleErrorKind === "user_cancelled" && "Sign-in window was closed"}
+                      {googleErrorKind === "provider_error" && "Google rejected the request"}
+                      {googleErrorKind === "unknown" && "Google sign-in didn't complete"}
+                    </div>
                     <p className="mt-0.5 text-destructive/80 leading-relaxed">{googleError}</p>
+                    {googleErrorKind === "third_party_cookies" && (
+                      <a
+                        href={getPopupHelpUrl()}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-1.5 inline-flex items-center gap-1 text-primary font-medium hover:underline"
+                      >
+                        How to allow third-party cookies <ExternalLink className="w-3 h-3" />
+                      </a>
+                    )}
+                    {googleErrorKind === "network" && (
+                      <p className="mt-1 text-destructive/70 leading-relaxed">
+                        Status: {typeof navigator !== "undefined" && navigator.onLine ? "online" : "offline"}.
+                        Try reloading the page once your connection is stable.
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="mt-2.5 flex flex-wrap gap-2">
@@ -431,7 +525,7 @@ function AuthPage() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => { setGoogleError(null); setMethod("email"); }}
+                    onClick={() => { setGoogleError(null); setGoogleErrorKind(null); setMethod("email"); }}
                     className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-secondary"
                   >
                     Use email instead
