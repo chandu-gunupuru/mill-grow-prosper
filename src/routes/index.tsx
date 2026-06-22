@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "motion/react";
 import {
   Phone, Mail, MapPin, MessageCircle, Award, Truck, Sparkles, ShieldCheck,
   Factory, Leaf, Package, CheckCircle2, Star, ArrowRight, ArrowLeft, Menu, X, Download,
-  ShoppingCart, Plus, Minus, Trash2, Loader2, ExternalLink, AlertCircle,
+  ShoppingCart, Plus, Minus, Trash2, Loader2, ExternalLink, AlertCircle, Bell,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
