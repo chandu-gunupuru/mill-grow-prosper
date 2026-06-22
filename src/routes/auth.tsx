@@ -360,18 +360,56 @@ function AuthPage() {
               {busy ? "Connecting to Google…" : "Continue with Google"}
             </button>
 
-            {googleError && !busy && (
+            {googleError && !busy && googlePopupBlocked && (
+              <div className="mt-3 rounded-md border border-amber-500/40 bg-amber-500/5 p-3.5 text-xs">
+                <div className="flex items-start gap-2 text-amber-700 dark:text-amber-400">
+                  <ShieldAlert className="w-4 h-4 shrink-0 mt-0.5" />
+                  <div className="min-w-0 flex-1">
+                    <div className="font-semibold text-sm">Your browser blocked the Google sign-in window</div>
+                    <p className="mt-1 text-amber-700/80 dark:text-amber-400/80 leading-relaxed">
+                      We tried to open Google in a new window, but your browser stopped it. Allow pop-ups for this site to continue.
+                    </p>
+                    <ol className="mt-2.5 space-y-1.5 text-foreground/85 list-decimal list-inside leading-relaxed">
+                      <li>Look for a small blocked-pop-up icon (🚫 or 🔒) in your browser's address bar.</li>
+                      <li>Click it and choose <strong>"Always allow pop-ups and redirects"</strong> for this site.</li>
+                      <li>Come back here and tap <strong>Try again</strong> below.</li>
+                    </ol>
+                    <a
+                      href={getPopupHelpUrl()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-2.5 inline-flex items-center gap-1 text-primary font-medium hover:underline"
+                    >
+                      How do I allow pop-ups? <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={handleGoogle}
+                    className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:opacity-90"
+                  >
+                    <RotateCw className="w-3.5 h-3.5" /> Try again
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setGoogleError(null); setGooglePopupBlocked(false); setMethod("email"); }}
+                    className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-secondary"
+                  >
+                    Use email instead
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {googleError && !busy && !googlePopupBlocked && (
               <div className="mt-3 rounded-md border border-destructive/30 bg-destructive/5 p-3 text-xs">
                 <div className="flex items-start gap-2 text-destructive">
                   <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
                   <div className="min-w-0">
                     <div className="font-semibold">Google sign-in didn't complete</div>
                     <p className="mt-0.5 text-destructive/80 leading-relaxed">{googleError}</p>
-                    {googlePopupBlocked && (
-                      <p className="mt-1.5 text-destructive/70 leading-relaxed">
-                        Tip: look for a blocked pop-up icon in your address bar, choose "Always allow", then tap Try again.
-                      </p>
-                    )}
                   </div>
                 </div>
                 <div className="mt-2.5 flex flex-wrap gap-2">
