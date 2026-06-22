@@ -361,7 +361,7 @@ function Index() {
                 </SheetTrigger>
                 <SheetContent
                   side="right"
-                  className="w-80 sm:max-w-sm"
+                  className="flex h-full w-[88vw] max-w-sm flex-col gap-0 overflow-hidden p-0 sm:w-80"
                   onInteractOutside={() => setAccountOpen(false)}
                   onEscapeKeyDown={() => setAccountOpen(false)}
                   onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
