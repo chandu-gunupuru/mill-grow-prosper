@@ -207,6 +207,10 @@ function SettingsPage() {
             </div>
           </Section>
 
+          <LanguageSection />
+
+
+
           <Section icon={<Bell className="h-5 w-5" />} title="Notification Preferences">
             <Toggle
               label="Email notifications"
@@ -265,6 +269,50 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       <span className="mb-1 block text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</span>
       {children}
     </label>
+  );
+}
+
+function LanguageSection() {
+  const { language, setLanguage } = useLanguage();
+  return (
+    <section id="language" className="rounded-2xl border border-border bg-card p-6 shadow-premium">
+      <div className="mb-4 flex items-center gap-2">
+        <div className="grid h-9 w-9 place-items-center rounded-md bg-secondary text-primary">
+          <Languages className="h-5 w-5" />
+        </div>
+        <h2 className="font-display text-lg font-semibold text-primary">Language</h2>
+      </div>
+      <p className="mb-3 text-xs text-muted-foreground">
+        Choose your preferred language. The selection is saved to your account and applied immediately.
+      </p>
+      <div className="grid gap-2 sm:grid-cols-2">
+        {LANGUAGES.map((l) => {
+          const active = l.code === language;
+          return (
+            <button
+              key={l.code}
+              type="button"
+              onClick={async () => {
+                await setLanguage(l.code as LanguageCode);
+                toast.success(`Language set to ${l.label}`);
+              }}
+              className={`flex items-center justify-between rounded-lg border px-4 py-3 text-left text-sm transition ${
+                active
+                  ? "border-primary bg-primary/5 text-primary"
+                  : "border-border hover:bg-secondary/40"
+              }`}
+              aria-pressed={active}
+            >
+              <span>
+                <span className="block font-medium">{l.native}</span>
+                <span className="block text-xs text-muted-foreground">{l.label}</span>
+              </span>
+              {active && <CheckCircle2 className="h-4 w-4 text-primary" />}
+            </button>
+          );
+        })}
+      </div>
+    </section>
   );
 }
 
