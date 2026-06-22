@@ -410,19 +410,19 @@ function Index() {
             <button
               onClick={() => toast.info("No new notifications", { description: "You're all caught up." })}
               aria-label="View notifications"
-              className="relative w-11 h-11 rounded-md border border-border bg-transparent grid place-items-center hover:border-primary hover:text-primary transition"
+              className="relative w-11 h-11 rounded-md bg-transparent grid place-items-center hover:text-primary transition"
             >
               <Bell className="w-5 h-5" />
               <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-gold ring-2 ring-background" aria-hidden="true" />
             </button>
-            <button onClick={() => setCartOpen(true)} aria-label="Open cart" className="relative w-11 h-11 rounded-md border border-border bg-transparent grid place-items-center hover:border-primary hover:text-primary transition">
+            <button onClick={() => setCartOpen(true)} aria-label="Open cart" className="relative w-11 h-11 rounded-md bg-transparent grid place-items-center hover:text-primary transition">
               <ShoppingCart className="w-5 h-5" />
               {cartCount > 0 && (
                 <span className="absolute -top-1.5 -right-1.5 bg-gold text-primary text-[10px] font-bold rounded-full min-w-[18px] h-[18px] grid place-items-center px-1">{cartCount}</span>
               )}
             </button>
             {!user && (
-              <Link to="/auth" className="inline-flex items-center gap-1.5 border border-border bg-transparent px-4 py-2 rounded-md text-sm font-semibold hover:border-primary hover:text-primary transition">
+              <Link to="/auth" className="inline-flex items-center gap-1.5 bg-transparent px-4 py-2 rounded-md text-sm font-semibold hover:text-primary transition">
                 <LogIn className="w-4 h-4" /> Login
               </Link>
             )}
@@ -432,7 +432,7 @@ function Index() {
             {user && (
               <button
                 onClick={() => setAccountOpen(true)}
-                className="relative w-10 h-10 rounded-md border border-border bg-transparent grid place-items-center hover:border-primary hover:text-primary transition"
+                className="relative w-10 h-10 rounded-md bg-transparent grid place-items-center hover:text-primary transition"
                 aria-label="Open account menu"
               >
                 {user.user_metadata?.avatar_url ? (
