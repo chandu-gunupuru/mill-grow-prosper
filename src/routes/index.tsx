@@ -457,10 +457,12 @@ function Index() {
               </span>
             </button>
             <button onClick={() => setCartOpen(true)} aria-label="Open cart" className="relative w-10 h-10 grid place-items-center">
-              <ShoppingCart className="w-5 h-5" />
-              {cartCount > 0 && (
-                <span className="absolute top-0 right-0 bg-gold text-primary text-[10px] font-bold rounded-full min-w-[18px] h-[18px] grid place-items-center px-1">{cartCount}</span>
-              )}
+              <span className="relative inline-flex">
+                <ShoppingCart className="w-5 h-5" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-gold text-primary text-[10px] font-bold rounded-full min-w-[16px] h-[16px] grid place-items-center px-1 ring-2 ring-background">{cartCount}</span>
+                )}
+              </span>
             </button>
             <button onClick={() => setNavOpen(!navOpen)} aria-label="Toggle menu">
               {navOpen ? <X /> : <Menu />}
