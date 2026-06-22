@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import {
   ArrowLeft,
   LifeBuoy,
@@ -13,6 +14,7 @@ import {
   Loader2,
   Send,
   CheckCircle2,
+  ChevronRight,
 } from "lucide-react";
 import { sendQuoteInquiry } from "@/lib/inquiry.functions";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -64,6 +66,18 @@ function HelpCenter() {
   });
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const KEY = "help.contactDrawerShown";
+    if (sessionStorage.getItem(KEY)) return;
+    const t = window.setTimeout(() => {
+      setContactOpen(true);
+      sessionStorage.setItem(KEY, "1");
+    }, 350);
+    return () => window.clearTimeout(t);
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -129,7 +143,16 @@ function HelpCenter() {
               </h1>
             </div>
           </div>
-          <ThemeToggle />
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setContactOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-3 py-2 text-xs font-semibold text-primary hover:border-primary hover:bg-primary/5 transition"
+            >
+              <Phone className="h-4 w-4" /> Contact
+            </button>
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 
@@ -355,6 +378,80 @@ function HelpCenter() {
           </div>
         </aside>
       </main>
+
+      <Sheet open={contactOpen} onOpenChange={setContactOpen}>
+        <SheetContent
+          side="right"
+          className="flex h-full w-[90vw] max-w-sm flex-col gap-0 overflow-hidden p-0 sm:w-96"
+        >
+          <SheetHeader className="shrink-0 border-b border-border px-6 py-4">
+            <SheetTitle className="flex items-center gap-3">
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+                <LifeBuoy className="h-5 w-5" />
+              </div>
+              <div className="min-w-0 text-left">
+                <div className="truncate text-base font-semibold">How can we help?</div>
+                <div className="truncate text-xs text-muted-foreground font-normal">
+                  Pick the fastest way to reach us
+                </div>
+              </div>
+            </SheetTitle>
+          </SheetHeader>
+          <div className="flex flex-1 flex-col gap-3 overflow-y-auto overscroll-contain px-4 py-5 pb-[env(safe-area-inset-bottom)]">
+            <a
+              href={telLink}
+              onClick={() => setContactOpen(false)}
+              className="group flex items-center gap-3 rounded-xl border border-border bg-card p-4 hover:border-primary hover:shadow-md transition"
+            >
+              <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+                <Phone className="h-5 w-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-xs text-muted-foreground">Click to call</div>
+                <div className="truncate font-semibold text-primary">{PHONE}</div>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </a>
+            <a
+              href={waLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setContactOpen(false)}
+              className="group flex items-center gap-3 rounded-xl border border-border bg-card p-4 hover:border-primary hover:shadow-md transition"
+            >
+              <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-green-500/10 text-green-600 dark:text-green-400">
+                <MessageCircle className="h-5 w-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-xs text-muted-foreground">WhatsApp message</div>
+                <div className="truncate font-semibold text-primary">Chat on WhatsApp</div>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </a>
+            <a
+              href={mailLink}
+              onClick={() => setContactOpen(false)}
+              className="group flex items-center gap-3 rounded-xl border border-border bg-card p-4 hover:border-primary hover:shadow-md transition"
+            >
+              <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+                <Mail className="h-5 w-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-xs text-muted-foreground">Send email</div>
+                <div className="truncate font-semibold text-primary">{EMAIL}</div>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </a>
+            <button
+              type="button"
+              onClick={() => setContactOpen(false)}
+              className="mt-2 inline-flex items-center justify-center gap-2 rounded-md border border-border bg-background px-4 py-2.5 text-sm font-medium text-muted-foreground hover:bg-secondary"
+            >
+              Prefer to write to us? Use the form
+            </button>
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
