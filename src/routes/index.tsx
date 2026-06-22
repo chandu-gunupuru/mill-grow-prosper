@@ -442,6 +442,14 @@ function Index() {
                 )}
               </button>
             )}
+            <button
+              onClick={() => toast.info("No new notifications", { description: "You're all caught up." })}
+              aria-label="View notifications"
+              className="relative w-10 h-10 grid place-items-center"
+            >
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-gold ring-2 ring-background" aria-hidden="true" />
+            </button>
             <button onClick={() => setCartOpen(true)} aria-label="Open cart" className="relative w-10 h-10 grid place-items-center">
               <ShoppingCart className="w-5 h-5" />
               {cartCount > 0 && (
