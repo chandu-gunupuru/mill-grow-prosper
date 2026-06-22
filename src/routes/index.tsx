@@ -419,6 +419,30 @@ function Index() {
                     </motion.div>
                     <motion.div variants={{ hidden: { opacity: 0, x: 30 }, visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 300, damping: 24 } } }}>
                       <Link
+                        to="/admin/orders"
+                        onClick={() => setAccountOpen(false)}
+                        className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors"
+                      >
+                        <span className="flex items-center gap-3">
+                          <ShoppingBag className="w-4 h-4 text-muted-foreground" /> Orders
+                        </span>
+                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                      </Link>
+                    </motion.div>
+                    <motion.div variants={{ hidden: { opacity: 0, x: 30 }, visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 300, damping: 24 } } }}>
+                      <a
+                        href="#contact"
+                        onClick={() => setAccountOpen(false)}
+                        className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors"
+                      >
+                        <span className="flex items-center gap-3">
+                          <LifeBuoy className="w-4 h-4 text-muted-foreground" /> Help Center
+                        </span>
+                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                      </a>
+                    </motion.div>
+                    <motion.div variants={{ hidden: { opacity: 0, x: 30 }, visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 300, damping: 24 } } }}>
+                      <Link
                         to="/settings"
                         onClick={() => setAccountOpen(false)}
                         className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors"
