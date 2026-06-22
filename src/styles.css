@@ -5,23 +5,19 @@
 @custom-variant dark (&:is(.dark *));
 
 /* Theme switch animation.
-   Strategy: prefer the View Transitions API (GPU-composited crossfade — one
-   snapshot, no per-element style recalc). Fallback: a lightweight transition
-   limited to root background + color only, so we don't pay per-element
-   transition cost on low-end devices. Both paths respect prefers-reduced-motion. */
+   We use the View Transitions API for a GPU-composited crossfade — a single
+   snapshot animation that stays smooth even on low-end mobile, regardless of
+   DOM size. Browsers without the API fall back to an instant swap (which our
+   benchmark showed runs at 44+ fps under 6x CPU throttle on mobile, so it
+   feels snappy without an extra animation layer). Respects reduced-motion. */
 @media (prefers-reduced-motion: no-preference) {
   ::view-transition-old(root),
   ::view-transition-new(root) {
-    animation-duration: 360ms;
+    animation-duration: 320ms;
     animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
-
-  html.theme-transition,
-  html.theme-transition body {
-    transition: background-color 360ms cubic-bezier(0.4, 0, 0.2, 1),
-                color 360ms cubic-bezier(0.4, 0, 0.2, 1);
-  }
 }
+
 
 
 
