@@ -535,9 +535,73 @@ function Index() {
 
 
       {/* HERO */}
-      <section id="top" className="relative min-h-screen flex items-center pt-16 overflow-hidden">
-        <img src={heroMill} alt="Modern rice mill processing facility" width={1920} height={1080} fetchPriority="high" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-hero" />
+      <section id="top" className="relative min-h-screen flex items-center pt-16 overflow-hidden bg-primary">
+        {/* Animated brand backdrop — replaces the static photo */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,oklch(0.35_0.06_60_/_0.9),transparent_60%),radial-gradient(circle_at_80%_30%,oklch(0.55_0.14_70_/_0.45),transparent_55%),radial-gradient(circle_at_50%_90%,oklch(0.25_0.04_60_/_0.95),transparent_60%)]" aria-hidden="true" />
+
+        {/* Slow drifting gold orbs */}
+        <motion.div
+          aria-hidden="true"
+          className="absolute -top-32 -left-20 w-[34rem] h-[34rem] rounded-full bg-gold/20 blur-3xl"
+          animate={{ x: [0, 40, -20, 0], y: [0, 30, -10, 0] }}
+          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          aria-hidden="true"
+          className="absolute -bottom-40 right-[-6rem] w-[40rem] h-[40rem] rounded-full bg-gold/15 blur-3xl"
+          animate={{ x: [0, -50, 20, 0], y: [0, -30, 20, 0] }}
+          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+        />
+
+        {/* Sweeping light ray */}
+        <motion.div
+          aria-hidden="true"
+          className="absolute inset-y-0 -left-1/3 w-1/2 bg-gradient-to-r from-transparent via-gold/10 to-transparent skew-x-12"
+          animate={{ x: ["0%", "260%"] }}
+          transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", repeatDelay: 1.5 }}
+        />
+
+        {/* Floating rice grains */}
+        <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
+          {[
+            { left: "8%", size: 14, delay: 0, dur: 11 },
+            { left: "18%", size: 9, delay: 1.5, dur: 13 },
+            { left: "32%", size: 12, delay: 3, dur: 10 },
+            { left: "46%", size: 8, delay: 0.8, dur: 14 },
+            { left: "60%", size: 15, delay: 2.2, dur: 12 },
+            { left: "73%", size: 10, delay: 4, dur: 11 },
+            { left: "86%", size: 13, delay: 1, dur: 13 },
+            { left: "92%", size: 9, delay: 3.5, dur: 15 },
+          ].map((g, i) => (
+            <motion.span
+              key={i}
+              className="absolute block rounded-full bg-gradient-to-br from-gold to-amber-200/80 shadow-[0_0_12px_rgba(255,200,80,0.4)]"
+              style={{
+                left: g.left,
+                top: "110%",
+                width: g.size,
+                height: g.size * 2.2,
+                transform: "rotate(20deg)",
+              }}
+              animate={{
+                top: ["110%", "-15%"],
+                opacity: [0, 0.85, 0.85, 0],
+                rotate: [20, 35, 12, 25],
+              }}
+              transition={{
+                duration: g.dur,
+                delay: g.delay,
+                repeat: Infinity,
+                ease: "easeInOut",
+                times: [0, 0.15, 0.85, 1],
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Foreground readability wash */}
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/70 via-primary/30 to-transparent" aria-hidden="true" />
+
         <div className="relative max-w-7xl mx-auto px-6 py-20 w-full">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="max-w-3xl">
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gold/20 backdrop-blur border border-gold/40 text-gold text-xs font-semibold tracking-wider uppercase">
