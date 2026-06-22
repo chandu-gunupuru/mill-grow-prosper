@@ -97,13 +97,13 @@ export function LogoIntro({ children }: LogoIntroProps) {
             className="flex cursor-default flex-col items-center"
             initial={{ scale: 0.6, opacity: 0, y: 60 }}
             animate={{
-              scale: [0.6, 1.05, 1],
-              opacity: [0, 1, 1],
-              y: [60, 0, 0],
+              scale: [0.6, 1.05, 1, 1],
+              opacity: [0, 1, 1, 1],
+              y: [60, 0, 0, 0],
             }}
             transition={{
-              duration: 2.4,
-              times: [0, 0.35, 0.55],
+              duration: 2,
+              times: [0, 0.4, 0.6, 1],
               ease: [0.22, 1, 0.36, 1],
             }}
             onAnimationComplete={finishIntro}
