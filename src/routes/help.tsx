@@ -95,9 +95,17 @@ function HelpCenter() {
     }
   }
 
-  const waLink = `https://wa.me/${WHATSAPP.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
-    "Hello Gayathri Rice Mill, I need help with ",
-  )}`;
+  const greeting = form.name.trim() ? `Hello, I'm ${form.name.trim()}.` : "Hello Gayathri Rice Mill,";
+  const topic = form.category || "support";
+  const body = form.message.trim()
+    ? form.message.trim()
+    : `I need help with ${topic.toLowerCase()}.`;
+  const waText = `${greeting} ${body}`;
+  const waLink = `https://wa.me/${WHATSAPP.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(waText)}`;
+  const telLink = `tel:${PHONE.replace(/[^0-9+]/g, "")}`;
+  const mailSubject = `Help Center — ${topic}`;
+  const mailBody = `${greeting}\n\n${body}\n\n${form.phone ? `Phone: ${form.phone}\n` : ""}${form.email ? `Email: ${form.email}` : ""}`.trim();
+  const mailLink = `mailto:${EMAIL}?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
 
   return (
     <div className="min-h-screen bg-background">
@@ -236,9 +244,12 @@ function HelpCenter() {
             <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
               Or contact us directly
             </h3>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Your topic{form.message.trim() ? " and message" : ""} will be prefilled.
+            </p>
             <div className="mt-4 flex flex-col gap-3">
               <a
-                href={`tel:${PHONE.replace(/\s/g, "")}`}
+                href={telLink}
                 className="group flex items-center gap-3 rounded-xl border border-border bg-background p-3 hover:border-primary hover:bg-primary/5 transition"
               >
                 <div className="grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary">
@@ -264,7 +275,7 @@ function HelpCenter() {
                 </div>
               </a>
               <a
-                href={`mailto:${EMAIL}`}
+                href={mailLink}
                 className="group flex items-center gap-3 rounded-xl border border-border bg-background p-3 hover:border-primary hover:bg-primary/5 transition"
               >
                 <div className="grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary">
