@@ -126,6 +126,7 @@ function AuthPage() {
 
   const [googleError, setGoogleError] = useState<string | null>(null);
   const [googleErrorKind, setGoogleErrorKind] = useState<GoogleErrorKind | null>(null);
+  const [googleTakingLong, setGoogleTakingLong] = useState(false);
   const googlePopupBlocked = googleErrorKind === "popup_blocked";
 
   const classifyGoogleError = (raw: string): GoogleErrorKind => {
@@ -179,7 +180,7 @@ function AuthPage() {
     setBusy(false);
     const toastTitle: Record<GoogleErrorKind, string> = {
       popup_blocked: "Pop-up blocked by your browser",
-      timeout: "Google sign-in timed out",
+      timeout: "Google sign-in is taking longer than expected",
       network: "Network problem reaching Google",
       third_party_cookies: "Third-party cookies are blocked",
       user_cancelled: "Sign-in window was closed",
@@ -195,15 +196,15 @@ function AuthPage() {
   const handleGoogle = () => {
     setGoogleError(null);
     setGoogleErrorKind(null);
+    setGoogleTakingLong(false);
     setBusy(true);
 
-    // Soft watchdog: if nothing resolves in 15s, surface a timeout. We do NOT
-    // re-call signInWithOAuth from here — that would lose the user gesture.
+    // Soft status only: OAuth can take longer than 15s while the user chooses
+    // an account. Do not mark it as failed unless the auth provider returns an
+    // actual error, otherwise users see a false timeout while sign-in is still working.
     let settled = false;
-    const watchdog = window.setTimeout(() => {
-      if (settled) return;
-      settled = true;
-      showGoogleError("timeout", "Google sign-in did not resolve within 15s", "watchdog");
+    const longWaitNotice = window.setTimeout(() => {
+      if (!settled) setGoogleTakingLong(true);
     }, 15000);
 
     lovable.auth
@@ -211,7 +212,8 @@ function AuthPage() {
       .then((result) => {
         if (settled) return;
         settled = true;
-        window.clearTimeout(watchdog);
+        window.clearTimeout(longWaitNotice);
+        setGoogleTakingLong(false);
         if (result.error) {
           const raw = result.error.message || "Google sign-in failed";
           showGoogleError(classifyGoogleError(raw), raw, "result.error");
@@ -224,7 +226,8 @@ function AuthPage() {
       .catch((err) => {
         if (settled) return;
         settled = true;
-        window.clearTimeout(watchdog);
+        window.clearTimeout(longWaitNotice);
+        setGoogleTakingLong(false);
         const raw = err instanceof Error ? err.message : String(err ?? "Google sign-in failed");
         showGoogleError(classifyGoogleError(raw), raw, "rejection");
       });
