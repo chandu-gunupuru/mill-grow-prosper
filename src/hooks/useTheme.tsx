@@ -31,24 +31,47 @@ function applyThemeClass(theme: Theme) {
 }
 
 const THEME_TRANSITION_CLASS = "theme-transition";
-const THEME_TRANSITION_DURATION = 500;
+const THEME_TRANSITION_DURATION = 400;
 
 function prefersReducedMotion() {
   return typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-function enableThemeTransition(): boolean {
-  if (typeof document === "undefined" || prefersReducedMotion()) return false;
-  document.documentElement.classList.add(THEME_TRANSITION_CLASS);
-  return true;
-}
-
-function disableThemeTransition() {
-  if (typeof document === "undefined") return;
-  document.documentElement.classList.remove(THEME_TRANSITION_CLASS);
-}
-
 let transitionTimer: ReturnType<typeof setTimeout> | null = null;
+
+function withFallbackTransition(swap: () => void) {
+  if (typeof document === "undefined") {
+    swap();
+    return;
+  }
+  if (prefersReducedMotion()) {
+    swap();
+    return;
+  }
+  document.documentElement.classList.add(THEME_TRANSITION_CLASS);
+  swap();
+  if (transitionTimer) clearTimeout(transitionTimer);
+  transitionTimer = setTimeout(() => {
+    document.documentElement.classList.remove(THEME_TRANSITION_CLASS);
+  }, THEME_TRANSITION_DURATION);
+}
+
+type DocumentWithVT = Document & {
+  startViewTransition?: (cb: () => void) => { finished: Promise<void> };
+};
+
+function runThemeSwap(swap: () => void) {
+  if (typeof document === "undefined") {
+    swap();
+    return;
+  }
+  const doc = document as DocumentWithVT;
+  if (doc.startViewTransition && !prefersReducedMotion()) {
+    doc.startViewTransition(swap);
+    return;
+  }
+  withFallbackTransition(swap);
+}
 
 export function useTheme() {
   const [theme, setThemeState] = useState<Theme>(getInitialTheme);
@@ -72,22 +95,18 @@ export function useTheme() {
   }, []);
 
   const setTheme = (next: Theme) => {
-    const willTransition = enableThemeTransition();
     try {
       window.localStorage.setItem(STORAGE_KEY, next);
     } catch {
       // ignore storage errors (e.g. private mode)
     }
-    setThemeState(next);
-    if (willTransition) {
-      if (transitionTimer) clearTimeout(transitionTimer);
-      transitionTimer = setTimeout(disableThemeTransition, THEME_TRANSITION_DURATION);
-    }
+    runThemeSwap(() => setThemeState(next));
   };
 
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light");
   };
+
 
   const setLight = () => setTheme("light");
   const setDark = () => setTheme("dark");
