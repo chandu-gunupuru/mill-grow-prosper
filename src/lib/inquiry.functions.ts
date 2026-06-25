@@ -13,6 +13,54 @@ const schema = z.object({
 
 const TO_EMAIL = "gunupuruchandu29@gmail.com";
 const GMAIL_SEND_TIMEOUT_MS = 12000;
+const GMAIL_MAX_ATTEMPTS = 3;
+const GMAIL_RETRY_BASE_MS = 600;
+
+function sleep(ms: number) {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+async function sendGmailWithRetry(
+  body: string,
+  headers: Record<string, string>,
+): Promise<void> {
+  let lastErr: unknown = null;
+  for (let attempt = 1; attempt <= GMAIL_MAX_ATTEMPTS; attempt++) {
+    const t = createTimeoutSignal(GMAIL_SEND_TIMEOUT_MS);
+    try {
+      const res = await fetch(
+        "https://connector-gateway.lovable.dev/google_mail/gmail/v1/users/me/messages/send",
+        { method: "POST", headers, body, signal: t.signal },
+      );
+      if (res.ok) return;
+      const text = await res.text().catch(() => "");
+      const retriable = res.status === 408 || res.status === 425 || res.status === 429 || res.status >= 500;
+      console.error("Gmail send failed", { attempt, status: res.status, text, retriable });
+      if (!retriable) throw new Error("Failed to send inquiry email.");
+      lastErr = new Error(`Gmail HTTP ${res.status}`);
+    } catch (err) {
+      const name = (err as Error)?.name;
+      const isAbort = name === "AbortError";
+      const isNetwork = name === "TypeError" || name === "FetchError";
+      if (!isAbort && !isNetwork && attempt > 1) {
+        // Non-retriable error thrown above
+        throw err;
+      }
+      console.error("Gmail send attempt error", { attempt, name, message: (err as Error)?.message });
+      lastErr = err;
+    } finally {
+      t.clear();
+    }
+    if (attempt < GMAIL_MAX_ATTEMPTS) {
+      const backoff = GMAIL_RETRY_BASE_MS * 2 ** (attempt - 1) + Math.floor(Math.random() * 200);
+      await sleep(backoff);
+    }
+  }
+  const msg = (lastErr as Error)?.name === "AbortError"
+    ? "Email sending is taking too long. Please try again or use WhatsApp."
+    : "We couldn't send your message right now. Please try again or use WhatsApp.";
+  throw new Error(msg);
+}
 
 function encodeRfc2822Base64Url(raw: string) {
   const b64 =
