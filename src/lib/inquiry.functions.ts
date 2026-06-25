@@ -220,7 +220,14 @@ export const sendQuoteInquiry = createServerFn({ method: "POST" })
     // Await the primary Gmail send so we can surface failures to the user,
     // but race the confirmation against a short timeout so a slow queue
     // never holds the submit button.
-    await gmailSend;
+    try {
+      await gmailSend;
+    } catch (err) {
+      // Release the reservation so the user can retry immediately.
+      recentSubmissions.delete(dedupeHash);
+      lastByEmail.delete(emailKey);
+      throw err;
+    }
     await Promise.race([
       confirmation,
       new Promise<void>((resolve) => setTimeout(resolve, 600)),
