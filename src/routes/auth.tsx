@@ -202,23 +202,12 @@ function AuthPage() {
     const attemptId = googleAttemptRef.current + 1;
     googleAttemptRef.current = attemptId;
 
-    // Soft status only: OAuth can take longer than 15s while the user chooses
-    // an account. Do not mark it as failed unless the auth provider returns an
-    // actual error, otherwise users see a false timeout while sign-in is still working.
-    let settled = false;
-    const longWaitNotice = window.setTimeout(() => {
-      if (settled || googleAttemptRef.current !== attemptId) return;
-      setGoogleTakingLong(true);
-      setBusy(false);
-    }, 15000);
-
+    // No watchdog timer: OAuth account selection can legitimately take minutes.
+    // Only react to actual provider errors so users never see a false "still waiting" notice.
     lovable.auth
       .signInWithOAuth("google", { redirect_uri: window.location.origin })
       .then((result) => {
-        if (settled || googleAttemptRef.current !== attemptId) return;
-        settled = true;
-        window.clearTimeout(longWaitNotice);
-        setGoogleTakingLong(false);
+        if (googleAttemptRef.current !== attemptId) return;
         if (result.error) {
           const raw = result.error.message || "Google sign-in failed";
           showGoogleError(classifyGoogleError(raw), raw, "result.error");
@@ -229,10 +218,7 @@ function AuthPage() {
         window.location.replace("/");
       })
       .catch((err) => {
-        if (settled || googleAttemptRef.current !== attemptId) return;
-        settled = true;
-        window.clearTimeout(longWaitNotice);
-        setGoogleTakingLong(false);
+        if (googleAttemptRef.current !== attemptId) return;
         const raw = err instanceof Error ? err.message : String(err ?? "Google sign-in failed");
         showGoogleError(classifyGoogleError(raw), raw, "rejection");
       });
