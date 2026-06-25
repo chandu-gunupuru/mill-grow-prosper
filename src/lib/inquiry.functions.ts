@@ -83,7 +83,7 @@ export const sendQuoteInquiry = createServerFn({ method: "POST" })
 
     const raw = encodeRfc2822Base64Url(mime);
 
-    const res = await fetch(
+    const gmailSend = fetch(
       "https://connector-gateway.lovable.dev/google_mail/gmail/v1/users/me/messages/send",
       {
         method: "POST",
@@ -94,30 +94,43 @@ export const sendQuoteInquiry = createServerFn({ method: "POST" })
         },
         body: JSON.stringify({ raw }),
       },
-    );
-
-    if (!res.ok) {
-      const text = await res.text();
-      console.error("Gmail send failed", res.status, text);
-      throw new Error("Failed to send inquiry email.");
-    }
-
-    // Send a branded confirmation email to the customer for Help Center submissions.
-    if (isHelp) {
-      try {
-        const { sendHelpCenterConfirmation } = await import(
-          "@/lib/email/send-help-center-confirmation.server"
-        );
-        await sendHelpCenterConfirmation({
-          name: data.name,
-          email: data.email,
-          topic,
-          message: data.message,
-        });
-      } catch (confirmErr) {
-        console.error("Failed to send help center confirmation email", confirmErr);
+    ).then(async (res) => {
+      if (!res.ok) {
+        const text = await res.text();
+        console.error("Gmail send failed", res.status, text);
+        throw new Error("Failed to send inquiry email.");
       }
-    }
+    });
+
+    // For Help Center: kick off the customer confirmation enqueue in parallel.
+    // It's best-effort — never block the submit button on it.
+    const confirmation =
+      isHelp
+        ? (async () => {
+            try {
+              const { sendHelpCenterConfirmation } = await import(
+                "@/lib/email/send-help-center-confirmation.server"
+              );
+              await sendHelpCenterConfirmation({
+                name: data.name,
+                email: data.email,
+                topic,
+                message: data.message,
+              });
+            } catch (confirmErr) {
+              console.error("Failed to enqueue help center confirmation email", confirmErr);
+            }
+          })()
+        : Promise.resolve();
+
+    // Await the primary Gmail send so we can surface failures to the user,
+    // but race the confirmation against a short timeout so a slow queue
+    // never holds the submit button.
+    await gmailSend;
+    await Promise.race([
+      confirmation,
+      new Promise<void>((resolve) => setTimeout(resolve, 600)),
+    ]);
 
     return { ok: true as const };
   });
