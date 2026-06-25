@@ -126,7 +126,7 @@ function AuthPage() {
 
   const [googleError, setGoogleError] = useState<string | null>(null);
   const [googleErrorKind, setGoogleErrorKind] = useState<GoogleErrorKind | null>(null);
-  const [googleTakingLong, setGoogleTakingLong] = useState(false);
+  
   const googleAttemptRef = useRef(0);
   const googlePopupBlocked = googleErrorKind === "popup_blocked";
 
@@ -197,28 +197,16 @@ function AuthPage() {
   const handleGoogle = () => {
     setGoogleError(null);
     setGoogleErrorKind(null);
-    setGoogleTakingLong(false);
     setBusy(true);
     const attemptId = googleAttemptRef.current + 1;
     googleAttemptRef.current = attemptId;
 
-    // Soft status only: OAuth can take longer than 15s while the user chooses
-    // an account. Do not mark it as failed unless the auth provider returns an
-    // actual error, otherwise users see a false timeout while sign-in is still working.
-    let settled = false;
-    const longWaitNotice = window.setTimeout(() => {
-      if (settled || googleAttemptRef.current !== attemptId) return;
-      setGoogleTakingLong(true);
-      setBusy(false);
-    }, 15000);
-
+    // No watchdog timer: OAuth account selection can legitimately take minutes.
+    // Only react to actual provider errors so users never see a false "still waiting" notice.
     lovable.auth
       .signInWithOAuth("google", { redirect_uri: window.location.origin })
       .then((result) => {
-        if (settled || googleAttemptRef.current !== attemptId) return;
-        settled = true;
-        window.clearTimeout(longWaitNotice);
-        setGoogleTakingLong(false);
+        if (googleAttemptRef.current !== attemptId) return;
         if (result.error) {
           const raw = result.error.message || "Google sign-in failed";
           showGoogleError(classifyGoogleError(raw), raw, "result.error");
@@ -229,10 +217,7 @@ function AuthPage() {
         window.location.replace("/");
       })
       .catch((err) => {
-        if (settled || googleAttemptRef.current !== attemptId) return;
-        settled = true;
-        window.clearTimeout(longWaitNotice);
-        setGoogleTakingLong(false);
+        if (googleAttemptRef.current !== attemptId) return;
         const raw = err instanceof Error ? err.message : String(err ?? "Google sign-in failed");
         showGoogleError(classifyGoogleError(raw), raw, "rejection");
       });
@@ -491,36 +476,6 @@ function AuthPage() {
               </div>
             )}
 
-            {googleTakingLong && !googleError && (
-              <div className="mt-3 rounded-md border border-amber-500/40 bg-amber-500/5 p-3 text-xs">
-                <div className="flex items-start gap-2 text-amber-700 dark:text-amber-400">
-                  <Clock className="w-4 h-4 shrink-0 mt-0.5" />
-                  <div className="min-w-0 flex-1">
-                    <div className="font-semibold">Google sign-in is still waiting</div>
-                    <p className="mt-0.5 text-amber-700/80 dark:text-amber-400/80 leading-relaxed">
-                      If the Google window did not open, allow pop-ups for this site and tap Try again. If it is open, finish sign-in there.
-                    </p>
-                  </div>
-                </div>
-                <div className="mt-2.5 flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    onClick={handleGoogle}
-                    className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:opacity-90"
-                  >
-                    <RotateCw className="w-3.5 h-3.5" /> Try again
-                  </button>
-                  <a
-                    href={getPopupHelpUrl()}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-secondary"
-                  >
-                    Pop-up help <ExternalLink className="w-3 h-3" />
-                  </a>
-                </div>
-              </div>
-            )}
 
             {googleError && !busy && !googlePopupBlocked && googleErrorKind && (
               <div className="mt-3 rounded-md border border-destructive/30 bg-destructive/5 p-3 text-xs">
