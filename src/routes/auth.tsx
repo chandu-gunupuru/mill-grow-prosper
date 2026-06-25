@@ -127,7 +127,10 @@ function AuthPage() {
 
   const [googleError, setGoogleError] = useState<string | null>(null);
   const [googleErrorKind, setGoogleErrorKind] = useState<GoogleErrorKind | null>(null);
-  
+  const [googleBusy, setGoogleBusy] = useState(false);
+  const [googleProgress, setGoogleProgress] = useState(0);
+  const [googleProgressMessage, setGoogleProgressMessage] = useState("");
+
   const googleAttemptRef = useRef(0);
   const googlePopupBlocked = googleErrorKind === "popup_blocked";
 
