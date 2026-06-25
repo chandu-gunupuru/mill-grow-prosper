@@ -80,7 +80,14 @@ function HelpCenter() {
   });
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
   const [contactOpen, setContactOpen] = useState(false);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const id = window.setInterval(() => setCooldown((s) => (s > 0 ? s - 1 : 0)), 1000);
+    return () => window.clearInterval(id);
+  }, [cooldown]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
