@@ -332,7 +332,7 @@ function HelpCenter() {
               </Field>
               <button
                 type="submit"
-                disabled={sending}
+                disabled={sending || cooldown > 0}
                 className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-60"
               >
                 {sending ? (
@@ -340,7 +340,11 @@ function HelpCenter() {
                 ) : (
                   <Send className="h-4 w-4" />
                 )}
-                {sending ? "Sending…" : "Send to support"}
+                {sending
+                  ? "Sending…"
+                  : cooldown > 0
+                    ? `Please wait ${cooldown}s…`
+                    : "Send to support"}
               </button>
             </form>
           )}
