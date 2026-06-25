@@ -195,7 +195,29 @@ function AuthPage() {
     toast.error(toastTitle[kind], { description: friendlyMessage[kind] });
   };
 
-  // IMPORTANT: This must be invoked SYNCHRONOUSLY from a user click. Any
+  // Progress indicator messages + simulated progress for the Google sign-in wait.
+  useEffect(() => {
+    if (!googleBusy) {
+      setGoogleProgress(0);
+      setGoogleProgressMessage("");
+      return;
+    }
+    const messages = [
+      "Opening Google sign-in…",
+      "Waiting for Google…",
+      "Almost there…",
+    ];
+    setGoogleProgressMessage(messages[0]);
+    setGoogleProgress(15);
+    let step = 0;
+    const timer = setInterval(() => {
+      step += 1;
+      const progress = Math.min(15 + step * 18, 92);
+      setGoogleProgress(progress);
+      setGoogleProgressMessage(messages[Math.min(step, messages.length - 1)]);
+    }, 2000);
+    return () => clearInterval(timer);
+  }, [googleBusy]);
   // `await` / `setTimeout` before calling `signInWithOAuth` makes browsers
   // treat the resulting window.open as non-user-initiated and block it.
   const handleGoogle = () => {
