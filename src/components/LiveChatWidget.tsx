@@ -111,7 +111,13 @@ export function LiveChatWidget({ phone, email, waLink, telLink, mailLink }: Prop
       return;
     }
     if (value === "wa") {
-      window.open(waLink, "_blank", "noopener,noreferrer");
+      const a = document.createElement("a");
+      a.href = waLink;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
       pushUser(label);
       pushBot({ role: "bot", text: "Opening WhatsApp…" });
       return;
