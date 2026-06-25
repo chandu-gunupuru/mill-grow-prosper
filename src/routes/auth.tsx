@@ -197,7 +197,6 @@ function AuthPage() {
   const handleGoogle = () => {
     setGoogleError(null);
     setGoogleErrorKind(null);
-    setGoogleTakingLong(false);
     setBusy(true);
     const attemptId = googleAttemptRef.current + 1;
     googleAttemptRef.current = attemptId;
