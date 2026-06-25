@@ -34,11 +34,26 @@ export const sendQuoteInquiry = createServerFn({ method: "POST" })
       throw new Error("Email service is not configured.");
     }
 
-    const subject = `New Quote Request — ${data.product} (${data.name})`;
-    const html = `
-      <h2>New Wholesale Quote Inquiry</h2>
-      <p>You received a new inquiry from the Gayathri Rice Mill website.</p>
-      <table cellpadding="6" style="border-collapse:collapse;font-family:Arial,sans-serif;font-size:14px">
+    const isHelp = data.product.startsWith("Help Center");
+    const topic = isHelp ? data.product.replace(/^Help Center\s*—\s*/, "") : data.product;
+    const subject = isHelp
+      ? `Help Center Doubt — ${topic} (${data.name})`
+      : `New Quote Request — ${data.product} (${data.name})`;
+    const heading = isHelp ? "New Help Center Doubt" : "New Wholesale Quote Inquiry";
+    const intro = isHelp
+      ? "A customer submitted a doubt from the Help Center on the Gayathri Rice Mill website."
+      : "You received a new inquiry from the Gayathri Rice Mill website.";
+
+    const rows = isHelp
+      ? `
+        <tr><td><b>Name</b></td><td>${esc(data.name)}</td></tr>
+        <tr><td><b>Email</b></td><td>${esc(data.email)}</td></tr>
+        <tr><td><b>Phone</b></td><td>${esc(data.phone)}</td></tr>
+        <tr><td><b>Topic</b></td><td>${esc(topic)}</td></tr>
+        <tr><td valign="top"><b>Doubt / Message</b></td><td>${esc(data.message || "—").replace(/\n/g, "<br/>")}</td></tr>
+        <tr><td><b>Submitted</b></td><td>${new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })} IST</td></tr>
+      `
+      : `
         <tr><td><b>Name</b></td><td>${esc(data.name)}</td></tr>
         <tr><td><b>Company</b></td><td>${esc(data.company || "—")}</td></tr>
         <tr><td><b>Email</b></td><td>${esc(data.email)}</td></tr>
@@ -46,6 +61,13 @@ export const sendQuoteInquiry = createServerFn({ method: "POST" })
         <tr><td><b>Product</b></td><td>${esc(data.product)}</td></tr>
         <tr><td><b>Quantity</b></td><td>${esc(data.qty || "—")}</td></tr>
         <tr><td valign="top"><b>Message</b></td><td>${esc(data.message || "—").replace(/\n/g, "<br/>")}</td></tr>
+      `;
+
+    const html = `
+      <h2>${heading}</h2>
+      <p>${intro}</p>
+      <table cellpadding="6" style="border-collapse:collapse;font-family:Arial,sans-serif;font-size:14px">
+        ${rows}
       </table>
     `.trim();
 
