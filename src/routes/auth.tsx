@@ -182,6 +182,7 @@ function AuthPage() {
     logGoogleFailure(kind, raw, source);
     setGoogleErrorKind(kind);
     setGoogleError(friendlyMessage[kind]);
+    setGoogleBusy(false);
     setBusy(false);
     const toastTitle: Record<GoogleErrorKind, string> = {
       popup_blocked: "Pop-up blocked by your browser",
