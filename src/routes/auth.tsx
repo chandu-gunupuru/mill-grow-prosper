@@ -126,7 +126,7 @@ function AuthPage() {
 
   const [googleError, setGoogleError] = useState<string | null>(null);
   const [googleErrorKind, setGoogleErrorKind] = useState<GoogleErrorKind | null>(null);
-  const [googleTakingLong, setGoogleTakingLong] = useState(false);
+  
   const googleAttemptRef = useRef(0);
   const googlePopupBlocked = googleErrorKind === "popup_blocked";
 
