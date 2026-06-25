@@ -223,6 +223,7 @@ function AuthPage() {
   const handleGoogle = () => {
     setGoogleError(null);
     setGoogleErrorKind(null);
+    setGoogleBusy(true);
     setBusy(true);
     const attemptId = googleAttemptRef.current + 1;
     googleAttemptRef.current = attemptId;
@@ -236,18 +237,24 @@ function AuthPage() {
         if (result.error) {
           const raw = result.error.message || "Google sign-in failed";
           showGoogleError(classifyGoogleError(raw), raw, "result.error");
+          setGoogleBusy(false);
           return;
         }
-        if (result.redirected) return; // browser is navigating to Google
+        if (result.redirected) {
+          // Browser is navigating to Google; progress keeps running until the popup returns.
+          return;
+        }
         // Session is already set by the popup flow; let onAuthStateChange + the
         // user-effect above navigate to "/" without a full page reload.
         toast.success("Signed in!");
+        setGoogleBusy(false);
         navigate({ to: "/", replace: true });
       })
       .catch((err) => {
         if (googleAttemptRef.current !== attemptId) return;
         const raw = err instanceof Error ? err.message : String(err ?? "Google sign-in failed");
         showGoogleError(classifyGoogleError(raw), raw, "rejection");
+        setGoogleBusy(false);
       });
   };
 
