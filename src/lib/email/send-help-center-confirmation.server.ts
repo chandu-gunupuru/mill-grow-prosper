@@ -137,14 +137,7 @@ export async function sendHelpCenterConfirmation(input: SendHelpCenterConfirmati
   })
   const html = await render(element)
   const plainText = await render(element, { plainText: true })
-  const resolvedSubject =
-    typeof confirmationTemplate.subject === 'function'
-      ? confirmationTemplate.subject({
-          name: input.name,
-          topic: input.topic,
-          message: input.message,
-        })
-      : confirmationTemplate.subject
+  const resolvedSubject = confirmationTemplate.subject as string
 
   // 4. Log pending and enqueue
   await supabase.from('email_send_log').insert({
