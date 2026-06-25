@@ -102,6 +102,7 @@ function HelpCenter() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (sending || cooldown > 0) return;
     const parsed = formSchema.safeParse(form);
     if (!parsed.success) {
       toast.error(parsed.error.issues[0]?.message ?? "Please check the form.");
@@ -125,6 +126,7 @@ function HelpCenter() {
         "Sending is taking too long. Please try again or contact us on WhatsApp.",
       );
       setSent(true);
+      setCooldown(20);
       toast.success("Your question was sent. We'll reply shortly.");
       setForm({ name: "", email: "", phone: "", category: CATEGORIES[0], message: "" });
     } catch (err) {
