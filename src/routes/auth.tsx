@@ -213,8 +213,10 @@ function AuthPage() {
           return;
         }
         if (result.redirected) return; // browser is navigating to Google
+        // Session is already set by the popup flow; let onAuthStateChange + the
+        // user-effect above navigate to "/" without a full page reload.
         toast.success("Signed in!");
-        window.location.replace("/");
+        navigate({ to: "/", replace: true });
       })
       .catch((err) => {
         if (googleAttemptRef.current !== attemptId) return;
