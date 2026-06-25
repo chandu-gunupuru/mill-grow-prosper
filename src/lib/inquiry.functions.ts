@@ -114,8 +114,10 @@ export const sendQuoteInquiry = createServerFn({ method: "POST" })
 
     const lastEmailAt = lastByEmail.get(emailKey);
     if (lastEmailAt && now - lastEmailAt < COOLDOWN_MS) {
-      const wait = Math.ceil((COOLDOWN_MS - (now - lastEmailAt)) / 1000);
-      throw new Error(`Please wait ${wait}s before sending another message.`);
+      // Same email submitting again very quickly — accept silently so the
+      // UI never shows a scary "please wait" error. The client already
+      // enforces its own visible cooldown after a successful send.
+      return { ok: true as const, throttled: true as const };
     }
 
     const dedupeHash = await hashPayload([
