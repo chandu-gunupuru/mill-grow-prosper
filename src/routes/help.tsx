@@ -45,12 +45,14 @@ const formSchema = z.object({
 });
 
 function withTimeout<T>(promise: Promise<T>, ms: number, message: string) {
-  let timeout: ReturnType<typeof setTimeout>;
+  let timeout: ReturnType<typeof setTimeout> | undefined;
   const timer = new Promise<never>((_, reject) => {
     timeout = setTimeout(() => reject(new Error(message)), ms);
   });
 
-  return Promise.race([promise, timer]).finally(() => clearTimeout(timeout));
+  return Promise.race([promise, timer]).finally(() => {
+    if (timeout) clearTimeout(timeout);
+  });
 }
 
 export const Route = createFileRoute("/help")({
