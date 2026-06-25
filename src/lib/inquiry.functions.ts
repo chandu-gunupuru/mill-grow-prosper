@@ -83,9 +83,58 @@ function createTimeoutSignal(ms: number) {
   };
 }
 
+// In-memory dedupe + per-email cooldown. Caveat: serverless workers are
+// stateless across instances, so this is best-effort — it reliably stops
+// the common case (rapid duplicate clicks hitting the same warm worker)
+// without adding infra. A signed-in user repeating from another region
+// would not be blocked here; the client-side cooldown covers that.
+const DEDUPE_WINDOW_MS = 30_000;
+const COOLDOWN_MS = 20_000;
+const recentSubmissions = new Map<string, number>(); // hash -> ts
+const lastByEmail = new Map<string, number>(); // email -> ts
+
+function pruneExpired(map: Map<string, number>, ttl: number, now: number) {
+  if (map.size < 200) return;
+  for (const [k, t] of map) if (now - t > ttl) map.delete(k);
+}
+
+async function hashPayload(parts: string[]): Promise<string> {
+  const data = new TextEncoder().encode(parts.join("|"));
+  const buf = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(buf))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
 export const sendQuoteInquiry = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => schema.parse(data))
   .handler(async ({ data }) => {
+    const now = Date.now();
+    const emailKey = data.email.trim().toLowerCase();
+
+    const lastEmailAt = lastByEmail.get(emailKey);
+    if (lastEmailAt && now - lastEmailAt < COOLDOWN_MS) {
+      const wait = Math.ceil((COOLDOWN_MS - (now - lastEmailAt)) / 1000);
+      throw new Error(`Please wait ${wait}s before sending another message.`);
+    }
+
+    const dedupeHash = await hashPayload([
+      emailKey,
+      data.phone.trim(),
+      data.product.trim(),
+      (data.message || "").trim(),
+    ]);
+    const lastDup = recentSubmissions.get(dedupeHash);
+    if (lastDup && now - lastDup < DEDUPE_WINDOW_MS) {
+      // Same content already accepted moments ago — treat as success, do not resend.
+      return { ok: true as const, deduped: true as const };
+    }
+    // Reserve the slot up front so concurrent duplicates collapse to one send.
+    recentSubmissions.set(dedupeHash, now);
+    lastByEmail.set(emailKey, now);
+    pruneExpired(recentSubmissions, DEDUPE_WINDOW_MS, now);
+    pruneExpired(lastByEmail, COOLDOWN_MS, now);
+
     const lovableKey = process.env.LOVABLE_API_KEY;
     const gmailKey = process.env.GOOGLE_MAIL_API_KEY;
     if (!lovableKey || !gmailKey) {
