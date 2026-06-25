@@ -12,6 +12,7 @@ const schema = z.object({
 });
 
 const TO_EMAIL = "gunupuruchandu29@gmail.com";
+const GMAIL_SEND_TIMEOUT_MS = 12000;
 
 function encodeRfc2822Base64Url(raw: string) {
   const b64 =
@@ -23,6 +24,15 @@ function encodeRfc2822Base64Url(raw: string) {
 
 function esc(s: string) {
   return s.replace(/[<>&]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[c]!));
+}
+
+function createTimeoutSignal(ms: number) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), ms);
+  return {
+    signal: controller.signal,
+    clear: () => clearTimeout(timeout),
+  };
 }
 
 export const sendQuoteInquiry = createServerFn({ method: "POST" })
@@ -83,6 +93,7 @@ export const sendQuoteInquiry = createServerFn({ method: "POST" })
 
     const raw = encodeRfc2822Base64Url(mime);
 
+    const gmailTimeout = createTimeoutSignal(GMAIL_SEND_TIMEOUT_MS);
     const gmailSend = fetch(
       "https://connector-gateway.lovable.dev/google_mail/gmail/v1/users/me/messages/send",
       {
@@ -93,14 +104,24 @@ export const sendQuoteInquiry = createServerFn({ method: "POST" })
           "X-Connection-Api-Key": gmailKey,
         },
         body: JSON.stringify({ raw }),
+        signal: gmailTimeout.signal,
       },
-    ).then(async (res) => {
-      if (!res.ok) {
-        const text = await res.text();
-        console.error("Gmail send failed", res.status, text);
-        throw new Error("Failed to send inquiry email.");
-      }
-    });
+    )
+      .then(async (res) => {
+        if (!res.ok) {
+          const text = await res.text();
+          console.error("Gmail send failed", res.status, text);
+          throw new Error("Failed to send inquiry email.");
+        }
+      })
+      .catch((err) => {
+        if ((err as Error).name === "AbortError") {
+          console.error("Gmail send timed out", { timeout_ms: GMAIL_SEND_TIMEOUT_MS });
+          throw new Error("Email sending is taking too long. Please try again or use WhatsApp.");
+        }
+        throw err;
+      })
+      .finally(gmailTimeout.clear);
 
     // For Help Center: kick off the customer confirmation enqueue in parallel.
     // It's best-effort — never block the submit button on it.
