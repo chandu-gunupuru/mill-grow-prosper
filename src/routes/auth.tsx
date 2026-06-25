@@ -1,11 +1,12 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Loader2, Leaf, ArrowLeft, Mail, Phone, CheckCircle2, AlertTriangle, Clock, RotateCw, ShieldAlert, ExternalLink } from "lucide-react";
+import { Loader2, Leaf, ArrowLeft, Mail, Phone, CheckCircle2, AlertTriangle, ShieldAlert, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/useAuth";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { Progress } from "@/components/ui/progress";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [{ title: "Sign in — Gayathri Modern Rice Mill" }] }),
