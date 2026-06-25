@@ -24,6 +24,7 @@ import { LiveChatWidget } from "@/components/LiveChatWidget";
 const WHATSAPP = "+919398553951";
 const PHONE = "+91 93985 53951";
 const EMAIL = "gunupuruchandu29@gmail.com";
+const SUPPORT_SUBMIT_TIMEOUT_MS = 15000;
 
 const CATEGORIES = [
   "Order issue",
@@ -42,6 +43,15 @@ const formSchema = z.object({
   category: z.string().trim().min(1).max(80),
   message: z.string().trim().min(10, "Please describe your doubt (min 10 chars)").max(2000),
 });
+
+function withTimeout<T>(promise: Promise<T>, ms: number, message: string) {
+  let timeout: ReturnType<typeof setTimeout>;
+  const timer = new Promise<never>((_, reject) => {
+    timeout = setTimeout(() => reject(new Error(message)), ms);
+  });
+
+  return Promise.race([promise, timer]).finally(() => clearTimeout(timeout));
+}
 
 export const Route = createFileRoute("/help")({
   head: () => ({
@@ -90,17 +100,21 @@ function HelpCenter() {
     }
     setSending(true);
     try {
-      await send({
-        data: {
-          name: parsed.data.name,
-          company: "",
-          email: parsed.data.email,
-          phone: parsed.data.phone,
-          product: `Help Center — ${parsed.data.category}`,
-          qty: "",
-          message: parsed.data.message,
-        },
-      });
+      await withTimeout(
+        send({
+          data: {
+            name: parsed.data.name,
+            company: "",
+            email: parsed.data.email,
+            phone: parsed.data.phone,
+            product: `Help Center — ${parsed.data.category}`,
+            qty: "",
+            message: parsed.data.message,
+          },
+        }),
+        SUPPORT_SUBMIT_TIMEOUT_MS,
+        "Sending is taking too long. Please try again or contact us on WhatsApp.",
+      );
       setSent(true);
       toast.success("Your question was sent. We'll reply shortly.");
       setForm({ name: "", email: "", phone: "", category: CATEGORIES[0], message: "" });
