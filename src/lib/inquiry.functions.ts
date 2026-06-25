@@ -102,5 +102,22 @@ export const sendQuoteInquiry = createServerFn({ method: "POST" })
       throw new Error("Failed to send inquiry email.");
     }
 
+    // Send a branded confirmation email to the customer for Help Center submissions.
+    if (isHelp) {
+      try {
+        const { sendHelpCenterConfirmation } = await import(
+          "@/lib/email/send-help-center-confirmation.server"
+        );
+        await sendHelpCenterConfirmation({
+          name: data.name,
+          email: data.email,
+          topic,
+          message: data.message,
+        });
+      } catch (confirmErr) {
+        console.error("Failed to send help center confirmation email", confirmErr);
+      }
+    }
+
     return { ok: true as const };
   });
