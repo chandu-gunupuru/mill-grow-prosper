@@ -80,7 +80,14 @@ function HelpCenter() {
   });
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
   const [contactOpen, setContactOpen] = useState(false);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const id = window.setInterval(() => setCooldown((s) => (s > 0 ? s - 1 : 0)), 1000);
+    return () => window.clearInterval(id);
+  }, [cooldown]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -95,6 +102,7 @@ function HelpCenter() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (sending || cooldown > 0) return;
     const parsed = formSchema.safeParse(form);
     if (!parsed.success) {
       toast.error(parsed.error.issues[0]?.message ?? "Please check the form.");
@@ -118,6 +126,7 @@ function HelpCenter() {
         "Sending is taking too long. Please try again or contact us on WhatsApp.",
       );
       setSent(true);
+      setCooldown(20);
       toast.success("Your question was sent. We'll reply shortly.");
       setForm({ name: "", email: "", phone: "", category: CATEGORIES[0], message: "" });
     } catch (err) {
@@ -323,7 +332,7 @@ function HelpCenter() {
               </Field>
               <button
                 type="submit"
-                disabled={sending}
+                disabled={sending || cooldown > 0}
                 className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-60"
               >
                 {sending ? (
@@ -331,7 +340,11 @@ function HelpCenter() {
                 ) : (
                   <Send className="h-4 w-4" />
                 )}
-                {sending ? "Sending…" : "Send to support"}
+                {sending
+                  ? "Sending…"
+                  : cooldown > 0
+                    ? `Please wait ${cooldown}s…`
+                    : "Send to support"}
               </button>
             </form>
           )}
