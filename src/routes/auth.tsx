@@ -528,7 +528,7 @@ function AuthPage() {
             )}
 
 
-            {googleError && !busy && !googlePopupBlocked && googleErrorKind && (
+            {googleError && !googleBusy && !googlePopupBlocked && googleErrorKind && (
               <div className="mt-3 rounded-md border border-destructive/30 bg-destructive/5 p-3 text-xs">
                 <div className="flex items-start gap-2 text-destructive">
                   <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
