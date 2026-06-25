@@ -141,35 +141,11 @@ export const sendQuoteInquiry = createServerFn({ method: "POST" })
 
     const raw = encodeRfc2822Base64Url(mime);
 
-    const gmailTimeout = createTimeoutSignal(GMAIL_SEND_TIMEOUT_MS);
-    const gmailSend = fetch(
-      "https://connector-gateway.lovable.dev/google_mail/gmail/v1/users/me/messages/send",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${lovableKey}`,
-          "X-Connection-Api-Key": gmailKey,
-        },
-        body: JSON.stringify({ raw }),
-        signal: gmailTimeout.signal,
-      },
-    )
-      .then(async (res) => {
-        if (!res.ok) {
-          const text = await res.text();
-          console.error("Gmail send failed", res.status, text);
-          throw new Error("Failed to send inquiry email.");
-        }
-      })
-      .catch((err) => {
-        if ((err as Error).name === "AbortError") {
-          console.error("Gmail send timed out", { timeout_ms: GMAIL_SEND_TIMEOUT_MS });
-          throw new Error("Email sending is taking too long. Please try again or use WhatsApp.");
-        }
-        throw err;
-      })
-      .finally(gmailTimeout.clear);
+    const gmailSend = sendGmailWithRetry(JSON.stringify({ raw }), {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${lovableKey}`,
+      "X-Connection-Api-Key": gmailKey,
+    });
 
     // For Help Center: kick off the customer confirmation enqueue in parallel.
     // It's best-effort — never block the submit button on it.
