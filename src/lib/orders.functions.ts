@@ -196,33 +196,57 @@ export const listMyShopifyOrders = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const email = (context.claims?.email as string | undefined)?.trim().toLowerCase();
     if (!email) {
-      return { orders: [] as MyOrder[], unauthenticatedEmail: true };
+      return {
+        orders: [] as MyOrder[],
+        unauthenticatedEmail: true,
+        unavailable: false as boolean,
+        message: null as string | null,
+      };
     }
 
-    const res = await shopifyAdmin(
-      `/orders.json?status=any&limit=50&email=${encodeURIComponent(email)}&fields=${ORDER_FIELDS}`,
-    );
-
-    if (!res.ok) {
-      const body = await res.text();
-      console.error("listMyShopifyOrders failed", res.status, body);
-      throw new Error(
-        res.status === 401 || res.status === 403
-          ? "Could not load orders right now. Please try again later."
-          : `Order service error (${res.status}).`,
+    try {
+      const res = await shopifyAdmin(
+        `/orders.json?status=any&limit=50&email=${encodeURIComponent(email)}&fields=${ORDER_FIELDS}`,
       );
+
+      if (!res.ok) {
+        const body = await res.text();
+        console.error("listMyShopifyOrders failed", res.status, body);
+        return {
+          orders: [] as MyOrder[],
+          unauthenticatedEmail: false,
+          unavailable: true,
+          message:
+            res.status === 401 || res.status === 403
+              ? "Order history isn't available right now. Please try again later."
+              : `Order service error (${res.status}).`,
+        };
+      }
+
+      const json = (await res.json()) as { orders?: ShopifyOrderRaw[] };
+      const raw = json.orders ?? [];
+      const productIds = raw
+        .flatMap((o) => o.line_items ?? [])
+        .map((li) => li.product_id)
+        .filter((id): id is number => typeof id === "number");
+      const imagesByProductId = await fetchProductImages(productIds);
+
+      const orders = raw.map((o) => mapOrder(o, imagesByProductId));
+      return {
+        orders,
+        unauthenticatedEmail: false,
+        unavailable: false,
+        message: null,
+      };
+    } catch (err) {
+      console.error("listMyShopifyOrders error", err);
+      return {
+        orders: [] as MyOrder[],
+        unauthenticatedEmail: false,
+        unavailable: true,
+        message: "Could not load orders right now. Please try again later.",
+      };
     }
-
-    const json = (await res.json()) as { orders?: ShopifyOrderRaw[] };
-    const raw = json.orders ?? [];
-    const productIds = raw
-      .flatMap((o) => o.line_items ?? [])
-      .map((li) => li.product_id)
-      .filter((id): id is number => typeof id === "number");
-    const imagesByProductId = await fetchProductImages(productIds);
-
-    const orders = raw.map((o) => mapOrder(o, imagesByProductId));
-    return { orders, unauthenticatedEmail: false };
   });
 
 export const cancelMyShopifyOrder = createServerFn({ method: "POST" })
