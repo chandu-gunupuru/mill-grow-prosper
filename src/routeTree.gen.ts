@@ -17,6 +17,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedOrdersRouteImport } from './routes/_authenticated/orders'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as AuthenticatedAdminOrdersRouteImport } from './routes/_authenticated/admin.orders'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
@@ -62,6 +63,11 @@ const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedOrdersRoute = AuthenticatedOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
@@ -110,6 +116,7 @@ export interface FileRoutesByFullPath {
   '/help': typeof HelpRoute
   '/reset-password': typeof ResetPasswordRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/orders': typeof AuthenticatedOrdersRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
@@ -126,6 +133,7 @@ export interface FileRoutesByTo {
   '/help': typeof HelpRoute
   '/reset-password': typeof ResetPasswordRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/orders': typeof AuthenticatedOrdersRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
@@ -144,6 +152,7 @@ export interface FileRoutesById {
   '/help': typeof HelpRoute
   '/reset-password': typeof ResetPasswordRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/_authenticated/orders': typeof AuthenticatedOrdersRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/_authenticated/admin/orders': typeof AuthenticatedAdminOrdersRoute
@@ -162,6 +171,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/reset-password'
     | '/unsubscribe'
+    | '/orders'
     | '/settings'
     | '/email/unsubscribe'
     | '/admin/orders'
@@ -178,6 +188,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/reset-password'
     | '/unsubscribe'
+    | '/orders'
     | '/settings'
     | '/email/unsubscribe'
     | '/admin/orders'
@@ -195,6 +206,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/reset-password'
     | '/unsubscribe'
+    | '/_authenticated/orders'
     | '/_authenticated/settings'
     | '/email/unsubscribe'
     | '/_authenticated/admin/orders'
@@ -280,6 +292,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/orders': {
+      id: '/_authenticated/orders'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof AuthenticatedOrdersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/lovable/email/suppression': {
       id: '/lovable/email/suppression'
       path: '/lovable/email/suppression'
@@ -333,11 +352,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedOrdersRoute: typeof AuthenticatedOrdersRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedOrdersRoute: AuthenticatedOrdersRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRoute,
 }
