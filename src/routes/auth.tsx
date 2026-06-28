@@ -48,7 +48,15 @@ function AuthPage() {
   const cooldownFor = (attemptCount: number) => [30, 60, 120, 180][Math.min(attemptCount - 1, 3)] ?? 180;
 
   useEffect(() => {
-    if (user) navigate({ to: "/", replace: true });
+    if (user) {
+      // Session is live — clear any spinner from in-flight OAuth/email/phone
+      // attempts and ignore late provider resolutions so we don't double-toast.
+      setBusy(false);
+      setGoogleError(null);
+      setGoogleErrorKind(null);
+      googleAttemptRef.current += 1;
+      navigate({ to: "/", replace: true });
+    }
   }, [user, navigate]);
 
   // Tick the cooldown every second; flip to "delayed" only once the cooldown expires
