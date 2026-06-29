@@ -138,6 +138,7 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          phone: string | null
           updated_at: string
         }
         Insert: {
@@ -146,6 +147,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id: string
+          phone?: string | null
           updated_at?: string
         }
         Update: {
@@ -154,6 +156,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          phone?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -179,6 +182,57 @@ export type Database = {
           id?: string
           metadata?: Json | null
           reason?: string
+        }
+        Relationships: []
+      }
+      user_addresses: {
+        Row: {
+          city: string | null
+          country: string | null
+          created_at: string
+          id: string
+          is_default: boolean
+          label: string | null
+          line1: string
+          line2: string | null
+          phone: string | null
+          postal_code: string | null
+          recipient_name: string | null
+          state: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          label?: string | null
+          line1: string
+          line2?: string | null
+          phone?: string | null
+          postal_code?: string | null
+          recipient_name?: string | null
+          state?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          label?: string | null
+          line1?: string
+          line2?: string | null
+          phone?: string | null
+          postal_code?: string | null
+          recipient_name?: string | null
+          state?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -247,6 +301,39 @@ export type Database = {
           notify_marketing?: boolean
           notify_sms?: boolean
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      wishlist_items: {
+        Row: {
+          added_at: string
+          currency: string | null
+          id: string
+          image_url: string | null
+          price: number | null
+          product_handle: string
+          title: string | null
+          user_id: string
+        }
+        Insert: {
+          added_at?: string
+          currency?: string | null
+          id?: string
+          image_url?: string | null
+          price?: number | null
+          product_handle: string
+          title?: string | null
+          user_id: string
+        }
+        Update: {
+          added_at?: string
+          currency?: string | null
+          id?: string
+          image_url?: string | null
+          price?: number | null
+          product_handle?: string
+          title?: string | null
           user_id?: string
         }
         Relationships: []
