@@ -334,7 +334,8 @@ function CheckoutPage() {
                     {fmt(item.quantity * parseFloat(item.price.amount))}
                   </p>
                 </li>
-              ))}
+                );
+              })}
             </ul>
             <div className="p-5 space-y-2 text-sm border-t border-border">
               <div className="flex justify-between text-muted-foreground">
