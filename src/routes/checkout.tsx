@@ -311,19 +311,23 @@ function CheckoutPage() {
               </p>
             </div>
             <ul className="max-h-72 overflow-y-auto divide-y divide-border">
-              {items.map((item) => (
+              {items.map((item) => {
+                const title = item.product?.node?.title ?? "Item";
+                const image =
+                  item.product?.node?.images?.edges?.[0]?.node?.url ?? null;
+                return (
                 <li key={item.variantId} className="p-4 flex gap-3">
-                  {item.image ? (
+                  {image ? (
                     <img
-                      src={item.image}
-                      alt={item.title}
+                      src={image}
+                      alt={title}
                       className="w-14 h-14 rounded-md object-cover border border-border"
                     />
                   ) : (
                     <div className="w-14 h-14 rounded-md bg-secondary" />
                   )}
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm leading-tight truncate">{item.title}</p>
+                    <p className="font-medium text-sm leading-tight truncate">{title}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">Qty {item.quantity}</p>
                   </div>
                   <p className="text-sm font-semibold whitespace-nowrap">
