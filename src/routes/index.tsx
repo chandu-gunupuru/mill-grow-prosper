@@ -16,7 +16,7 @@ import { useCartStore } from "@/stores/cartStore";
 import { useCartSync } from "@/hooks/useCartSync";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { LogIn, LogOut, User as UserIcon, Settings, UserCog, ChevronRight, ShoppingBag, LifeBuoy, MapPinned, Languages, BellRing, Star as StarIcon } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -158,6 +158,7 @@ function HeroMillSlideshow() {
 
 function Index() {
 
+  const navigate = useNavigate();
   const [navOpen, setNavOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -1255,11 +1256,19 @@ function Index() {
                     </>
                   ) : (
                     <>
-                      <button onClick={checkout} disabled={isLoading || isSyncing} className="w-full inline-flex items-center justify-center gap-2 bg-gradient-gold text-primary py-3 rounded-md font-bold shadow-gold hover:scale-[1.01] transition disabled:opacity-60 disabled:cursor-not-allowed">
-                        {isLoading || isSyncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <><ShoppingCart className="w-4 h-4" /> Buy Now</>}
+                      <button
+                        onClick={() => { setCartOpen(false); navigate({ to: "/checkout" }); }}
+                        disabled={isLoading || isSyncing}
+                        className="w-full inline-flex items-center justify-center gap-2 bg-gradient-gold text-primary py-3 rounded-md font-bold shadow-gold hover:scale-[1.01] transition disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        {isLoading || isSyncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <><ShoppingCart className="w-4 h-4" /> Proceed to Checkout</>}
                       </button>
-                      <button onClick={checkout} disabled={isLoading || isSyncing} className="w-full inline-flex items-center justify-center gap-2 border border-primary text-primary py-2.5 rounded-md font-semibold hover:bg-primary/5 transition disabled:opacity-60 disabled:cursor-not-allowed">
-                        {isLoading || isSyncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <><ExternalLink className="w-4 h-4" /> Checkout Securely</>}
+                      <button
+                        onClick={checkout}
+                        disabled={isLoading || isSyncing}
+                        className="w-full inline-flex items-center justify-center gap-2 border border-primary text-primary py-2.5 rounded-md font-semibold hover:bg-primary/5 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        {isLoading || isSyncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <><ExternalLink className="w-4 h-4" /> Skip & Pay on Shopify</>}
                       </button>
                     </>
                   )}
