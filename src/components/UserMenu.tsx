@@ -50,7 +50,7 @@ export function UserMenu({ onOpenCart }: UserMenuProps) {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
-  const { theme, setTheme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
 
   if (!user) return null;
 
@@ -104,7 +104,7 @@ export function UserMenu({ onOpenCart }: UserMenuProps) {
         {
           icon: theme === "dark" ? Sun : Moon,
           label: theme === "dark" ? "Light Mode" : "Dark Mode",
-          onClick: () => setTheme(theme === "dark" ? "light" : "dark"),
+          onClick: toggleTheme,
         },
       ],
     },

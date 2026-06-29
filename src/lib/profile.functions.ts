@@ -51,10 +51,13 @@ export const updateMyProfile = createServerFn({ method: "POST" })
   .inputValidator((d: { full_name?: string; phone?: string; avatar_url?: string }) => d)
   .handler(async ({ data, context }) => {
     const { supabase, userId, claims } = context;
-    const payload: Record<string, unknown> = { id: userId, email: claims?.email ?? null };
-    if (typeof data.full_name === "string") payload.full_name = data.full_name.trim() || null;
-    if (typeof data.phone === "string") payload.phone = data.phone.trim() || null;
-    if (typeof data.avatar_url === "string") payload.avatar_url = data.avatar_url.trim() || null;
+    const payload = {
+      id: userId,
+      email: (claims?.email as string | undefined) ?? null,
+      full_name: typeof data.full_name === "string" ? data.full_name.trim() || null : undefined,
+      phone: typeof data.phone === "string" ? data.phone.trim() || null : undefined,
+      avatar_url: typeof data.avatar_url === "string" ? data.avatar_url.trim() || null : undefined,
+    };
     const { error } = await supabase.from("profiles").upsert(payload, { onConflict: "id" });
     if (error) throw new Error(error.message);
     return { ok: true as const };
@@ -77,12 +80,25 @@ export const upsertMyAddress = createServerFn({ method: "POST" })
   .inputValidator((d: Partial<AddressRow> & { line1: string }) => d)
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const row = { ...data, user_id: userId } as Record<string, unknown>;
     if (data.is_default) {
       await supabase.from("user_addresses").update({ is_default: false }).eq("user_id", userId);
     }
-    const { data: saved, error } = data.id
-      ? await supabase.from("user_addresses").update(row).eq("id", data.id).eq("user_id", userId).select().single()
+    const { id, ...rest } = data;
+    const row = {
+      user_id: userId,
+      label: rest.label ?? null,
+      recipient_name: rest.recipient_name ?? null,
+      phone: rest.phone ?? null,
+      line1: rest.line1,
+      line2: rest.line2 ?? null,
+      city: rest.city ?? null,
+      state: rest.state ?? null,
+      postal_code: rest.postal_code ?? null,
+      country: rest.country ?? "India",
+      is_default: rest.is_default ?? false,
+    };
+    const { data: saved, error } = id
+      ? await supabase.from("user_addresses").update(row).eq("id", id).eq("user_id", userId).select().single()
       : await supabase.from("user_addresses").insert(row).select().single();
     if (error) throw new Error(error.message);
     return { address: saved as AddressRow };
