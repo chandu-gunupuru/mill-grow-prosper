@@ -349,17 +349,11 @@ function Index() {
             ))}
           </nav>
           <div className="hidden md:flex items-center gap-2">
+            {user && <UserMenu onOpenCart={() => setCartOpen(true)} />}
             {user && (
               <Sheet open={accountOpen} onOpenChange={setAccountOpen}>
                 <SheetTrigger asChild>
-                  <button className="flex items-center gap-1.5 px-2 py-1.5 rounded-md text-sm font-semibold text-primary hover:bg-primary/5 transition-colors">
-                    {user.user_metadata?.avatar_url ? (
-                      <img src={user.user_metadata.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover border border-primary/20" />
-                    ) : (
-                      <UserIcon className="w-4 h-4" />
-                    )}
-                    <span className="max-w-[100px] truncate">{user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0]}</span>
-                  </button>
+                  <span className="hidden" aria-hidden />
                 </SheetTrigger>
                 <SheetContent
                   side="right"
