@@ -12,10 +12,13 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as HelpRouteImport } from './routes/help'
+import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
+import { Route as CheckoutSuccessRouteImport } from './routes/checkout.success'
+import { Route as CheckoutFailedRouteImport } from './routes/checkout.failed'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedOrdersRouteImport } from './routes/_authenticated/orders'
@@ -42,6 +45,11 @@ const HelpRoute = HelpRouteImport.update({
   path: '/help',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -60,6 +68,16 @@ const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/email/unsubscribe',
   path: '/email/unsubscribe',
   getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
+  id: '/success',
+  path: '/success',
+  getParentRoute: () => CheckoutRoute,
+} as any)
+const CheckoutFailedRoute = CheckoutFailedRouteImport.update({
+  id: '/failed',
+  path: '/failed',
+  getParentRoute: () => CheckoutRoute,
 } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
@@ -119,12 +137,15 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/checkout': typeof CheckoutRouteWithChildren
   '/help': typeof HelpRoute
   '/reset-password': typeof ResetPasswordRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/orders': typeof AuthenticatedOrdersRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/checkout/failed': typeof CheckoutFailedRoute
+  '/checkout/success': typeof CheckoutSuccessRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -137,12 +158,15 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/checkout': typeof CheckoutRouteWithChildren
   '/help': typeof HelpRoute
   '/reset-password': typeof ResetPasswordRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/orders': typeof AuthenticatedOrdersRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/checkout/failed': typeof CheckoutFailedRoute
+  '/checkout/success': typeof CheckoutSuccessRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -157,12 +181,15 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/checkout': typeof CheckoutRouteWithChildren
   '/help': typeof HelpRoute
   '/reset-password': typeof ResetPasswordRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/orders': typeof AuthenticatedOrdersRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/checkout/failed': typeof CheckoutFailedRoute
+  '/checkout/success': typeof CheckoutSuccessRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/_authenticated/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -177,12 +204,15 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/checkout'
     | '/help'
     | '/reset-password'
     | '/unsubscribe'
     | '/orders'
     | '/profile'
     | '/settings'
+    | '/checkout/failed'
+    | '/checkout/success'
     | '/email/unsubscribe'
     | '/admin/orders'
     | '/lovable/email/suppression'
@@ -195,12 +225,15 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/checkout'
     | '/help'
     | '/reset-password'
     | '/unsubscribe'
     | '/orders'
     | '/profile'
     | '/settings'
+    | '/checkout/failed'
+    | '/checkout/success'
     | '/email/unsubscribe'
     | '/admin/orders'
     | '/lovable/email/suppression'
@@ -214,12 +247,15 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/checkout'
     | '/help'
     | '/reset-password'
     | '/unsubscribe'
     | '/_authenticated/orders'
     | '/_authenticated/profile'
     | '/_authenticated/settings'
+    | '/checkout/failed'
+    | '/checkout/success'
     | '/email/unsubscribe'
     | '/_authenticated/admin/orders'
     | '/lovable/email/suppression'
@@ -234,6 +270,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  CheckoutRoute: typeof CheckoutRouteWithChildren
   HelpRoute: typeof HelpRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
@@ -269,6 +306,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HelpRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -296,6 +340,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/email/unsubscribe'
       preLoaderRoute: typeof EmailUnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/checkout/success': {
+      id: '/checkout/success'
+      path: '/success'
+      fullPath: '/checkout/success'
+      preLoaderRoute: typeof CheckoutSuccessRouteImport
+      parentRoute: typeof CheckoutRoute
+    }
+    '/checkout/failed': {
+      id: '/checkout/failed'
+      path: '/failed'
+      fullPath: '/checkout/failed'
+      preLoaderRoute: typeof CheckoutFailedRouteImport
+      parentRoute: typeof CheckoutRoute
     }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
@@ -387,10 +445,25 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface CheckoutRouteChildren {
+  CheckoutFailedRoute: typeof CheckoutFailedRoute
+  CheckoutSuccessRoute: typeof CheckoutSuccessRoute
+}
+
+const CheckoutRouteChildren: CheckoutRouteChildren = {
+  CheckoutFailedRoute: CheckoutFailedRoute,
+  CheckoutSuccessRoute: CheckoutSuccessRoute,
+}
+
+const CheckoutRouteWithChildren = CheckoutRoute._addFileChildren(
+  CheckoutRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  CheckoutRoute: CheckoutRouteWithChildren,
   HelpRoute: HelpRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   UnsubscribeRoute: UnsubscribeRoute,
