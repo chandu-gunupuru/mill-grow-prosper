@@ -24,6 +24,7 @@ import { openShopifyCheckout, getOpenInSameTab, setOpenInSameTab } from "@/lib/c
 import { getStoreStatus } from "@/lib/store-status.functions";
 import { logProductClick } from "@/lib/analytics";
 import { ProfileModal } from "@/components/ProfileModal";
+import { UserMenu } from "@/components/UserMenu";
 
 
 import paddyField from "@/assets/paddy-field.jpg?w=900&format=webp&quality=72&imagetools";
