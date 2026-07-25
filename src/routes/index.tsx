@@ -25,6 +25,9 @@ import { getStoreStatus } from "@/lib/store-status.functions";
 import { logProductClick } from "@/lib/analytics";
 import { ProfileModal } from "@/components/ProfileModal";
 import { UserMenu } from "@/components/UserMenu";
+import { ProductDetailsDrawer } from "@/components/ProductDetailsDrawer";
+import { Heart } from "lucide-react";
+import { wishlist } from "@/lib/wishlist";
 
 
 import paddyField from "@/assets/paddy-field.jpg?w=900&format=webp&quality=72&imagetools";
