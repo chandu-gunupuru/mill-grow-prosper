@@ -337,6 +337,29 @@ function Index() {
     <div className="min-h-screen bg-background">
       <Toaster richColors position="top-center" />
       {user && <ProfileModal open={profileOpen} onClose={() => setProfileOpen(false)} user={user} />}
+      <ProductDetailsDrawer
+        product={detailProduct}
+        allProducts={shopifyProducts}
+        open={!!detailProduct}
+        onOpenChange={(o) => { if (!o) setDetailProduct(null); }}
+        onAddToCart={async (product, quantity) => {
+          const variant = product.node.variants.edges[0]?.node;
+          if (!variant) return false;
+          void logProductClick("add_to_cart", product.node.id, variant.id);
+          await addItem({
+            product,
+            variantId: variant.id,
+            variantTitle: variant.title,
+            price: variant.price,
+            quantity,
+            selectedOptions: variant.selectedOptions || [],
+          });
+          return !useCartStore.getState().checkoutError;
+        }}
+        onBuyNow={(p) => buyNow(p)}
+        onOpenProduct={(p) => setDetailProduct(p)}
+        isBuying={buyingId !== null}
+      />
 
 
       {/* NAV */}
