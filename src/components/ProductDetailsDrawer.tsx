@@ -258,7 +258,7 @@ export function ProductDetailsDrawer({
                 {/* INFO COLUMN */}
                 <div className="flex flex-col">
                   <div className="text-xs font-semibold uppercase tracking-wider text-gold">
-                    {product.node.productType || "Premium Rice"}
+                    Premium Rice
                   </div>
                   <h2 className="mt-1 font-display text-2xl font-bold text-primary md:text-3xl">
                     {product.node.title}
