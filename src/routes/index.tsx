@@ -273,6 +273,9 @@ function Index() {
   }
 
   const [buyingId, setBuyingId] = useState<string | null>(null);
+  const [detailProduct, setDetailProduct] = useState<ShopifyProduct | null>(null);
+  const [wishlistTick, setWishlistTick] = useState(0);
+  useEffect(() => wishlist.subscribe(() => setWishlistTick((t) => t + 1)), []);
   async function buyNow(product: ShopifyProduct) {
     // Buy Now is a direct checkout: create a one-off Shopify cart for just
     // this item and open its checkoutUrl. The user's persistent cart is NOT
