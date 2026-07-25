@@ -807,11 +807,34 @@ function Index() {
                   >
                     <div className="relative aspect-square overflow-hidden bg-cream">
                       {img && (
-                        <img src={img.url} alt={img.altText || p.node.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                        <button
+                          type="button"
+                          onClick={() => setDetailProduct(p)}
+                          aria-label={`View details for ${p.node.title}`}
+                          className="block w-full h-full"
+                        >
+                          <img src={img.url} alt={img.altText || p.node.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                        </button>
                       )}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const nowSaved = wishlist.toggle(p.node.id);
+                          toast.success(nowSaved ? "Added to Wishlist" : "Removed from Wishlist");
+                        }}
+                        aria-label={wishlist.has(p.node.id) ? "Remove from wishlist" : "Add to wishlist"}
+                        aria-pressed={wishlist.has(p.node.id)}
+                        data-tick={wishlistTick}
+                        className="absolute right-2.5 top-2.5 grid h-9 w-9 place-items-center rounded-full bg-background/85 backdrop-blur shadow ring-1 ring-border transition hover:scale-110 active:scale-90"
+                      >
+                        <Heart className={`h-4.5 w-4.5 transition-colors ${wishlist.has(p.node.id) ? "fill-red-500 text-red-500" : "text-foreground"}`} />
+                      </button>
                     </div>
                     <div className="p-5 flex flex-col flex-1">
-                      <h3 className="font-bold text-primary leading-tight">{p.node.title}</h3>
+                      <button type="button" onClick={() => setDetailProduct(p)} className="text-left">
+                        <h3 className="font-bold text-primary leading-tight hover:text-gold transition-colors">{p.node.title}</h3>
+                      </button>
                       {weight && <div className="text-xs text-muted-foreground mt-1">{weight} pack</div>}
                       <div className="mt-3 flex items-baseline gap-2">
                         <span className="font-display text-2xl font-bold text-primary">{symbol}{price.toFixed(0)}</span>
