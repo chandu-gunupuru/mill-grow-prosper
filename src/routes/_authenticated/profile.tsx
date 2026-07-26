@@ -486,3 +486,65 @@ function AddressEditor({ initial, onCancel, onSave }: {
     </Card>
   );
 }
+
+function WishlistTabContent() {
+  const [ids, setIds] = useState<string[]>(() => wishlist.list());
+
+  useEffect(() => wishlist.subscribe(() => setIds(wishlist.list())), []);
+
+  const count = ids.length;
+
+  if (count === 0) {
+    return (
+      <Card className="p-8 border-border/60 text-center">
+        <Heart className="w-10 h-10 mx-auto text-muted-foreground mb-3" />
+        <h3 className="font-semibold">Your wishlist is empty</h3>
+        <p className="text-sm text-muted-foreground mt-1">Tap the heart on any product to save it here.</p>
+        <Link to="/" hash="shop" className="inline-flex items-center gap-2 mt-4 text-sm text-primary hover:underline">
+          Browse products
+        </Link>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <h3 className="font-semibold flex items-center gap-2">
+          <Heart className="w-4 h-4 text-red-500 fill-red-500" /> Saved items
+          <span className="text-xs font-normal text-muted-foreground">({count})</span>
+        </h3>
+        <Link to="/" hash="shop" className="text-sm text-primary hover:underline">Continue browsing</Link>
+      </div>
+      <div className="grid sm:grid-cols-2 gap-3">
+        {ids.map((id) => {
+          const short = id.split("/").pop() || id;
+          return (
+            <Card key={id} className="p-4 border-border/60 flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <div className="text-sm font-semibold truncate">Product #{short}</div>
+                <div className="text-xs text-muted-foreground mt-0.5">Saved to your wishlist</div>
+              </div>
+              <div className="flex items-center gap-1 shrink-0">
+                <Button asChild size="sm" variant="outline">
+                  <Link to="/" hash="shop">View</Link>
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  aria-label="Remove from wishlist"
+                  onClick={() => {
+                    wishlist.remove(id);
+                    toast.success("Removed from Wishlist");
+                  }}
+                >
+                  <Trash2 className="w-4 h-4 text-destructive" />
+                </Button>
+              </div>
+            </Card>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
