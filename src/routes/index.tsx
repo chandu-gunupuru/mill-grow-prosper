@@ -365,10 +365,13 @@ function Index() {
       {/* NAV */}
       <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-md bg-background/80 border-b border-border">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <a href="#top" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-md bg-gradient-gold grid place-items-center shadow-gold">
-              <Leaf className="w-5 h-5 text-primary" />
-            </div>
+          <a href="#top" className="flex items-center gap-2.5">
+            <img
+              src={new URL("../assets/gmrm-logo-mark.png", import.meta.url).href}
+              alt="Gayathri Modern Rice Mill"
+              className="w-10 h-10 rounded-lg object-contain bg-cream ring-1 ring-border/60 shadow-gold"
+              draggable={false}
+            />
             <div className="leading-tight">
               <div className="font-display font-bold text-primary">Gayathri</div>
               <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Modern Rice Mill</div>
