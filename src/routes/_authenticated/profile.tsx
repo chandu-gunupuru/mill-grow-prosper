@@ -343,14 +343,7 @@ function ProfilePage() {
 
           {/* SAVED */}
           <TabsContent value="saved" className="mt-4">
-            <Card className="p-8 border-border/60 text-center">
-              <Heart className="w-10 h-10 mx-auto text-muted-foreground mb-3" />
-              <h3 className="font-semibold">Your wishlist is empty</h3>
-              <p className="text-sm text-muted-foreground mt-1">Tap the heart on any product to save it here.</p>
-              <Link to="/" hash="shop" className="inline-flex items-center gap-2 mt-4 text-sm text-primary hover:underline">
-                Browse products
-              </Link>
-            </Card>
+            <WishlistTabContent />
           </TabsContent>
 
           {/* SECURITY */}
