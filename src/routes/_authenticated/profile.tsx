@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { wishlist } from "@/lib/wishlist";
 import { motion } from "motion/react";
 import {
   ArrowLeft, User as UserIcon, MapPin, Settings, Package, Heart, Shield,
