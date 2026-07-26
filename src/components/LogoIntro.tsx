@@ -89,32 +89,36 @@ export function LogoIntro({ children }: LogoIntroProps) {
   return (
     <>
       {showIntro && (
-        <div
+        <motion.div
           role="dialog"
           aria-label="Welcome animation"
           aria-live="polite"
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-background"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-gradient-to-br from-background via-background to-cream/40"
           onClick={handleSkip}
           onKeyDown={handleKeyDown}
           tabIndex={0}
+          initial={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          animate={{ opacity: [1, 1, 0] }}
+          transition={{ duration: 2.2, times: [0, 0.82, 1], ease: "easeOut" }}
         >
           <motion.div
             className="flex cursor-default flex-col items-center"
-            initial={{ scale: 0.6, opacity: 0, y: 60 }}
+            initial={{ scale: 0.7, opacity: 0, y: 40 }}
             animate={{
-              scale: [0.6, 1.05, 1, 1],
+              scale: [0.7, 1.05, 1, 1],
               opacity: [0, 1, 1, 1],
-              y: [60, 0, 0, 0],
+              y: [40, 0, 0, -12],
             }}
             transition={{
               duration: 2,
-              times: [0, 0.4, 0.6, 1],
+              times: [0, 0.35, 0.6, 1],
               ease: [0.22, 1, 0.36, 1],
             }}
             onAnimationComplete={finishIntro}
             onClick={(e) => e.stopPropagation()}
           >
-            <Logo size={120} showText />
+            <Logo size={280} full />
             <p className="sr-only">Gayathri Modern Rice Mill is loading</p>
           </motion.div>
 
@@ -124,7 +128,7 @@ export function LogoIntro({ children }: LogoIntroProps) {
           >
             Press any key to skip
           </p>
-        </div>
+        </motion.div>
       )}
 
       <div aria-hidden={!contentVisible && showIntro}>{children}</div>
