@@ -81,26 +81,26 @@ export function UserMenu({ onOpenCart }: UserMenuProps) {
       items: [
         { icon: UserIcon, label: "My Profile", to: "/profile" },
         { icon: Package, label: "My Orders", to: "/orders" },
-        { icon: Heart, label: "Wishlist", to: "/profile", trailing: <span className="text-[10px] text-muted-foreground">Saved</span> },
+        { icon: Heart, label: "Wishlist", to: "/wishlist" },
         { icon: ShoppingCart, label: "Cart", onClick: () => { setOpen(false); onOpenCart(); } },
       ],
     },
     {
       title: "Account",
       items: [
-        { icon: MapPin, label: "Saved Addresses", to: "/profile" },
-        { icon: CreditCard, label: "Payment Methods", to: "/profile" },
-        { icon: Bell, label: "Notifications", to: "/settings" },
-        { icon: Gift, label: "Offers & Coupons", to: "/profile" },
-        { icon: Star, label: "Reviews & Ratings", to: "/settings" },
+        { icon: MapPin, label: "Saved Addresses", to: "/addresses" },
+        { icon: CreditCard, label: "Payment Methods", to: "/payment-methods" },
+        { icon: Bell, label: "Notifications", to: "/notifications" },
+        { icon: Gift, label: "Offers & Coupons", to: "/offers" },
+        { icon: Star, label: "Reviews & Ratings", to: "/reviews" },
       ],
     },
     {
       title: "Preferences",
       items: [
-        { icon: Settings, label: "Account Settings", to: "/profile" },
-        { icon: Shield, label: "Privacy & Security", to: "/profile" },
-        { icon: Languages, label: "Language", to: "/settings" },
+        { icon: Settings, label: "Account Settings", to: "/settings" },
+        { icon: Shield, label: "Privacy & Security", to: "/privacy" },
+        { icon: Languages, label: "Language", to: "/language" },
         {
           icon: theme === "dark" ? Sun : Moon,
           label: theme === "dark" ? "Light Mode" : "Dark Mode",
@@ -119,6 +119,7 @@ export function UserMenu({ onOpenCart }: UserMenuProps) {
       items: [{ icon: LogOut, label: "Logout", onClick: handleSignOut, destructive: true }],
     },
   ];
+
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
