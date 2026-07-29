@@ -568,7 +568,7 @@ function Index() {
             )}
             <ThemeToggle />
           </div>
-          <div className="flex md:hidden items-center gap-2">
+          <div className="flex lg:hidden items-center gap-0.5 sm:gap-1.5 shrink-0">
             {user && (
               <button
                 onClick={() => setAccountOpen(true)}
