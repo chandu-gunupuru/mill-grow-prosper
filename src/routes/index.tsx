@@ -608,15 +608,16 @@ function Index() {
                 )}
               </span>
             </button>
-            <button onClick={() => setNavOpen(!navOpen)} aria-label="Toggle menu">
-              {navOpen ? <X /> : <Menu />}
+            <button onClick={() => setNavOpen(!navOpen)} aria-label="Toggle menu" aria-expanded={navOpen} className="w-10 h-10 grid place-items-center shrink-0">
+              {navOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
             <ThemeToggle />
           </div>
         </div>
         {navOpen && (
-          <div className="md:hidden border-t border-border bg-background">
-            <div className="px-6 py-4 flex flex-col gap-3">
+          <div className="lg:hidden border-t border-border bg-background max-h-[70vh] overflow-y-auto">
+            <div className="px-4 sm:px-6 py-4 flex flex-col gap-3">
+
               {["About","Shop","Products","Process","Why Us","Contact"].map(i => (
                 <a key={i} href={`#${i.toLowerCase().replace(" ","-")}`} onClick={() => setNavOpen(false)} className="text-foreground/80">{i}</a>
               ))}
