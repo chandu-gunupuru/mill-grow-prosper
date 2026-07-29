@@ -364,26 +364,27 @@ function Index() {
 
       {/* NAV */}
       <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-md bg-background/80 border-b border-border">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <a href="#top" className="flex items-center gap-2.5">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 h-16 flex items-center justify-between gap-2 sm:gap-4">
+          <a href="#top" className="flex min-w-0 shrink items-center gap-2 sm:gap-2.5">
             <img
               src={new URL("../assets/gmrm-logo-mark.png", import.meta.url).href}
               alt="Gayathri Modern Rice Mill"
-              className="w-10 h-10 rounded-lg object-contain bg-cream ring-1 ring-border/60 shadow-gold"
+              className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-lg object-contain bg-cream ring-1 ring-border/60 shadow-gold"
               draggable={false}
             />
-            <div className="leading-tight">
-              <div className="font-display font-bold text-primary">Gayathri</div>
-              <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Modern Rice Mill</div>
+            <div className="min-w-0 leading-tight">
+              <div className="truncate font-display font-bold text-primary text-base sm:text-lg">Gayathri</div>
+              <div className="hidden xs:block truncate text-[9px] sm:text-[10px] uppercase tracking-widest text-muted-foreground">Modern Rice Mill</div>
             </div>
           </a>
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
+          <nav className="hidden lg:flex items-center gap-5 xl:gap-8 text-sm font-medium">
             {["About","Shop","Products","Process","Why Us","Contact"].map(i => (
-              <a key={i} href={`#${i.toLowerCase().replace(" ","-")}`} className="text-foreground/80 hover:text-primary transition-colors">{i}</a>
+              <a key={i} href={`#${i.toLowerCase().replace(" ","-")}`} className="whitespace-nowrap text-foreground/80 hover:text-primary transition-colors">{i}</a>
             ))}
           </nav>
-          <div className="hidden md:flex items-center gap-2">
+          <div className="hidden lg:flex items-center gap-1 xl:gap-2 shrink-0">
             {user && <UserMenu onOpenCart={() => setCartOpen(true)} />}
+
             {user && (
               <Sheet open={accountOpen} onOpenChange={setAccountOpen}>
                 <SheetTrigger asChild>
