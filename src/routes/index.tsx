@@ -572,7 +572,7 @@ function Index() {
             {user && (
               <button
                 onClick={() => setAccountOpen(true)}
-                className="relative w-10 h-10 rounded-md bg-transparent grid place-items-center hover:text-primary transition"
+                className="relative w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-md bg-transparent grid place-items-center hover:text-primary transition"
                 aria-label="Open account menu"
               >
                 {user.user_metadata?.avatar_url ? (
