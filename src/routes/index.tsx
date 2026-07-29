@@ -364,26 +364,27 @@ function Index() {
 
       {/* NAV */}
       <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-md bg-background/80 border-b border-border">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <a href="#top" className="flex items-center gap-2.5">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 h-16 flex items-center justify-between gap-2 sm:gap-4">
+          <a href="#top" className="flex min-w-0 shrink items-center gap-2 sm:gap-2.5">
             <img
               src={new URL("../assets/gmrm-logo-mark.png", import.meta.url).href}
               alt="Gayathri Modern Rice Mill"
-              className="w-10 h-10 rounded-lg object-contain bg-cream ring-1 ring-border/60 shadow-gold"
+              className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-lg object-contain bg-cream ring-1 ring-border/60 shadow-gold"
               draggable={false}
             />
-            <div className="leading-tight">
-              <div className="font-display font-bold text-primary">Gayathri</div>
-              <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Modern Rice Mill</div>
+            <div className="min-w-0 leading-tight">
+              <div className="truncate font-display font-bold text-primary text-base sm:text-lg">Gayathri</div>
+              <div className="hidden xs:block truncate text-[9px] sm:text-[10px] uppercase tracking-widest text-muted-foreground">Modern Rice Mill</div>
             </div>
           </a>
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
+          <nav className="hidden lg:flex items-center gap-5 xl:gap-8 text-sm font-medium">
             {["About","Shop","Products","Process","Why Us","Contact"].map(i => (
-              <a key={i} href={`#${i.toLowerCase().replace(" ","-")}`} className="text-foreground/80 hover:text-primary transition-colors">{i}</a>
+              <a key={i} href={`#${i.toLowerCase().replace(" ","-")}`} className="whitespace-nowrap text-foreground/80 hover:text-primary transition-colors">{i}</a>
             ))}
           </nav>
-          <div className="hidden md:flex items-center gap-2">
+          <div className="hidden lg:flex items-center gap-1 xl:gap-2 shrink-0">
             {user && <UserMenu onOpenCart={() => setCartOpen(true)} />}
+
             {user && (
               <Sheet open={accountOpen} onOpenChange={setAccountOpen}>
                 <SheetTrigger asChild>
@@ -567,11 +568,11 @@ function Index() {
             )}
             <ThemeToggle />
           </div>
-          <div className="flex md:hidden items-center gap-2">
+          <div className="flex lg:hidden items-center gap-0.5 sm:gap-1.5 shrink-0">
             {user && (
               <button
                 onClick={() => setAccountOpen(true)}
-                className="relative w-10 h-10 rounded-md bg-transparent grid place-items-center hover:text-primary transition"
+                className="relative w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-md bg-transparent grid place-items-center hover:text-primary transition"
                 aria-label="Open account menu"
               >
                 {user.user_metadata?.avatar_url ? (
@@ -584,14 +585,15 @@ function Index() {
             <button
               onClick={() => toast.info("No new notifications", { description: "You're all caught up." })}
               aria-label="View notifications"
-              className="relative w-10 h-10 grid place-items-center"
+              className="relative w-9 h-9 sm:w-10 sm:h-10 hidden xs:grid place-items-center shrink-0"
             >
               <span className="relative inline-flex">
                 <Bell className="w-5 h-5" />
                 <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-gold ring-2 ring-background" aria-hidden="true" />
               </span>
             </button>
-            <button onClick={() => setCartOpen(true)} aria-label="Open cart" className="relative w-10 h-10 grid place-items-center">
+            <button onClick={() => setCartOpen(true)} aria-label="Open cart" className="relative w-9 h-9 sm:w-10 sm:h-10 grid place-items-center shrink-0">
+
               <span className="relative inline-flex">
                 <ShoppingCart className="w-5 h-5" />
                 {cartCount > 0 && (
@@ -607,15 +609,16 @@ function Index() {
                 )}
               </span>
             </button>
-            <button onClick={() => setNavOpen(!navOpen)} aria-label="Toggle menu">
-              {navOpen ? <X /> : <Menu />}
+            <button onClick={() => setNavOpen(!navOpen)} aria-label="Toggle menu" aria-expanded={navOpen} className="w-10 h-10 grid place-items-center shrink-0">
+              {navOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
             <ThemeToggle />
           </div>
         </div>
         {navOpen && (
-          <div className="md:hidden border-t border-border bg-background">
-            <div className="px-6 py-4 flex flex-col gap-3">
+          <div className="lg:hidden border-t border-border bg-background max-h-[70vh] overflow-y-auto">
+            <div className="px-4 sm:px-6 py-4 flex flex-col gap-3">
+
               {["About","Shop","Products","Process","Why Us","Contact"].map(i => (
                 <a key={i} href={`#${i.toLowerCase().replace(" ","-")}`} onClick={() => setNavOpen(false)} className="text-foreground/80">{i}</a>
               ))}

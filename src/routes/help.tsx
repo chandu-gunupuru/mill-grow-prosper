@@ -196,10 +196,10 @@ function HelpCenter() {
             </div>
             <span className="text-xs text-muted-foreground">Mon–Sat · 9 AM – 7 PM IST</span>
           </div>
-          <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-3">
             <a
               href={telLink}
-              className="group flex items-center gap-3 rounded-xl border border-border bg-background p-4 hover:border-primary hover:shadow-md transition"
+              className="group flex min-w-0 items-center gap-3 rounded-xl border border-border bg-background p-4 hover:border-primary hover:shadow-md transition"
             >
               <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
                 <Phone className="h-5 w-5" />
@@ -213,7 +213,7 @@ function HelpCenter() {
               href={waLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-center gap-3 rounded-xl border border-border bg-background p-4 hover:border-primary hover:shadow-md transition"
+              className="group flex min-w-0 items-center gap-3 rounded-xl border border-border bg-background p-4 hover:border-primary hover:shadow-md transition"
             >
               <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-green-500/10 text-green-600 dark:text-green-400">
                 <MessageCircle className="h-5 w-5" />
@@ -225,7 +225,7 @@ function HelpCenter() {
             </a>
             <a
               href={mailLink}
-              className="group flex items-center gap-3 rounded-xl border border-border bg-background p-4 hover:border-primary hover:shadow-md transition"
+              className="group flex min-w-0 items-center gap-3 rounded-xl border border-border bg-background p-4 hover:border-primary hover:shadow-md transition"
             >
               <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
                 <Mail className="h-5 w-5" />
@@ -362,7 +362,7 @@ function HelpCenter() {
             <div className="mt-4 flex flex-col gap-3">
               <a
                 href={telLink}
-                className="group flex items-center gap-3 rounded-xl border border-border bg-background p-3 hover:border-primary hover:bg-primary/5 transition"
+                className="group flex min-w-0 items-center gap-3 rounded-xl border border-border bg-background p-3 hover:border-primary hover:bg-primary/5 transition"
               >
                 <div className="grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary">
                   <Phone className="h-5 w-5" />
@@ -376,7 +376,7 @@ function HelpCenter() {
                 href={waLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex items-center gap-3 rounded-xl border border-border bg-background p-3 hover:border-primary hover:bg-primary/5 transition"
+                className="group flex min-w-0 items-center gap-3 rounded-xl border border-border bg-background p-3 hover:border-primary hover:bg-primary/5 transition"
               >
                 <div className="grid h-10 w-10 place-items-center rounded-full bg-green-500/10 text-green-600 dark:text-green-400">
                   <MessageCircle className="h-5 w-5" />
@@ -388,7 +388,7 @@ function HelpCenter() {
               </a>
               <a
                 href={mailLink}
-                className="group flex items-center gap-3 rounded-xl border border-border bg-background p-3 hover:border-primary hover:bg-primary/5 transition"
+                className="group flex min-w-0 items-center gap-3 rounded-xl border border-border bg-background p-3 hover:border-primary hover:bg-primary/5 transition"
               >
                 <div className="grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary">
                   <Mail className="h-5 w-5" />
@@ -434,7 +434,7 @@ function HelpCenter() {
             <a
               href={telLink}
               onClick={() => setContactOpen(false)}
-              className="group flex items-center gap-3 rounded-xl border border-border bg-card p-4 hover:border-primary hover:shadow-md transition"
+              className="group flex min-w-0 items-center gap-3 rounded-xl border border-border bg-card p-4 hover:border-primary hover:shadow-md transition"
             >
               <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
                 <Phone className="h-5 w-5" />
@@ -450,7 +450,7 @@ function HelpCenter() {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setContactOpen(false)}
-              className="group flex items-center gap-3 rounded-xl border border-border bg-card p-4 hover:border-primary hover:shadow-md transition"
+              className="group flex min-w-0 items-center gap-3 rounded-xl border border-border bg-card p-4 hover:border-primary hover:shadow-md transition"
             >
               <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-green-500/10 text-green-600 dark:text-green-400">
                 <MessageCircle className="h-5 w-5" />
@@ -464,7 +464,7 @@ function HelpCenter() {
             <a
               href={mailLink}
               onClick={() => setContactOpen(false)}
-              className="group flex items-center gap-3 rounded-xl border border-border bg-card p-4 hover:border-primary hover:shadow-md transition"
+              className="group flex min-w-0 items-center gap-3 rounded-xl border border-border bg-card p-4 hover:border-primary hover:shadow-md transition"
             >
               <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
                 <Mail className="h-5 w-5" />

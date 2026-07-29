@@ -21,11 +21,16 @@
 
 
 
+@theme {
+  --breakpoint-xs: 25rem; /* 400px */
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -113,14 +118,18 @@
 
 @layer base {
   * { border-color: var(--color-border); }
+  html, body { max-width: 100%; overflow-x: hidden; }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
-  h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; }
+  img, video, canvas, svg { max-width: 100%; }
+  h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; overflow-wrap: break-word; }
+  p, a, span, li, button { overflow-wrap: break-word; }
 }
+
 
 @utility text-balance { text-wrap: balance; }
 @utility bg-gradient-hero { background: var(--gradient-hero); }
