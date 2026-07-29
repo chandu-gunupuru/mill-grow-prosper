@@ -14,6 +14,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const NAV = [
   { to: "/profile", label: "My Profile", icon: UserIcon },
@@ -52,7 +53,9 @@ export function AccountLayout({
             <ArrowLeft className="w-4 h-4" /> Back to home
           </Link>
           <h1 className="text-sm md:text-base font-semibold truncate">{title}</h1>
-          <span className="w-20" />
+          <div className="flex items-center justify-end w-20">
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 
