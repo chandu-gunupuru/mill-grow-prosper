@@ -568,13 +568,13 @@ function Index() {
               </Link>
             )}
             <ColorThemeSwitcher />
-<ThemeToggle />
           </div>
-          <div className="flex lg:hidden items-center gap-0.5 sm:gap-1.5 shrink-0">
+          {/* Mobile: profile · hamburger · cart only */}
+          <div className="flex lg:hidden items-center gap-1 shrink-0">
             {user && (
               <button
                 onClick={() => setAccountOpen(true)}
-                className="relative w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-md bg-transparent grid place-items-center hover:text-primary transition"
+                className="relative w-10 h-10 shrink-0 rounded-md bg-transparent grid place-items-center hover:text-primary transition"
                 aria-label="Open account menu"
               >
                 {user.user_metadata?.avatar_url ? (
@@ -584,18 +584,10 @@ function Index() {
                 )}
               </button>
             )}
-            <button
-              onClick={() => toast.info("No new notifications", { description: "You're all caught up." })}
-              aria-label="View notifications"
-              className="relative w-9 h-9 sm:w-10 sm:h-10 hidden xs:grid place-items-center shrink-0"
-            >
-              <span className="relative inline-flex">
-                <Bell className="w-5 h-5" />
-                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-gold ring-2 ring-background" aria-hidden="true" />
-              </span>
+            <button onClick={() => setNavOpen(!navOpen)} aria-label="Toggle menu" aria-expanded={navOpen} className="w-10 h-10 grid place-items-center shrink-0">
+              {navOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
-            <button onClick={() => setCartOpen(true)} aria-label="Open cart" className="relative w-9 h-9 sm:w-10 sm:h-10 grid place-items-center shrink-0">
-
+            <button onClick={() => setCartOpen(true)} aria-label="Open cart" className="relative w-10 h-10 grid place-items-center shrink-0">
               <span className="relative inline-flex">
                 <ShoppingCart className="w-5 h-5" />
                 {cartCount > 0 && (
@@ -611,12 +603,8 @@ function Index() {
                 )}
               </span>
             </button>
-            <button onClick={() => setNavOpen(!navOpen)} aria-label="Toggle menu" aria-expanded={navOpen} className="w-10 h-10 grid place-items-center shrink-0">
-              {navOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-            <ColorThemeSwitcher />
-<ThemeToggle />
           </div>
+
         </div>
         {navOpen && (
           <div className="lg:hidden border-t border-border bg-background max-h-[70vh] overflow-y-auto">
