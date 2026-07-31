@@ -19,7 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { LogIn, LogOut, User as UserIcon, Settings, UserCog, ChevronRight, ShoppingBag, LifeBuoy, MapPinned, Languages, BellRing, Star as StarIcon } from "lucide-react";
 import { ColorThemeSwitcher } from "@/components/ColorThemeSwitcher";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { FloatingThemeButton } from "@/components/FloatingThemeButton";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { openShopifyCheckout, getOpenInSameTab, setOpenInSameTab } from "@/lib/checkout";
 import { getStoreStatus } from "@/lib/store-status.functions";
@@ -1152,6 +1152,9 @@ function Index() {
           </div>
         </div>
       </footer>
+
+      {/* Floating website color + appearance button (above chat button) */}
+      <FloatingThemeButton />
 
       {/* Floating WhatsApp Chat Button */}
       <a
