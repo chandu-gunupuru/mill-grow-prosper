@@ -5,6 +5,7 @@ import { Loader2, Leaf, ArrowLeft, Mail, Phone, CheckCircle2, AlertTriangle, Clo
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/useAuth";
+import { ColorThemeSwitcher } from "@/components/ColorThemeSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const Route = createFileRoute("/auth")({
@@ -401,7 +402,8 @@ function AuthPage() {
               <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Modern Rice Mill</div>
             </div>
           </Link>
-          <ThemeToggle />
+          <ColorThemeSwitcher />
+<ThemeToggle />
         </div>
       </header>
       <div className="w-full max-w-md bg-card border border-border rounded-xl p-8 shadow-lg">

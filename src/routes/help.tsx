@@ -17,6 +17,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { sendQuoteInquiry } from "@/lib/inquiry.functions";
+import { ColorThemeSwitcher } from "@/components/ColorThemeSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { HelpFAQ } from "@/components/HelpFAQ";
 import { LiveChatWidget } from "@/components/LiveChatWidget";
@@ -178,7 +179,8 @@ function HelpCenter() {
             >
               <Phone className="h-4 w-4" /> Contact
             </button>
-            <ThemeToggle />
+            <ColorThemeSwitcher />
+<ThemeToggle />
           </div>
         </div>
       </header>

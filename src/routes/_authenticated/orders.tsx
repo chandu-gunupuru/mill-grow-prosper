@@ -51,6 +51,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { ColorThemeSwitcher } from "@/components/ColorThemeSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   cancelMyShopifyOrder,
@@ -202,7 +203,8 @@ function MyOrdersPage() {
             >
               <RefreshCw className={`w-4 h-4 ${ordersQuery.isFetching ? "animate-spin" : ""}`} />
             </Button>
-            <ThemeToggle />
+            <ColorThemeSwitcher />
+<ThemeToggle />
           </div>
         </div>
       </header>
