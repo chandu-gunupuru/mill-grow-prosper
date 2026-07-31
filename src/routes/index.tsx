@@ -613,9 +613,26 @@ function Index() {
               {["About","Shop","Products","Process","Why Us","Contact"].map(i => (
                 <a key={i} href={`#${i.toLowerCase().replace(" ","-")}`} onClick={() => setNavOpen(false)} className="text-foreground/80">{i}</a>
               ))}
-              {!user && (
-                <Link to="/auth" onClick={() => setNavOpen(false)} className="text-foreground/80 font-medium">Login</Link>
+              <button
+                onClick={() => { setNavOpen(false); toast.info("No new notifications", { description: "You're all caught up." }); }}
+                className="flex items-center gap-2 text-left text-foreground/80"
+              >
+                <Bell className="w-4 h-4 text-muted-foreground" /> Notifications
+              </button>
+              {user && (
+                <Link to="/orders" onClick={() => setNavOpen(false)} className="flex items-center gap-2 text-foreground/80">
+                  <ShoppingBag className="w-4 h-4 text-muted-foreground" /> Orders
+                </Link>
               )}
+              <Link to="/help" onClick={() => setNavOpen(false)} className="flex items-center gap-2 text-foreground/80">
+                <LifeBuoy className="w-4 h-4 text-muted-foreground" /> Help Center
+              </Link>
+              {!user && (
+                <Link to="/auth" onClick={() => setNavOpen(false)} className="flex items-center gap-2 text-foreground/80 font-medium">
+                  <LogIn className="w-4 h-4 text-muted-foreground" /> Login
+                </Link>
+              )}
+
             </div>
           </div>
         )}
