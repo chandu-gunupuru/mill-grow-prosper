@@ -18,6 +18,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { LogIn, LogOut, User as UserIcon, Settings, UserCog, ChevronRight, ShoppingBag, LifeBuoy, MapPinned, Languages, BellRing, Star as StarIcon } from "lucide-react";
+import { ColorThemeSwitcher } from "@/components/ColorThemeSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { openShopifyCheckout, getOpenInSameTab, setOpenInSameTab } from "@/lib/checkout";
@@ -566,7 +567,8 @@ function Index() {
                 <LogIn className="w-4 h-4" /> Login
               </Link>
             )}
-            <ThemeToggle />
+            <ColorThemeSwitcher />
+<ThemeToggle />
           </div>
           <div className="flex lg:hidden items-center gap-0.5 sm:gap-1.5 shrink-0">
             {user && (
@@ -612,7 +614,8 @@ function Index() {
             <button onClick={() => setNavOpen(!navOpen)} aria-label="Toggle menu" aria-expanded={navOpen} className="w-10 h-10 grid place-items-center shrink-0">
               {navOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
-            <ThemeToggle />
+            <ColorThemeSwitcher />
+<ThemeToggle />
           </div>
         </div>
         {navOpen && (

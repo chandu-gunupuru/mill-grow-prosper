@@ -116,7 +116,104 @@
   --shadow-gold: 0 10px 40px -10px oklch(0.85 0.14 80 / 0.4);
 }
 
+/* ---- Predefined color themes (colors only) ---- */
+[data-color-theme="ocean"] {
+  --primary: oklch(0.50 0.13 245);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.95 0.02 240);
+  --secondary-foreground: oklch(0.32 0.07 245);
+  --accent: oklch(0.72 0.12 220);
+  --accent-foreground: oklch(0.20 0.04 245);
+  --ring: oklch(0.50 0.13 245);
+  --gold: oklch(0.72 0.12 220);
+  --gold-foreground: oklch(0.18 0.04 245);
+  --cream: oklch(0.97 0.02 235);
+  --gradient-hero: linear-gradient(135deg, oklch(0.34 0.09 245 / 0.85), oklch(0.20 0.06 245 / 0.75));
+  --gradient-gold: linear-gradient(135deg, oklch(0.78 0.12 225), oklch(0.64 0.14 245));
+  --shadow-premium: 0 20px 60px -20px oklch(0.34 0.09 245 / 0.28);
+  --shadow-gold: 0 10px 40px -10px oklch(0.62 0.14 240 / 0.45);
+}
+
+.dark[data-color-theme="ocean"] {
+  --background: oklch(0.17 0.02 245);
+  --foreground: oklch(0.98 0.005 240);
+  --card: oklch(0.23 0.025 245);
+  --card-foreground: oklch(0.98 0.005 240);
+  --popover: oklch(0.23 0.025 245);
+  --popover-foreground: oklch(0.98 0.005 240);
+  --primary: oklch(0.78 0.12 225);
+  --primary-foreground: oklch(0.15 0.03 245);
+  --secondary: oklch(0.29 0.03 245);
+  --muted: oklch(0.27 0.02 245);
+  --muted-foreground: oklch(0.82 0.02 240);
+  --accent: oklch(0.78 0.12 225);
+  --accent-foreground: oklch(0.15 0.03 245);
+  --border: oklch(0.38 0.02 240);
+  --input: oklch(0.34 0.02 240);
+  --ring: oklch(0.78 0.12 225);
+  --gold: oklch(0.82 0.12 225);
+  --gold-foreground: oklch(0.15 0.03 245);
+  --cream: oklch(0.28 0.03 240);
+  --gradient-hero: linear-gradient(135deg, oklch(0.23 0.05 245 / 0.94), oklch(0.13 0.03 245 / 0.9));
+  --gradient-gold: linear-gradient(135deg, oklch(0.85 0.12 225), oklch(0.70 0.14 240));
+  --shadow-premium: 0 20px 60px -20px oklch(0.06 0.03 245 / 0.7);
+  --shadow-gold: 0 10px 40px -10px oklch(0.80 0.12 230 / 0.4);
+}
+
+[data-color-theme="saffron"] {
+  --primary: oklch(0.52 0.17 30);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.95 0.02 60);
+  --secondary-foreground: oklch(0.34 0.09 30);
+  --accent: oklch(0.76 0.15 60);
+  --accent-foreground: oklch(0.22 0.04 40);
+  --ring: oklch(0.52 0.17 30);
+  --gold: oklch(0.78 0.15 65);
+  --gold-foreground: oklch(0.22 0.04 40);
+  --cream: oklch(0.97 0.025 65);
+  --gradient-hero: linear-gradient(135deg, oklch(0.36 0.12 30 / 0.85), oklch(0.22 0.08 30 / 0.75));
+  --gradient-gold: linear-gradient(135deg, oklch(0.82 0.15 65), oklch(0.68 0.17 45));
+  --shadow-premium: 0 20px 60px -20px oklch(0.36 0.12 30 / 0.28);
+  --shadow-gold: 0 10px 40px -10px oklch(0.72 0.16 50 / 0.45);
+}
+
+.dark[data-color-theme="saffron"] {
+  --background: oklch(0.17 0.02 40);
+  --foreground: oklch(0.98 0.008 70);
+  --card: oklch(0.23 0.025 40);
+  --card-foreground: oklch(0.98 0.008 70);
+  --popover: oklch(0.23 0.025 40);
+  --popover-foreground: oklch(0.98 0.008 70);
+  --primary: oklch(0.80 0.15 55);
+  --primary-foreground: oklch(0.15 0.03 40);
+  --secondary: oklch(0.29 0.03 40);
+  --muted: oklch(0.27 0.02 40);
+  --muted-foreground: oklch(0.83 0.02 70);
+  --accent: oklch(0.80 0.15 55);
+  --accent-foreground: oklch(0.15 0.03 40);
+  --border: oklch(0.38 0.02 60);
+  --input: oklch(0.34 0.02 60);
+  --ring: oklch(0.80 0.15 55);
+  --gold: oklch(0.84 0.15 65);
+  --gold-foreground: oklch(0.15 0.03 40);
+  --cream: oklch(0.28 0.03 60);
+  --gradient-hero: linear-gradient(135deg, oklch(0.23 0.06 35 / 0.94), oklch(0.13 0.04 35 / 0.9));
+  --gradient-gold: linear-gradient(135deg, oklch(0.87 0.15 65), oklch(0.74 0.17 45));
+  --shadow-premium: 0 20px 60px -20px oklch(0.06 0.03 40 / 0.7);
+  --shadow-gold: 0 10px 40px -10px oklch(0.83 0.15 60 / 0.4);
+}
+
+/* Smooth color transitions when switching palettes / modes */
+@media (prefers-reduced-motion: no-preference) {
+  body, header, footer, section, nav, aside, main, article, div, span, a, p, li,
+  h1, h2, h3, h4, h5, h6, button, input, textarea, select, svg {
+    transition: background-color 250ms ease, border-color 250ms ease,
+      color 250ms ease, fill 250ms ease, stroke 250ms ease;
+  }
+}
+
 @layer base {
+
   * { border-color: var(--color-border); }
   html, body { max-width: 100%; overflow-x: hidden; }
   body {

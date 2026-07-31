@@ -14,6 +14,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
+import { ColorThemeSwitcher } from "@/components/ColorThemeSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 const NAV = [
@@ -54,7 +55,8 @@ export function AccountLayout({
           </Link>
           <h1 className="text-sm md:text-base font-semibold truncate">{title}</h1>
           <div className="flex items-center justify-end w-20">
-            <ThemeToggle />
+            <ColorThemeSwitcher />
+<ThemeToggle />
           </div>
         </div>
       </header>

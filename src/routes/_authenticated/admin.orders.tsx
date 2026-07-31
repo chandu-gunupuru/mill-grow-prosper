@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
+import { ColorThemeSwitcher } from "@/components/ColorThemeSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   Loader2,
@@ -99,7 +100,8 @@ function AdminOrdersPage() {
                 Refresh
               </button>
             )}
-            <ThemeToggle />
+            <ColorThemeSwitcher />
+<ThemeToggle />
           </div>
         </div>
       </header>
