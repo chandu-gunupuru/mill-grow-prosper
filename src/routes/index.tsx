@@ -1046,7 +1046,7 @@ function Index() {
             <h2 className="mt-3 text-4xl md:text-5xl font-bold text-primary text-balance">What Our Partners Say</h2>
           </div>
           <div className="mt-14 grid md:grid-cols-3 gap-6">
-            {testimonials.map((t, i) => (
+            {testimonials.map((item, i) => (
               <motion.div
                 key={item.n}
                 initial={{ opacity: 0, y: 20 }}
