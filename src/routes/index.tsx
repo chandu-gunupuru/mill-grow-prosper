@@ -29,6 +29,7 @@ import { UserMenu } from "@/components/UserMenu";
 import { ProductDetailsDrawer } from "@/components/ProductDetailsDrawer";
 import { Heart } from "lucide-react";
 import { wishlist } from "@/lib/wishlist";
+import { useTranslation } from "react-i18next";
 
 
 import paddyField from "@/assets/paddy-field.jpg?w=900&format=webp&quality=72&imagetools";
@@ -80,40 +81,33 @@ const PHONE = "+91 93985 53951";
 const EMAIL = "gunupuruchandu29@gmail.com";
 
 const products = [
-  { name: "Sona Masoori Rice", img: riceSona, grade: "Premium AAA", pack: "5 / 25 / 50 kg bags", stock: "In stock" },
-  { name: "Basmati Rice", img: riceBasmati, grade: "Long Grain Premium", pack: "10 / 25 kg bags", stock: "In stock" },
-  { name: "Steam Rice", img: riceSteam, grade: "Parboiled Grade A", pack: "25 / 50 kg bags", stock: "Bulk available" },
-  { name: "Raw Rice", img: riceRaw, grade: "Grade A", pack: "25 / 50 kg bags", stock: "In stock" },
-  { name: "Broken Rice", img: riceBroken, grade: "Industrial Grade", pack: "50 kg bags", stock: "Bulk available" },
-  { name: "Rice Bran", img: riceBran, grade: "Solvent Grade", pack: "Bulk / 50 kg", stock: "On order" },
+  { name: "Sona Masoori Rice", img: riceSona, grade: "Premium AAA", pack: "5 / 25 / 50 kg bags", stockKey: "inStock" as const },
+  { name: "Basmati Rice", img: riceBasmati, grade: "Long Grain Premium", pack: "10 / 25 kg bags", stockKey: "inStock" as const },
+  { name: "Steam Rice", img: riceSteam, grade: "Parboiled Grade A", pack: "25 / 50 kg bags", stockKey: "bulkAvailable" as const },
+  { name: "Raw Rice", img: riceRaw, grade: "Grade A", pack: "25 / 50 kg bags", stockKey: "inStock" as const },
+  { name: "Broken Rice", img: riceBroken, grade: "Industrial Grade", pack: "50 kg bags", stockKey: "bulkAvailable" as const },
+  { name: "Rice Bran", img: riceBran, grade: "Solvent Grade", pack: "Bulk / 50 kg", stockKey: "onOrder" as const },
 ];
 
 const whyUs = [
-  { icon: Sparkles, t: "Premium Quality", d: "Strict multi-stage quality assurance on every batch." },
-  { icon: Factory, t: "Advanced Machinery", d: "Modern Satake & Buhler-grade processing equipment." },
-  { icon: ShieldCheck, t: "Lab Tested", d: "Moisture, grain length & purity tested in-house." },
-  { icon: Truck, t: "Timely Delivery", d: "Pan-India logistics with export-ready dispatch." },
-  { icon: Package, t: "Bulk Supply", d: "Container loads & customised private labelling." },
-  { icon: Award, t: "Best Pricing", d: "Direct-from-mill rates with no middlemen." },
+  { icon: Sparkles, key: "premiumQuality" },
+  { icon: Factory, key: "advancedMachinery" },
+  { icon: ShieldCheck, key: "labTested" },
+  { icon: Truck, key: "timelyDelivery" },
+  { icon: Package, key: "bulkSupply" },
+  { icon: Award, key: "bestPricing" },
 ];
 
 const process = [
-  "Paddy Procurement", "Cleaning", "Milling", "Polishing", "Quality Testing", "Packaging", "Delivery",
+  "step1", "step2", "step3", "step4", "step5", "step6", "step7",
 ];
 
-const stats = [
-  { v: "8+", l: "Years in Business" },
-  { v: "20,000+", l: "Tons Processed Annually" },
-  { v: "900+", l: "Happy Customers" },
-  { v: "5+", l: "States Served" },
-];
-
-const certs = ["FSSAI Certified", "ISO 22000:2018", "APEDA Export", "HACCP Standards"];
+const certs = ["fssai", "iso", "apeda", "haccp"];
 
 const testimonials = [
-  { n: "Ramesh Traders", r: "Distributor, Hyderabad", q: "Consistent quality across every consignment — our retailers trust the Gayathri brand." },
-  { n: "Golden Spoon Hotels", r: "Procurement Head", q: "Their Sona Masoori is the best we've sourced in years. Always on time, always graded right." },
-  { n: "Al-Noor Exports", r: "Exporter, Dubai", q: "Export-grade packing and documentation — they made our shipments effortless." },
+  { n: "Ramesh Traders", key: "1" },
+  { n: "Golden Spoon Hotels", key: "2" },
+  { n: "Al-Noor Exports", key: "3" },
 ];
 
 const gallery = [
@@ -161,6 +155,7 @@ function HeroMillSlideshow() {
 }
 
 function Index() {
+  const { t } = useTranslation();
 
   const navigate = useNavigate();
   const [navOpen, setNavOpen] = useState(false);
@@ -187,8 +182,24 @@ function Index() {
   const { user } = useAuth();
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    toast.success("Signed out");
+    toast.success(t("common.signedOut"));
   };
+
+  const statsData = [
+    { v: "8+", l: t("hero.yearsInBusiness") },
+    { v: "20,000+", l: t("hero.tonsProcessed") },
+    { v: "900+", l: t("hero.happyCustomers") },
+    { v: "5+", l: t("hero.statesServed") },
+  ];
+
+  const navLinks = [
+    { id: "about", label: t("nav.about") },
+    { id: "shop", label: t("nav.shop") },
+    { id: "products", label: t("nav.products") },
+    { id: "process", label: t("nav.process") },
+    { id: "why-us", label: t("nav.whyUs") },
+    { id: "contact", label: t("nav.contact") },
+  ];
 
   const items = useCartStore((s) => s.items);
   const isLoading = useCartStore((s) => s.isLoading);
@@ -247,7 +258,7 @@ function Index() {
     const variantId = product.node.variants.edges[0]?.node?.id ?? null;
     void logProductClick("add_to_cart", product.node.id, variantId);
     const ok = await addProductToCart(product);
-    if (ok) toast.success(`${product.node.title} added to cart`);
+    if (ok) toast.success(t("products.addedWithName", { name: product.node.title }));
   }
 
   function checkout() {
@@ -256,14 +267,10 @@ function Index() {
     if (!result.ok) {
       if (result.reason === "popup_blocked" && url) {
         setBlockedUrl(url);
-        setCheckoutError(
-          "Your browser blocked the checkout window. Click the link below to continue.",
-        );
+        setCheckoutError(t("checkout.popupBlocked"));
       } else {
         setBlockedUrl(null);
-        setCheckoutError(
-          "Checkout link is missing. Please try adding the item again or contact us.",
-        );
+        setCheckoutError(t("checkout.missingLink"));
       }
       return false;
     }
@@ -289,7 +296,7 @@ function Index() {
       const result = await createShopifyCart(variant.id, 1);
       if (!result?.checkoutUrl) {
         setBlockedUrl(null);
-        setCheckoutError("Could not start checkout. Please try again.");
+        setCheckoutError(t("checkout.couldNotStart"));
         setCartOpen(true);
         return;
       }
@@ -297,12 +304,10 @@ function Index() {
       if (!opened.ok) {
         if (opened.reason === "popup_blocked") {
           setBlockedUrl(result.checkoutUrl);
-          setCheckoutError(
-            "Your browser blocked the checkout window. Click the link below to continue.",
-          );
+          setCheckoutError(t("checkout.popupBlocked"));
         } else {
           setBlockedUrl(null);
-          setCheckoutError("Could not open checkout window.");
+          setCheckoutError(t("checkout.couldNotOpen"));
         }
         setCartOpen(true);
       }
@@ -318,17 +323,17 @@ function Index() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!form.name || !form.email || !form.phone) {
-      toast.error("Please fill in name, email and phone.");
+      toast.error(t("contact.fillRequired"));
       return;
     }
     setSending(true);
     try {
       await sendInquiry({ data: form });
-      toast.success("Inquiry sent! We'll get back to you within 2 business hours.");
+      toast.success(t("contact.success"));
       setForm({ name: "", company: "", email: "", phone: "", product: "Sona Masoori Rice", qty: "", message: "" });
     } catch (err) {
       console.error(err);
-      toast.error("Could not send inquiry. Please try again or call us directly.");
+      toast.error(t("contact.error"));
     } finally {
       setSending(false);
     }
@@ -379,8 +384,8 @@ function Index() {
             </div>
           </a>
           <nav className="hidden lg:flex items-center gap-5 xl:gap-8 text-sm font-medium">
-            {["About","Shop","Products","Process","Why Us","Contact"].map(i => (
-              <a key={i} href={`#${i.toLowerCase().replace(" ","-")}`} className="whitespace-nowrap text-foreground/80 hover:text-primary transition-colors">{i}</a>
+            {navLinks.map(i => (
+              <a key={i.id} href={`#${i.id}`} className="whitespace-nowrap text-foreground/80 hover:text-primary transition-colors">{i.label}</a>
             ))}
           </nav>
           <div className="hidden lg:flex items-center gap-1 xl:gap-2 shrink-0">
@@ -433,7 +438,7 @@ function Index() {
                         className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors"
                       >
                         <span className="flex items-center gap-3">
-                          <UserIcon className="w-4 h-4 text-muted-foreground" /> Profile
+                          <UserIcon className="w-4 h-4 text-muted-foreground" /> {t("account.profile")}
                         </span>
                         <ChevronRight className="w-4 h-4 text-muted-foreground" />
                       </button>
@@ -444,7 +449,7 @@ function Index() {
                         className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors"
                       >
                         <span className="flex items-center gap-3">
-                          <UserCog className="w-4 h-4 text-muted-foreground" /> Account Center
+                          <UserCog className="w-4 h-4 text-muted-foreground" /> {t("account.accountCenter")}
                         </span>
                         <ChevronRight className="w-4 h-4 text-muted-foreground" />
                       </button>
@@ -456,7 +461,7 @@ function Index() {
                         className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors"
                       >
                         <span className="flex items-center gap-3">
-                          <ShoppingBag className="w-4 h-4 text-muted-foreground" /> Orders
+                          <ShoppingBag className="w-4 h-4 text-muted-foreground" /> {t("nav.orders")}
                         </span>
                         <ChevronRight className="w-4 h-4 text-muted-foreground" />
                       </Link>
@@ -468,7 +473,7 @@ function Index() {
                         className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors"
                       >
                         <span className="flex items-center gap-3">
-                          <LifeBuoy className="w-4 h-4 text-muted-foreground" /> Help Center
+                          <LifeBuoy className="w-4 h-4 text-muted-foreground" /> {t("nav.helpCenter")}
                         </span>
                         <ChevronRight className="w-4 h-4 text-muted-foreground" />
                       </Link>
@@ -480,7 +485,7 @@ function Index() {
                         className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors"
                       >
                         <span className="flex items-center gap-3">
-                          <Settings className="w-4 h-4 text-muted-foreground" /> Settings
+                          <Settings className="w-4 h-4 text-muted-foreground" /> {t("account.settings")}
                         </span>
                         <ChevronRight className="w-4 h-4 text-muted-foreground" />
                       </Link>
@@ -492,7 +497,7 @@ function Index() {
                         className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium text-destructive hover:bg-destructive/5 transition-colors"
                       >
                         <span className="flex items-center gap-3">
-                          <LogOut className="w-4 h-4" /> Sign out
+                          <LogOut className="w-4 h-4" /> {t("account.signOut")}
                         </span>
                         <ChevronRight className="w-4 h-4" />
                       </button>
@@ -510,26 +515,26 @@ function Index() {
                         <UserCog className="w-5 h-5 text-primary" />
                       </div>
                       <div className="min-w-0 text-left">
-                        <div className="truncate text-base font-semibold">Account Center</div>
-                        <div className="truncate text-xs text-muted-foreground font-normal">Manage your preferences</div>
+                        <div className="truncate text-base font-semibold">{t("account.accountCenter")}</div>
+                        <div className="truncate text-xs text-muted-foreground font-normal">{t("account.managePreferences")}</div>
                       </div>
                     </SheetTitle>
                   </SheetHeader>
                   <div className="flex flex-1 flex-col gap-2 overflow-y-auto overscroll-contain px-4 py-4 pb-[env(safe-area-inset-bottom)]">
-                    <Link to="/settings" hash="addresses" onClick={() => setAccountCenterOpen(false)} className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors">
-                      <span className="flex items-center gap-3"><MapPinned className="w-4 h-4 text-muted-foreground" /> Saved Addresses</span>
+                    <Link to="/addresses" onClick={() => setAccountCenterOpen(false)} className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors">
+                      <span className="flex items-center gap-3"><MapPinned className="w-4 h-4 text-muted-foreground" /> {t("account.savedAddresses")}</span>
                       <ChevronRight className="w-4 h-4 text-muted-foreground" />
                     </Link>
-                    <Link to="/settings" hash="language" onClick={() => setAccountCenterOpen(false)} className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors">
-                      <span className="flex items-center gap-3"><Languages className="w-4 h-4 text-muted-foreground" /> Language</span>
+                    <Link to="/language" onClick={() => setAccountCenterOpen(false)} className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors">
+                      <span className="flex items-center gap-3"><Languages className="w-4 h-4 text-muted-foreground" /> {t("account.language")}</span>
                       <ChevronRight className="w-4 h-4 text-muted-foreground" />
                     </Link>
-                    <Link to="/settings" hash="notifications" onClick={() => setAccountCenterOpen(false)} className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors">
-                      <span className="flex items-center gap-3"><BellRing className="w-4 h-4 text-muted-foreground" /> Notifications</span>
+                    <Link to="/notifications" onClick={() => setAccountCenterOpen(false)} className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors">
+                      <span className="flex items-center gap-3"><BellRing className="w-4 h-4 text-muted-foreground" /> {t("account.notifications")}</span>
                       <ChevronRight className="w-4 h-4 text-muted-foreground" />
                     </Link>
-                    <Link to="/settings" hash="reviews" onClick={() => setAccountCenterOpen(false)} className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors">
-                      <span className="flex items-center gap-3"><StarIcon className="w-4 h-4 text-muted-foreground" /> My Reviews</span>
+                    <Link to="/reviews" onClick={() => setAccountCenterOpen(false)} className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary/5 transition-colors">
+                      <span className="flex items-center gap-3"><StarIcon className="w-4 h-4 text-muted-foreground" /> {t("account.reviews")}</span>
                       <ChevronRight className="w-4 h-4 text-muted-foreground" />
                     </Link>
                   </div>
@@ -537,8 +542,8 @@ function Index() {
               </Sheet>
             )}
             <button
-              onClick={() => toast.info("No new notifications", { description: "You're all caught up." })}
-              aria-label="View notifications"
+              onClick={() => toast.info(t("notifications.none"), { description: t("notifications.upToDate") })}
+              aria-label={t("notifications.view")}
               className="relative w-11 h-11 rounded-md bg-transparent grid place-items-center hover:text-primary transition"
             >
               <span className="relative inline-flex">
@@ -546,7 +551,7 @@ function Index() {
                 <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-gold ring-2 ring-background" aria-hidden="true" />
               </span>
             </button>
-            <button onClick={() => setCartOpen(true)} aria-label="Open cart" className="relative w-11 h-11 rounded-md bg-transparent grid place-items-center hover:text-primary transition">
+            <button onClick={() => setCartOpen(true)} aria-label={t("cart.open")} className="relative w-11 h-11 rounded-md bg-transparent grid place-items-center hover:text-primary transition">
               <span className="relative inline-flex">
                 <ShoppingCart className="w-5 h-5" />
                 {cartCount > 0 && (
@@ -564,7 +569,7 @@ function Index() {
             </button>
             {!user && (
               <Link to="/auth" className="inline-flex items-center gap-1.5 bg-transparent px-4 py-2 rounded-md text-sm font-semibold hover:text-primary transition">
-                <LogIn className="w-4 h-4" /> Login
+                <LogIn className="w-4 h-4" /> {t("nav.login")}
               </Link>
             )}
             <ColorThemeSwitcher />
@@ -584,10 +589,10 @@ function Index() {
                 )}
               </button>
             )}
-            <button onClick={() => setNavOpen(!navOpen)} aria-label="Toggle menu" aria-expanded={navOpen} className="w-10 h-10 grid place-items-center shrink-0">
+            <button onClick={() => setNavOpen(!navOpen)} aria-label={t("nav.menu")} aria-expanded={navOpen} className="w-10 h-10 grid place-items-center shrink-0">
               {navOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
-            <button onClick={() => setCartOpen(true)} aria-label="Open cart" className="relative w-10 h-10 grid place-items-center shrink-0">
+            <button onClick={() => setCartOpen(true)} aria-label={t("cart.open")} className="relative w-10 h-10 grid place-items-center shrink-0">
               <span className="relative inline-flex">
                 <ShoppingCart className="w-5 h-5" />
                 {cartCount > 0 && (
@@ -610,26 +615,26 @@ function Index() {
           <div className="lg:hidden border-t border-border bg-background max-h-[70vh] overflow-y-auto">
             <div className="px-4 sm:px-6 py-4 flex flex-col gap-3">
 
-              {["About","Shop","Products","Process","Why Us","Contact"].map(i => (
-                <a key={i} href={`#${i.toLowerCase().replace(" ","-")}`} onClick={() => setNavOpen(false)} className="text-foreground/80">{i}</a>
+              {navLinks.map(i => (
+                <a key={i.id} href={`#${i.id}`} onClick={() => setNavOpen(false)} className="text-foreground/80">{i.label}</a>
               ))}
               <button
-                onClick={() => { setNavOpen(false); toast.info("No new notifications", { description: "You're all caught up." }); }}
+                onClick={() => { setNavOpen(false); toast.info(t("notifications.none"), { description: t("notifications.upToDate") }); }}
                 className="flex items-center gap-2 text-left text-foreground/80"
               >
-                <Bell className="w-4 h-4 text-muted-foreground" /> Notifications
+                <Bell className="w-4 h-4 text-muted-foreground" /> {t("account.notifications")}
               </button>
               {user && (
                 <Link to="/orders" onClick={() => setNavOpen(false)} className="flex items-center gap-2 text-foreground/80">
-                  <ShoppingBag className="w-4 h-4 text-muted-foreground" /> Orders
+                  <ShoppingBag className="w-4 h-4 text-muted-foreground" /> {t("nav.orders")}
                 </Link>
               )}
               <Link to="/help" onClick={() => setNavOpen(false)} className="flex items-center gap-2 text-foreground/80">
-                <LifeBuoy className="w-4 h-4 text-muted-foreground" /> Help Center
+                <LifeBuoy className="w-4 h-4 text-muted-foreground" /> {t("nav.helpCenter")}
               </Link>
               {!user && (
                 <Link to="/auth" onClick={() => setNavOpen(false)} className="flex items-center gap-2 text-foreground/80 font-medium">
-                  <LogIn className="w-4 h-4 text-muted-foreground" /> Login
+                  <LogIn className="w-4 h-4 text-muted-foreground" /> {t("nav.login")}
                 </Link>
               )}
 
@@ -654,17 +659,15 @@ function Index() {
               <>
                 <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
                 <span>
-                  Store claimed{storeStatus.planName ? ` (${storeStatus.planName})` : ""} —
-                  payments are enabled. Checkout is live.
+                  {storeStatus.planName
+                    ? t("storeStatus.claimedWithPlan", { plan: storeStatus.planName })
+                    : t("storeStatus.claimed")}
                 </span>
               </>
             ) : (
               <>
                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                <span>
-                  Demo mode: store is not yet claimed, so live payments are disabled.
-                  Browse freely — checkout will not charge any card.
-                </span>
+                <span>{t("storeStatus.demo")}</span>
               </>
             )}
           </div>
@@ -752,24 +755,24 @@ function Index() {
         <div className="relative max-w-7xl mx-auto px-6 py-20 w-full">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="max-w-3xl">
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gold/20 backdrop-blur border border-gold/40 text-gold text-xs font-semibold tracking-wider uppercase">
-              <Sparkles className="w-3.5 h-3.5" /> FSSAI · ISO · Export Certified
+              <Sparkles className="w-3.5 h-3.5" /> {t("hero.certBadge")}
             </span>
             <h1 className="mt-6 font-display font-bold text-5xl md:text-7xl text-white text-balance leading-[1.05]">
-              Premium Quality Rice <span className="text-gold">Direct From Our Mill</span>
+              {t("hero.heroHeading")} <span className="text-gold">{t("hero.heroHeadingHighlight")}</span>
             </h1>
             <p className="mt-6 text-lg md:text-xl text-white/85 max-w-2xl">
-              A decade of milling excellence. Processing 20,000+ tons annually with modern machinery, lab-tested quality and reliable bulk supply for distributors, exporters, hotels & retailers across India.
+              {t("hero.heroDescription")}
             </p>
             <div className="mt-10 flex flex-wrap gap-4">
               <a href="#contact" className="inline-flex items-center gap-2 bg-gradient-gold text-primary px-7 py-3.5 rounded-md font-semibold shadow-gold hover:scale-[1.02] transition">
-                Get a Quote <ArrowRight className="w-4 h-4" />
+                {t("hero.ctaQuote")} <ArrowRight className="w-4 h-4" />
               </a>
               <a href={`tel:${PHONE.replace(/\s/g, "")}`} className="inline-flex items-center gap-2 bg-white/10 backdrop-blur border border-white/30 text-white px-7 py-3.5 rounded-md font-semibold hover:bg-white/20 transition">
-                <Phone className="w-4 h-4" /> Contact Us
+                <Phone className="w-4 h-4" /> {t("hero.ctaCall")}
               </a>
             </div>
             <div className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-2xl">
-              {stats.slice(0,4).map(s => (
+              {statsData.slice(0,4).map(s => (
                 <div key={s.l}>
                   <div className="font-display text-3xl md:text-4xl text-gold font-bold">{s.v}</div>
                   <div className="text-xs md:text-sm text-white/70 mt-1">{s.l}</div>
@@ -788,21 +791,21 @@ function Index() {
             <img src={paddyField} alt="Beautiful lush green rice fields at golden hour" width={1024} height={1024} loading="lazy" className="rounded-2xl shadow-premium w-full aspect-[4/5] object-cover" />
           </motion.div>
           <div>
-            <span className="text-gold font-semibold uppercase tracking-widest text-xs">About Us</span>
-            <h2 className="mt-3 text-4xl md:text-5xl font-bold text-primary text-balance">From Paddy Fields to Premium Plates — for 10 Years.</h2>
+            <span className="text-gold font-semibold uppercase tracking-widest text-xs">{t("about.badge")}</span>
+            <h2 className="mt-3 text-4xl md:text-5xl font-bold text-primary text-balance">{t("about.heading")}</h2>
             <p className="mt-6 text-muted-foreground leading-relaxed">
-              Founded in 2016, Gayathri Modern Rice Mill is one of South India's most trusted rice processing companies. We source premium paddy directly from farmers, process it through state-of-the-art Satake-grade machinery, and deliver consistent, lab-tested quality to wholesalers, exporters and HoReCa clients across 5 states.
+              {t("about.description")}
             </p>
             <div className="mt-8 grid grid-cols-2 gap-4">
               {[
-                { i: Factory, t: "Modern Facility" },
-                { i: Leaf, t: "Farm to Mill" },
-                { i: ShieldCheck, t: "Quality Assured" },
-                { i: Award, t: "Award-winning" },
-              ].map(({ i: Icon, t }) => (
-                <div key={t} className="flex items-center gap-3 p-4 rounded-lg bg-card border border-border">
+                { i: Factory, key: "modernFacility" },
+                { i: Leaf, key: "farmToMill" },
+                { i: ShieldCheck, key: "qualityAssured" },
+                { i: Award, key: "awardWinning" },
+              ].map(({ i: Icon, key }) => (
+                <div key={key} className="flex items-center gap-3 p-4 rounded-lg bg-card border border-border">
                   <Icon className="w-5 h-5 text-primary" />
-                  <span className="font-medium text-sm">{t}</span>
+                  <span className="font-medium text-sm">{t(`about.${key}`)}</span>
                 </div>
               ))}
             </div>
@@ -814,16 +817,16 @@ function Index() {
       <section id="shop" className="py-24 bg-gradient-to-b from-background to-cream">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center max-w-2xl mx-auto">
-            <span className="text-gold font-semibold uppercase tracking-widest text-xs">Shop Our Rice</span>
-            <h2 className="mt-3 text-4xl md:text-5xl font-bold text-primary text-balance">Buy Premium Rice Packets Online</h2>
-            <p className="mt-4 text-muted-foreground">Mill-fresh, lab-tested rice delivered straight to your doorstep. Free shipping on orders above ₹1,500.</p>
+            <span className="text-gold font-semibold uppercase tracking-widest text-xs">{t("shop.badge")}</span>
+            <h2 className="mt-3 text-4xl md:text-5xl font-bold text-primary text-balance">{t("shop.heading")}</h2>
+            <p className="mt-4 text-muted-foreground">{t("shop.description")}</p>
           </div>
           {productsLoading ? (
             <div className="mt-14 grid place-items-center py-16 text-muted-foreground">
               <Loader2 className="w-8 h-8 animate-spin" />
             </div>
           ) : shopifyProducts.length === 0 ? (
-            <div className="mt-14 text-center py-16 text-muted-foreground">No products found.</div>
+            <div className="mt-14 text-center py-16 text-muted-foreground">{t("shop.noProductsFound")}</div>
           ) : (
             <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {shopifyProducts.map((p, idx) => {
@@ -872,7 +875,7 @@ function Index() {
                       <button type="button" onClick={() => setDetailProduct(p)} className="text-left">
                         <h3 className="font-bold text-primary leading-tight hover:text-gold transition-colors">{p.node.title}</h3>
                       </button>
-                      {weight && <div className="text-xs text-muted-foreground mt-1">{weight} pack</div>}
+                      {weight && <div className="text-xs text-muted-foreground mt-1">{t("shop.packWeight", { weight })}</div>}
                       <div className="mt-3 flex items-baseline gap-2">
                         <span className="font-display text-2xl font-bold text-primary">{symbol}{price.toFixed(0)}</span>
                       </div>
@@ -882,14 +885,14 @@ function Index() {
                           disabled={isLoading || buyingId !== null || !variant?.availableForSale}
                           className="w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2.5 rounded-md font-semibold hover:bg-gold hover:text-primary transition disabled:opacity-60 disabled:cursor-not-allowed"
                         >
-                          {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><ShoppingCart className="w-4 h-4" /> Add to Cart</>}
+                          {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><ShoppingCart className="w-4 h-4" /> {t("products.addToCart")}</>}
                         </button>
                         <button
                           onClick={() => buyNow(p)}
                           disabled={isLoading || buyingId !== null || !variant?.availableForSale}
                           className="w-full inline-flex items-center justify-center gap-2 bg-gradient-gold text-primary py-2.5 rounded-md font-bold shadow-gold hover:scale-[1.01] transition disabled:opacity-60 disabled:cursor-not-allowed"
                         >
-                          {buyingId === p.node.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Buy Now <ArrowRight className="w-4 h-4" /></>}
+                          {buyingId === p.node.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <>{t("products.buyNow")} <ArrowRight className="w-4 h-4" /></>}
                         </button>
 
                       </div>
@@ -927,12 +930,12 @@ function Index() {
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-primary">{p.name}</h3>
                   <dl className="mt-4 space-y-2 text-sm">
-                    <div className="flex justify-between"><dt className="text-muted-foreground">Grade</dt><dd className="font-medium">{p.grade}</dd></div>
-                    <div className="flex justify-between"><dt className="text-muted-foreground">Packaging</dt><dd className="font-medium">{p.pack}</dd></div>
-                    <div className="flex justify-between"><dt className="text-muted-foreground">Status</dt><dd className="text-primary font-semibold flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" />{p.stock}</dd></div>
+                    <div className="flex justify-between"><dt className="text-muted-foreground">{t("products.grade")}</dt><dd className="font-medium">{p.grade}</dd></div>
+                    <div className="flex justify-between"><dt className="text-muted-foreground">{t("products.packaging")}</dt><dd className="font-medium">{p.pack}</dd></div>
+                    <div className="flex justify-between"><dt className="text-muted-foreground">{t("products.status")}</dt><dd className="text-primary font-semibold flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" />{t(`common.${p.stockKey}`)}</dd></div>
                   </dl>
                   <a href="#contact" onClick={() => setForm(f => ({ ...f, product: p.name }))} className="mt-5 w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2.5 rounded-md font-semibold hover:opacity-90 transition">
-                    Inquire Now <ArrowRight className="w-4 h-4" />
+                    {t("products.inquireNow")} <ArrowRight className="w-4 h-4" />
                   </a>
                 </div>
               </motion.article>
@@ -951,13 +954,13 @@ function Index() {
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: `url(${machinery})`, backgroundSize: "cover" }} />
         <div className="relative max-w-7xl mx-auto px-6">
           <div className="text-center max-w-2xl mx-auto">
-            <span className="text-gold font-semibold uppercase tracking-widest text-xs">Why Choose Us</span>
-            <h2 className="mt-3 text-4xl md:text-5xl font-bold text-balance">Built on Trust. Delivered with Precision.</h2>
+            <span className="text-gold font-semibold uppercase tracking-widest text-xs">{t("whyUs.title")}</span>
+            <h2 className="mt-3 text-4xl md:text-5xl font-bold text-balance">{t("whyUs.heading")}</h2>
           </div>
           <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {whyUs.map(({ icon: Icon, t, d }, i) => (
+            {whyUs.map(({ icon: Icon, key }, i) => (
               <motion.div
-                key={t}
+                key={key}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -967,8 +970,8 @@ function Index() {
                 <div className="w-12 h-12 rounded-lg bg-gradient-gold grid place-items-center text-primary">
                   <Icon className="w-6 h-6" />
                 </div>
-                <h3 className="mt-5 text-xl font-bold">{t}</h3>
-                <p className="mt-2 text-primary-foreground/75 text-sm">{d}</p>
+                <h3 className="mt-5 text-xl font-bold">{t(`whyUs.${key}`)}</h3>
+                <p className="mt-2 text-primary-foreground/75 text-sm">{t(`whyUs.${key}Desc`)}</p>
               </motion.div>
             ))}
           </div>
@@ -1008,7 +1011,7 @@ function Index() {
       {/* STATS */}
       <section className="py-20 bg-gradient-gold">
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          {stats.map(s => (
+          {statsData.map(s => (
             <div key={s.l}>
               <div className="font-display text-5xl md:text-6xl font-bold text-primary">{s.v}</div>
               <div className="mt-2 text-primary/80 font-medium">{s.l}</div>
@@ -1043,9 +1046,9 @@ function Index() {
             <h2 className="mt-3 text-4xl md:text-5xl font-bold text-primary text-balance">What Our Partners Say</h2>
           </div>
           <div className="mt-14 grid md:grid-cols-3 gap-6">
-            {testimonials.map((t, i) => (
+            {testimonials.map((item, i) => (
               <motion.div
-                key={t.n}
+                key={item.n}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -1055,10 +1058,10 @@ function Index() {
                 <div className="flex gap-0.5 text-gold">
                   {Array.from({length: 5}).map((_, k) => <Star key={k} className="w-4 h-4 fill-current" />)}
                 </div>
-                <p className="mt-4 text-foreground/85 italic">"{t.q}"</p>
+                <p className="mt-4 text-foreground/85 italic">"{t(`testimonials.quote${item.key}`)}"</p>
                 <div className="mt-6 pt-6 border-t border-border">
-                  <div className="font-bold text-primary">{t.n}</div>
-                  <div className="text-sm text-muted-foreground">{t.r}</div>
+                  <div className="font-bold text-primary">{item.n}</div>
+                  <div className="text-sm text-muted-foreground">{t(`testimonials.role${item.key}`)}</div>
                 </div>
               </motion.div>
             ))}

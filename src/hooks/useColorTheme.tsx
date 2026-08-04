@@ -1,24 +1,24 @@
 import { useEffect, useState } from "react";
 
-export type ColorTheme = "harvest" | "ocean" | "saffron";
+export type ColorTheme = "harvest" | "royal";
 
 export const COLOR_THEMES: { id: ColorTheme; label: string; swatch: string }[] = [
   { id: "harvest", label: "Harvest Green", swatch: "oklch(0.42 0.11 145)" },
-  { id: "ocean", label: "Ocean Blue", swatch: "oklch(0.50 0.13 245)" },
-  { id: "saffron", label: "Saffron Red", swatch: "oklch(0.52 0.17 30)" },
+  { id: "royal", label: "Royal Gold", swatch: "oklch(0.38 0.12 305)" },
 ];
 
 const STORAGE_KEY = "color-theme";
 const DEFAULT: ColorTheme = "harvest";
 
 function isColorTheme(v: unknown): v is ColorTheme {
-  return v === "harvest" || v === "ocean" || v === "saffron";
+  return v === "harvest" || v === "royal";
 }
 
 function readStored(): ColorTheme {
   if (typeof window === "undefined") return DEFAULT;
   try {
     const stored = window.localStorage.getItem(STORAGE_KEY);
+    // Legacy palettes ("ocean" / "saffron") fall back to the default theme.
     return isColorTheme(stored) ? stored : DEFAULT;
   } catch {
     return DEFAULT;

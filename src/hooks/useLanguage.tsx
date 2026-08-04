@@ -1,16 +1,19 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
+import i18n, { readStoredLanguage, STORAGE_KEY, SUPPORTED_LANGUAGES } from "@/i18n";
 
 export const LANGUAGES = [
   { code: "en", label: "English", native: "English" },
   { code: "te", label: "Telugu", native: "తెలుగు" },
   { code: "hi", label: "Hindi", native: "हिन्दी" },
-  { code: "ta", label: "Tamil", native: "தமிழ்" },
 ] as const;
 
 export type LanguageCode = (typeof LANGUAGES)[number]["code"];
 
-const STORAGE_KEY = "site.language";
+function isSupported(v: unknown): v is LanguageCode {
+  return SUPPORTED_LANGUAGES.includes(v as LanguageCode);
+}
 
 type Ctx = {
   language: LanguageCode;
@@ -19,23 +22,23 @@ type Ctx = {
 
 const LanguageContext = createContext<Ctx | null>(null);
 
-function applyLangToDocument(lang: LanguageCode) {
+function applyLanguage(lang: LanguageCode) {
   if (typeof document !== "undefined") {
     document.documentElement.lang = lang;
     document.documentElement.setAttribute("data-lang", lang);
   }
+  if (i18n.language !== lang) void i18n.changeLanguage(lang);
 }
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
+  // Always start at "en" so SSR markup matches the first client render.
   const [language, setLanguageState] = useState<LanguageCode>("en");
+  useTranslation(); // re-render this subtree when i18next switches language
 
-  // Initial load: localStorage -> apply, then try to fetch user setting
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const stored = (localStorage.getItem(STORAGE_KEY) as LanguageCode | null) ?? "en";
-    const initial = LANGUAGES.some((l) => l.code === stored) ? stored : "en";
+    const initial = readStoredLanguage();
     setLanguageState(initial);
-    applyLangToDocument(initial);
+    applyLanguage(initial);
 
     (async () => {
       const { data: sess } = await supabase.auth.getSession();
@@ -46,10 +49,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         .select("language")
         .eq("user_id", uid)
         .maybeSingle();
-      const remote = (data?.language as LanguageCode | undefined) ?? null;
-      if (remote && LANGUAGES.some((l) => l.code === remote) && remote !== initial) {
+      const remote = data?.language;
+      if (isSupported(remote) && remote !== initial) {
         setLanguageState(remote);
-        applyLangToDocument(remote);
+        applyLanguage(remote);
         localStorage.setItem(STORAGE_KEY, remote);
       }
     })();
@@ -62,10 +65,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         .select("language")
         .eq("user_id", uid)
         .maybeSingle();
-      const remote = data?.language as LanguageCode | undefined;
-      if (remote && LANGUAGES.some((l) => l.code === remote)) {
+      const remote = data?.language;
+      if (isSupported(remote)) {
         setLanguageState(remote);
-        applyLangToDocument(remote);
+        applyLanguage(remote);
         localStorage.setItem(STORAGE_KEY, remote);
       }
     });
@@ -74,7 +77,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const setLanguage = useCallback(async (lang: LanguageCode) => {
     setLanguageState(lang);
-    applyLangToDocument(lang);
+    applyLanguage(lang);
     if (typeof window !== "undefined") localStorage.setItem(STORAGE_KEY, lang);
     const { data: sess } = await supabase.auth.getSession();
     const uid = sess.session?.user?.id;
