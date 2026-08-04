@@ -22,7 +22,6 @@ import {
   LifeBuoy,
   Phone,
   LogOut,
-  ChevronDown,
   BadgeCheck,
 } from "lucide-react";
 import { useState } from "react";
@@ -30,6 +29,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useTheme } from "@/hooks/useTheme";
+import { useTranslation } from "react-i18next";
 
 type Action = () => void;
 type Item = {
@@ -50,6 +50,7 @@ export function UserMenu({ onOpenCart }: UserMenuProps) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
+  const { t } = useTranslation();
 
   if (!user) return null;
 
@@ -72,51 +73,51 @@ export function UserMenu({ onOpenCart }: UserMenuProps) {
   async function handleSignOut() {
     setOpen(false);
     await supabase.auth.signOut();
-    toast.success("Signed out");
+    toast.success(t("common.signedOut"));
     navigate({ to: "/" });
   }
 
   const sections: { title?: string; items: Item[] }[] = [
     {
       items: [
-        { icon: UserIcon, label: "My Profile", to: "/profile" },
-        { icon: Package, label: "My Orders", to: "/orders" },
-        { icon: Heart, label: "Wishlist", to: "/wishlist" },
-        { icon: ShoppingCart, label: "Cart", onClick: () => { setOpen(false); onOpenCart(); } },
+        { icon: UserIcon, label: t("account.myProfile"), to: "/profile" },
+        { icon: Package, label: t("account.myOrders"), to: "/orders" },
+        { icon: Heart, label: t("wishlist.title"), to: "/wishlist" },
+        { icon: ShoppingCart, label: t("account.cart"), onClick: () => { setOpen(false); onOpenCart(); } },
       ],
     },
     {
-      title: "Account",
+      title: t("account.account"),
       items: [
-        { icon: MapPin, label: "Saved Addresses", to: "/addresses" },
-        { icon: CreditCard, label: "Payment Methods", to: "/payment-methods" },
-        { icon: Bell, label: "Notifications", to: "/notifications" },
-        { icon: Gift, label: "Offers & Coupons", to: "/offers" },
-        { icon: Star, label: "Reviews & Ratings", to: "/reviews" },
+        { icon: MapPin, label: t("account.savedAddresses"), to: "/addresses" },
+        { icon: CreditCard, label: t("account.paymentMethods"), to: "/payment-methods" },
+        { icon: Bell, label: t("account.notifications"), to: "/notifications" },
+        { icon: Gift, label: t("account.offers"), to: "/offers" },
+        { icon: Star, label: t("account.reviews"), to: "/reviews" },
       ],
     },
     {
-      title: "Preferences",
+      title: t("account.preferences"),
       items: [
-        { icon: Settings, label: "Account Settings", to: "/settings" },
-        { icon: Shield, label: "Privacy & Security", to: "/privacy" },
-        { icon: Languages, label: "Language", to: "/language" },
+        { icon: Settings, label: t("account.settings"), to: "/settings" },
+        { icon: Shield, label: t("account.privacy"), to: "/privacy" },
+        { icon: Languages, label: t("account.language"), to: "/language" },
         {
           icon: theme === "dark" ? Sun : Moon,
-          label: theme === "dark" ? "Light Mode" : "Dark Mode",
+          label: theme === "dark" ? t("theme.light") : t("theme.dark"),
           onClick: toggleTheme,
         },
       ],
     },
     {
-      title: "Support",
+      title: t("account.support"),
       items: [
-        { icon: LifeBuoy, label: "Help & Support", to: "/help" },
-        { icon: Phone, label: "Contact Us", to: "/", trailing: <span className="text-[10px] text-muted-foreground">#contact</span> },
+        { icon: LifeBuoy, label: t("account.help"), to: "/help" },
+        { icon: Phone, label: t("account.contactUs"), to: "/", trailing: <span className="text-[10px] text-muted-foreground">#contact</span> },
       ],
     },
     {
-      items: [{ icon: LogOut, label: "Logout", onClick: handleSignOut, destructive: true }],
+      items: [{ icon: LogOut, label: t("common.signOut"), onClick: handleSignOut, destructive: true }],
     },
   ];
 
@@ -125,8 +126,8 @@ export function UserMenu({ onOpenCart }: UserMenuProps) {
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <button
-          aria-label="Open account menu"
-          className="group flex items-center gap-2 rounded-full bg-transparent pl-1 pr-2 py-1 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 transition"
+          aria-label={t("account.openMenu")}
+          className="group flex items-center rounded-full bg-transparent p-1 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 transition"
         >
           <span className="relative">
             {avatarUrl ? (
@@ -146,10 +147,6 @@ export function UserMenu({ onOpenCart }: UserMenuProps) {
               className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-background"
             />
           </span>
-          <span className="hidden md:block text-sm font-semibold truncate max-w-[110px]">
-            {fullName}
-          </span>
-          <ChevronDown className="hidden md:block w-4 h-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
         </button>
       </SheetTrigger>
 

@@ -4,6 +4,7 @@ import { AccountLayout } from "@/components/AccountLayout";
 import { Card } from "@/components/ui/card";
 import { LANGUAGES, useLanguage, type LanguageCode } from "@/hooks/useLanguage";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/_authenticated/language")({
   head: () => ({ meta: [{ title: "Language — Gayathri Rice Mill" }] }),
@@ -12,11 +13,12 @@ export const Route = createFileRoute("/_authenticated/language")({
 
 function LanguagePage() {
   const { language, setLanguage } = useLanguage();
+  const { t } = useTranslation();
 
   return (
     <AccountLayout
-      title="Language"
-      description="Your selection is saved to your account and applied immediately."
+      title={t("language.title")}
+      description={t("language.description")}
     >
       <Card className="p-4 border-border/60">
         <div className="grid gap-2 sm:grid-cols-2">
@@ -28,7 +30,7 @@ function LanguagePage() {
                 type="button"
                 onClick={async () => {
                   await setLanguage(l.code as LanguageCode);
-                  toast.success(`Language set to ${l.label}`);
+                  toast.success(`${t("language.changed")} — ${l.native}`);
                 }}
                 aria-pressed={active}
                 className={`flex items-center justify-between rounded-lg border px-4 py-3 text-left text-sm transition ${
