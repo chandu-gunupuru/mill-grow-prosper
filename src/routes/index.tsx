@@ -930,12 +930,12 @@ function Index() {
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-primary">{p.name}</h3>
                   <dl className="mt-4 space-y-2 text-sm">
-                    <div className="flex justify-between"><dt className="text-muted-foreground">Grade</dt><dd className="font-medium">{p.grade}</dd></div>
-                    <div className="flex justify-between"><dt className="text-muted-foreground">Packaging</dt><dd className="font-medium">{p.pack}</dd></div>
-                    <div className="flex justify-between"><dt className="text-muted-foreground">Status</dt><dd className="text-primary font-semibold flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" />{p.stock}</dd></div>
+                    <div className="flex justify-between"><dt className="text-muted-foreground">{t("products.grade")}</dt><dd className="font-medium">{p.grade}</dd></div>
+                    <div className="flex justify-between"><dt className="text-muted-foreground">{t("products.packaging")}</dt><dd className="font-medium">{p.pack}</dd></div>
+                    <div className="flex justify-between"><dt className="text-muted-foreground">{t("products.status")}</dt><dd className="text-primary font-semibold flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" />{t(`common.${p.stockKey}`)}</dd></div>
                   </dl>
                   <a href="#contact" onClick={() => setForm(f => ({ ...f, product: p.name }))} className="mt-5 w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2.5 rounded-md font-semibold hover:opacity-90 transition">
-                    Inquire Now <ArrowRight className="w-4 h-4" />
+                    {t("products.inquireNow")} <ArrowRight className="w-4 h-4" />
                   </a>
                 </div>
               </motion.article>
@@ -954,13 +954,13 @@ function Index() {
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: `url(${machinery})`, backgroundSize: "cover" }} />
         <div className="relative max-w-7xl mx-auto px-6">
           <div className="text-center max-w-2xl mx-auto">
-            <span className="text-gold font-semibold uppercase tracking-widest text-xs">Why Choose Us</span>
-            <h2 className="mt-3 text-4xl md:text-5xl font-bold text-balance">Built on Trust. Delivered with Precision.</h2>
+            <span className="text-gold font-semibold uppercase tracking-widest text-xs">{t("whyUs.title")}</span>
+            <h2 className="mt-3 text-4xl md:text-5xl font-bold text-balance">{t("whyUs.heading")}</h2>
           </div>
           <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {whyUs.map(({ icon: Icon, t, d }, i) => (
+            {whyUs.map(({ icon: Icon, key }, i) => (
               <motion.div
-                key={t}
+                key={key}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -970,8 +970,8 @@ function Index() {
                 <div className="w-12 h-12 rounded-lg bg-gradient-gold grid place-items-center text-primary">
                   <Icon className="w-6 h-6" />
                 </div>
-                <h3 className="mt-5 text-xl font-bold">{t}</h3>
-                <p className="mt-2 text-primary-foreground/75 text-sm">{d}</p>
+                <h3 className="mt-5 text-xl font-bold">{t(`whyUs.${key}`)}</h3>
+                <p className="mt-2 text-primary-foreground/75 text-sm">{t(`whyUs.${key}Desc`)}</p>
               </motion.div>
             ))}
           </div>
@@ -1011,7 +1011,7 @@ function Index() {
       {/* STATS */}
       <section className="py-20 bg-gradient-gold">
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          {stats.map(s => (
+          {statsData.map(s => (
             <div key={s.l}>
               <div className="font-display text-5xl md:text-6xl font-bold text-primary">{s.v}</div>
               <div className="mt-2 text-primary/80 font-medium">{s.l}</div>
@@ -1048,7 +1048,7 @@ function Index() {
           <div className="mt-14 grid md:grid-cols-3 gap-6">
             {testimonials.map((t, i) => (
               <motion.div
-                key={t.n}
+                key={item.n}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -1058,10 +1058,10 @@ function Index() {
                 <div className="flex gap-0.5 text-gold">
                   {Array.from({length: 5}).map((_, k) => <Star key={k} className="w-4 h-4 fill-current" />)}
                 </div>
-                <p className="mt-4 text-foreground/85 italic">"{t.q}"</p>
+                <p className="mt-4 text-foreground/85 italic">"{t(`testimonials.quote${item.key}`)}"</p>
                 <div className="mt-6 pt-6 border-t border-border">
-                  <div className="font-bold text-primary">{t.n}</div>
-                  <div className="text-sm text-muted-foreground">{t.r}</div>
+                  <div className="font-bold text-primary">{item.n}</div>
+                  <div className="text-sm text-muted-foreground">{t(`testimonials.role${item.key}`)}</div>
                 </div>
               </motion.div>
             ))}
