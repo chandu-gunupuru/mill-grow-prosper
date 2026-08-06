@@ -158,7 +158,9 @@ function ProfilePage() {
       </header>
 
       <main className="container mx-auto max-w-5xl px-4 py-6 md:py-10">
+        <AccountNavBar className="mb-6" />
         {/* Hero card */}
+
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
           <Card className="relative overflow-hidden border-border/60 bg-gradient-to-br from-primary/10 via-card to-card shadow-lg">
             <div className="p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-6">
