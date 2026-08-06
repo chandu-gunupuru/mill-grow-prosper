@@ -1,35 +1,9 @@
-import { Link, useRouterState } from "@tanstack/react-router";
-import {
-  User as UserIcon,
-  Package,
-  Heart,
-  MapPin,
-  CreditCard,
-  Bell,
-  Gift,
-  Star,
-  Settings,
-  Shield,
-  Languages,
-  ArrowLeft,
-} from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 import { ColorThemeSwitcher } from "@/components/ColorThemeSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
-
-const NAV = [
-  { to: "/profile", label: "My Profile", icon: UserIcon },
-  { to: "/orders", label: "My Orders", icon: Package },
-  { to: "/wishlist", label: "Wishlist", icon: Heart },
-  { to: "/addresses", label: "Saved Addresses", icon: MapPin },
-  { to: "/payment-methods", label: "Payment Methods", icon: CreditCard },
-  { to: "/notifications", label: "Notifications", icon: Bell },
-  { to: "/offers", label: "Offers & Coupons", icon: Gift },
-  { to: "/reviews", label: "Reviews & Ratings", icon: Star },
-  { to: "/settings", label: "Account Settings", icon: Settings },
-  { to: "/privacy", label: "Privacy & Security", icon: Shield },
-  { to: "/language", label: "Language", icon: Languages },
-] as const;
+import { AccountNav } from "@/components/AccountNav";
 
 export function AccountLayout({
   title,
@@ -40,7 +14,7 @@ export function AccountLayout({
   description?: string;
   children: React.ReactNode;
 }) {
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5">
