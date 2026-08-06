@@ -25,7 +25,7 @@ export function ColorThemeSwitcher({ className = "" }: { className?: string }) {
           <Palette className="w-5 h-5" aria-hidden="true" />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48">
+      <DropdownMenuContent align="end" className="w-52 max-h-[70vh] overflow-y-auto">
         <DropdownMenuLabel>{t("theme.websiteColor")}</DropdownMenuLabel>
         {COLOR_THEMES.map((t, i) => {
           const active = mounted && colorTheme === t.id;

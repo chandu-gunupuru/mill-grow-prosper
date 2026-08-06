@@ -34,7 +34,7 @@ export function FloatingThemeButton() {
           <Palette className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" side="top" sideOffset={12} className="w-52">
+      <DropdownMenuContent align="end" side="top" sideOffset={12} className="w-52 max-h-[70vh] overflow-y-auto">
         <DropdownMenuLabel>{t("theme.websiteColor")}</DropdownMenuLabel>
         {COLOR_THEMES.map((t, i) => {
           const active = mounted && colorTheme === t.id;
