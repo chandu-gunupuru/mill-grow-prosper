@@ -220,6 +220,8 @@ function CheckoutPage() {
                     </Link>
                     <Link
                       to="/checkout/failed"
+                      search={{ reason: null }}
+
                       className="inline-flex items-center gap-2 border border-destructive/40 text-destructive px-3 py-2 rounded-md text-sm font-medium hover:bg-destructive/5"
                     >
                       Payment failed
