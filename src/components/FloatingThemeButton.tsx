@@ -29,12 +29,12 @@ export function FloatingThemeButton() {
           type="button"
           aria-label={t("theme.websiteColor")}
           title={t("theme.websiteColor")}
-          className="fixed bottom-24 right-6 z-50 grid h-12 w-12 place-items-center rounded-full bg-card text-foreground shadow-2xl ring-1 ring-border transition hover:scale-110 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:h-14 sm:w-14"
+          className="fixed bottom-24 right-6 z-50 grid h-12 w-12 place-items-center rounded-full bg-card text-foreground shadow-2xl ring-1 ring-border transition hover:scale-110 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:h-14 sm:w-14 lg:hidden"
         >
           <Palette className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" side="top" sideOffset={12} className="w-52">
+      <DropdownMenuContent align="end" side="top" sideOffset={12} className="w-52 max-h-[70vh] overflow-y-auto">
         <DropdownMenuLabel>{t("theme.websiteColor")}</DropdownMenuLabel>
         {COLOR_THEMES.map((t, i) => {
           const active = mounted && colorTheme === t.id;

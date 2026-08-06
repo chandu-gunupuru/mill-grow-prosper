@@ -52,6 +52,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { ColorThemeSwitcher } from "@/components/ColorThemeSwitcher";
+import { AccountNavBar } from "@/components/AccountNav";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   cancelMyShopifyOrder,
@@ -210,6 +211,7 @@ function MyOrdersPage() {
       </header>
 
       <main className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8">
+        <AccountNavBar />
         {/* Summary */}
         <SummaryCards loading={ordersQuery.isLoading} stats={stats} currency={currency} />
 
