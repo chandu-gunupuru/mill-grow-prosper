@@ -1,18 +1,35 @@
 import { useEffect, useState } from "react";
 
-export type ColorTheme = "harvest" | "royal";
+export type ColorTheme =
+  | "harvest"
+  | "royal"
+  | "blue"
+  | "purple"
+  | "red"
+  | "orange"
+  | "teal"
+  | "gray"
+  | "brown";
 
 export const COLOR_THEMES: { id: ColorTheme; label: string; swatch: string }[] = [
   { id: "harvest", label: "Harvest Green", swatch: "oklch(0.42 0.11 145)" },
   { id: "royal", label: "Royal Gold", swatch: "oklch(0.38 0.12 305)" },
+  { id: "blue", label: "Ocean Blue", swatch: "oklch(0.46 0.13 255)" },
+  { id: "purple", label: "Amethyst Purple", swatch: "oklch(0.46 0.13 300)" },
+  { id: "red", label: "Ruby Red", swatch: "oklch(0.46 0.15 25)" },
+  { id: "orange", label: "Sunset Orange", swatch: "oklch(0.46 0.14 60)" },
+  { id: "teal", label: "Teal", swatch: "oklch(0.46 0.11 190)" },
+  { id: "gray", label: "Graphite Gray", swatch: "oklch(0.46 0.012 255)" },
+  { id: "brown", label: "Rustic Brown", swatch: "oklch(0.46 0.06 55)" },
 ];
 
 const STORAGE_KEY = "color-theme";
 const DEFAULT: ColorTheme = "harvest";
 
 function isColorTheme(v: unknown): v is ColorTheme {
-  return v === "harvest" || v === "royal";
+  return typeof v === "string" && COLOR_THEMES.some((t) => t.id === v);
 }
+
 
 function readStored(): ColorTheme {
   if (typeof window === "undefined") return DEFAULT;
