@@ -7,6 +7,7 @@ import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/useAuth";
 import { ColorThemeSwitcher } from "@/components/ColorThemeSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { Logo } from "@/components/Logo";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [{ title: "Sign in — Gayathri Modern Rice Mill" }] }),
