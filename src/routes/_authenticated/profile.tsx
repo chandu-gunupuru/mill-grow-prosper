@@ -361,8 +361,9 @@ function ProfilePage() {
             </Card>
           </TabsContent>
         </Tabs>
-      </main>
-    </div>
+      </>
+    </AccountLayout>
+
   );
 }
 
