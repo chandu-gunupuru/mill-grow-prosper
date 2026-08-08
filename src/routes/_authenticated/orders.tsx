@@ -52,7 +52,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { ColorThemeSwitcher } from "@/components/ColorThemeSwitcher";
-import { AccountNavBar } from "@/components/AccountNav";
+import { AccountLayout } from "@/components/AccountLayout";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   cancelMyShopifyOrder,
@@ -177,41 +177,24 @@ function MyOrdersPage() {
   });
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <Toaster richColors closeButton position="top-center" />
-
-      {/* Header */}
-      <header className="sticky top-0 z-30 backdrop-blur bg-background/85 border-b border-border">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-3 flex items-center gap-3">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition"
+    <AccountLayout
+      title="My Orders"
+      description="Track, manage, and review every order in one place."
+    >
+      <>
+        <div className="flex justify-end mb-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => ordersQuery.refetch()}
+            aria-label="Refresh orders"
           >
-            <ArrowLeft className="w-4 h-4" /> <span className="hidden sm:inline">Home</span>
-          </Link>
-          <div className="ml-2 min-w-0">
-            <h1 className="text-lg sm:text-2xl font-bold tracking-tight truncate">My Orders</h1>
-            <p className="hidden sm:block text-xs text-muted-foreground">
-              Track, manage, and review every order in one place.
-            </p>
-          </div>
-          <div className="ml-auto flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => ordersQuery.refetch()}
-              aria-label="Refresh orders"
-            >
-              <RefreshCw className={`w-4 h-4 ${ordersQuery.isFetching ? "animate-spin" : ""}`} />
-            </Button>
-            <ColorThemeSwitcher />
-<ThemeToggle />
-          </div>
+            <RefreshCw className={`w-4 h-4 ${ordersQuery.isFetching ? "animate-spin" : ""}`} />
+          </Button>
         </div>
-      </header>
 
-      <main className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8">
-        <AccountNavBar />
+        <div className="space-y-6 sm:space-y-8">
+
         {/* Summary */}
         <SummaryCards loading={ordersQuery.isLoading} stats={stats} currency={currency} />
 
@@ -296,7 +279,7 @@ function MyOrdersPage() {
             </AnimatePresence>
           </ul>
         )}
-      </main>
+      </div>
 
       <OrderDetailsSheet
         order={detailsOrder}
@@ -331,7 +314,9 @@ function MyOrdersPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+      </>
+    </AccountLayout>
+
   );
 }
 

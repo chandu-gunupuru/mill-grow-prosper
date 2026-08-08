@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AccountNavBar } from "@/components/AccountNav";
+import { AccountLayout } from "@/components/AccountLayout";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useMemo, useEffect } from "react";
@@ -146,21 +146,10 @@ function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5">
-      <Toaster richColors position="top-center" />
-      <header className="sticky top-0 z-30 border-b border-border/60 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/70">
-        <div className="container mx-auto max-w-5xl flex items-center justify-between py-4 px-4">
-          <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition">
-            <ArrowLeft className="w-4 h-4" /> Back to home
-          </Link>
-          <h1 className="text-sm md:text-base font-semibold">My Profile</h1>
-          <span className="w-20" />
-        </div>
-      </header>
-
-      <main className="container mx-auto max-w-5xl px-4 py-6 md:py-10">
-        <AccountNavBar className="mb-6" />
+    <AccountLayout title="My Profile" description="Manage your personal details, addresses and account security.">
+      <>
         {/* Hero card */}
+
 
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
           <Card className="relative overflow-hidden border-border/60 bg-gradient-to-br from-primary/10 via-card to-card shadow-lg">
@@ -372,8 +361,9 @@ function ProfilePage() {
             </Card>
           </TabsContent>
         </Tabs>
-      </main>
-    </div>
+      </>
+    </AccountLayout>
+
   );
 }
 
