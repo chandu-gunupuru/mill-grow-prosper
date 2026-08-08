@@ -137,6 +137,17 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
           )
         }
 
+        // Non-privileged callers may only mail themselves — prevents using the
+        // site's verified sending domain as a spam/phishing relay.
+        if (!isPrivileged && effectiveRecipient.toLowerCase() !== callerEmail) {
+          return Response.json(
+            { error: 'Forbidden: you may only send to your own account email' },
+            { status: 403 }
+          )
+        }
+
+
+
         // 2. Check suppression list (fail-closed: if we can't verify, don't send)
         const { data: suppressed, error: suppressionError } = await supabase
           .from('suppressed_emails')
