@@ -296,7 +296,7 @@ function MyOrdersPage() {
             </AnimatePresence>
           </ul>
         )}
-      </main>
+      </div>
 
       <OrderDetailsSheet
         order={detailsOrder}
