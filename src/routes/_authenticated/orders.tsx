@@ -331,7 +331,9 @@ function MyOrdersPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+      </>
+    </AccountLayout>
+
   );
 }
 
