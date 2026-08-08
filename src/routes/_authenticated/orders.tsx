@@ -52,7 +52,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { ColorThemeSwitcher } from "@/components/ColorThemeSwitcher";
-import { AccountNavBar } from "@/components/AccountNav";
+import { AccountLayout } from "@/components/AccountLayout";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   cancelMyShopifyOrder,
