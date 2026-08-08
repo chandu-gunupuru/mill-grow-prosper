@@ -44,8 +44,11 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
           )
         }
 
-        // Verify the caller has a valid Supabase auth token.
-        // In TanStack, there is no Supabase gateway — we validate the JWT ourselves.
+        // Authorize the caller. Accepted callers, in order of privilege:
+        //  1. Internal service credential (LOVABLE_API_KEY) — unrestricted.
+        //  2. Admin users — unrestricted.
+        //  3. Any other signed-in user — may only send to their OWN account email.
+        // Without (3)'s restriction this endpoint is an open mail relay.
         const authHeader = request.headers.get('Authorization')
         if (!authHeader?.startsWith('Bearer ')) {
           return Response.json({ error: 'Unauthorized' }, { status: 401 })
@@ -53,11 +56,30 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
 
         const token = authHeader.slice('Bearer '.length).trim()
         const supabase = createClient(supabaseUrl, supabaseServiceKey)
-        const { data: { user }, error: authError } = await supabase.auth.getUser(token)
 
-        if (authError || !user) {
-          return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        const serviceKey = process.env.LOVABLE_API_KEY
+        let isPrivileged = serviceKey ? token === serviceKey : false
+        let callerEmail: string | null = null
+
+        if (!isPrivileged) {
+          const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+
+          if (authError || !user) {
+            return Response.json({ error: 'Unauthorized' }, { status: 401 })
+          }
+
+          callerEmail = user.email?.toLowerCase() ?? null
+
+          const { data: adminRole } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', user.id)
+            .eq('role', 'admin')
+            .maybeSingle()
+
+          if (adminRole) isPrivileged = true
         }
+
 
         // Parse request body
         let templateName: string
@@ -114,6 +136,17 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
             { status: 400 }
           )
         }
+
+        // Non-privileged callers may only mail themselves — prevents using the
+        // site's verified sending domain as a spam/phishing relay.
+        if (!isPrivileged && effectiveRecipient.toLowerCase() !== callerEmail) {
+          return Response.json(
+            { error: 'Forbidden: you may only send to your own account email' },
+            { status: 403 }
+          )
+        }
+
+
 
         // 2. Check suppression list (fail-closed: if we can't verify, don't send)
         const { data: suppressed, error: suppressionError } = await supabase
