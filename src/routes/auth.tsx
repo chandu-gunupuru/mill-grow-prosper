@@ -412,11 +412,8 @@ function AuthPage() {
           <ArrowLeft className="w-4 h-4" />
           Back
         </Link>
-        <Link to="/" className="flex items-center justify-center gap-2 mb-6">
-          <div className="w-9 h-9 rounded-md bg-gradient-gold grid place-items-center">
-            <Leaf className="w-5 h-5 text-primary" />
-          </div>
-          <span className="font-display font-bold text-primary">Gayathri</span>
+        <Link to="/" className="flex items-center justify-center mb-6">
+          <Logo size={40} showText={true} />
         </Link>
         <h1 className="text-2xl font-display font-bold mb-1">
           {mode === "signin" ? "Sign in" : mode === "signup" ? "Create your account" : "Reset your password"}
