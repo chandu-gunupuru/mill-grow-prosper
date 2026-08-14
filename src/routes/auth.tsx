@@ -541,14 +541,14 @@ function AuthPage() {
             <div className="grid grid-cols-2 gap-2 mb-3 p-1 bg-secondary rounded-md">
               <button
                 type="button"
-                onClick={() => { setMethod("email"); setOtpSent(false); }}
+                onClick={() => { setMethod("email"); resetOtpStep(); }}
                 className={`inline-flex items-center justify-center gap-1.5 py-2 text-xs font-medium rounded transition ${method === "email" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground"}`}
               >
                 <Mail className="w-3.5 h-3.5" /> Email
               </button>
               <button
                 type="button"
-                onClick={() => { setMethod("phone"); }}
+                onClick={() => { setMethod("phone"); resetOtpStep(); }}
                 className={`inline-flex items-center justify-center gap-1.5 py-2 text-xs font-medium rounded transition ${method === "phone" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground"}`}
               >
                 <Phone className="w-3.5 h-3.5" /> Phone
@@ -594,56 +594,8 @@ function AuthPage() {
               </>
             )}
           </form>
-        ) : method === "email" ? (
-          <form onSubmit={handleEmail} className="space-y-3">
-            {mode === "signup" && (
-              <input
-                type="text"
-                placeholder="Full name"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-md bg-secondary border border-border focus:border-primary outline-none text-sm"
-              />
-            )}
-            <input
-              type="email"
-              required
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-md bg-secondary border border-border focus:border-primary outline-none text-sm"
-            />
-            <input
-              type="password"
-              required
-              minLength={6}
-              placeholder="Password (min 6 chars)"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-md bg-secondary border border-border focus:border-primary outline-none text-sm"
-            />
-            {mode === "signin" && (
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => setMode("forgot")}
-                  className="text-xs text-primary font-medium hover:underline"
-                >
-                  Forgot password?
-                </button>
-              </div>
-            )}
-            <button
-              type="submit"
-              disabled={busy}
-              className="w-full inline-flex items-center justify-center gap-2 bg-sky-400 text-white py-2.5 rounded-md text-sm font-semibold hover:bg-sky-500 transition disabled:opacity-50"
-            >
-              {busy && <Loader2 className="w-4 h-4 animate-spin" />}
-              {mode === "signin" ? "Sign in" : "Create account"}
-            </button>
-          </form>
         ) : (
-          <form onSubmit={handlePhone} className="space-y-3">
+          <form onSubmit={handleOtp} className="space-y-3">
             {mode === "signup" && !otpSent && (
               <input
                 type="text"
@@ -653,24 +605,37 @@ function AuthPage() {
                 className="w-full px-4 py-2.5 rounded-md bg-secondary border border-border focus:border-primary outline-none text-sm"
               />
             )}
-            <input
-              type="tel"
-              required
-              placeholder="Phone (e.g. +911234567890)"
-              value={phone}
-              disabled={otpSent}
-              onChange={(e) => {
-                let v = e.target.value.replace(/[^\d+]/g, "");
-                // Auto-prefix +91 for Indian numbers entered without a country code
-                if (v && !v.startsWith("+")) {
-                  // Strip a leading 0 if user typed e.g. 0xxxxxxxxxx
-                  if (v.startsWith("0")) v = v.slice(1);
-                  v = "+91" + v;
-                }
-                setPhone(v);
-              }}
-              className="w-full px-4 py-2.5 rounded-md bg-secondary border border-border focus:border-primary outline-none text-sm disabled:opacity-60"
-            />
+            {method === "phone" ? (
+              <label className="block">
+                <span className="sr-only">10-digit Indian mobile number</span>
+                <div className="flex overflow-hidden rounded-md border border-border bg-secondary focus-within:border-primary">
+                  <span className="flex items-center border-r border-border px-3 text-sm font-medium text-foreground" aria-hidden="true">+91</span>
+                  <input
+                    type="tel"
+                    required
+                    inputMode="numeric"
+                    autoComplete="tel-national"
+                    aria-label="10-digit Indian mobile number"
+                    placeholder="XXXXX XXXXX"
+                    value={phone.length > 5 ? `${phone.slice(0, 5)} ${phone.slice(5)}` : phone}
+                    disabled={otpSent}
+                    onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                    className="min-w-0 flex-1 bg-transparent px-4 py-2.5 text-sm outline-none disabled:opacity-60"
+                  />
+                </div>
+              </label>
+            ) : (
+              <input
+                type="email"
+                required
+                autoComplete="email"
+                placeholder="Email address"
+                value={email}
+                disabled={otpSent}
+                onChange={(e) => setEmail(e.target.value.slice(0, 254))}
+                className="w-full px-4 py-2.5 rounded-md bg-secondary border border-border focus:border-primary outline-none text-sm disabled:opacity-60"
+              />
+            )}
             {otpSent && smsStatus !== "idle" && (
               <div
                 role="status"
@@ -692,9 +657,9 @@ function AuthPage() {
                 <div className="flex-1">
                   <p className="font-medium">
                     {smsStatus === "sending" && "Sending…"}
-                    {smsStatus === "sent" && `SMS dispatched${resendIn > 0 ? ` · arriving in ~${resendIn}s` : ""}`}
-                    {smsStatus === "delayed" && "Still no SMS?"}
-                    {smsStatus === "failed" && "SMS delivery failed"}
+                    {smsStatus === "sent" && `OTP sent${resendIn > 0 ? ` · resend in ${resendIn}s` : ""}`}
+                    {smsStatus === "delayed" && `Still no ${method === "phone" ? "SMS" : "email"}?`}
+                    {smsStatus === "failed" && "OTP delivery failed"}
                   </p>
                   {smsStatusMessage && <p className="opacity-90 mt-0.5">{smsStatusMessage}</p>}
                   {(smsStatus === "delayed" || smsStatus === "failed") && (
@@ -716,7 +681,10 @@ function AuthPage() {
                 inputMode="numeric"
                 placeholder="Enter 6-digit OTP"
                 value={otp}
-                onChange={(e) => setOtp(e.target.value)}
+                onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                autoComplete="one-time-code"
+                maxLength={6}
+                aria-label="6-digit one-time password"
                 className="w-full px-4 py-2.5 rounded-md bg-secondary border border-border focus:border-primary outline-none text-sm tracking-widest"
               />
             )}
@@ -754,19 +722,17 @@ function AuthPage() {
                   <span className="text-border">•</span>
                   <button
                     type="button"
-                    onClick={handleChangeNumber}
+                    onClick={resetOtpStep}
                     className="text-muted-foreground hover:text-primary"
                   >
-                    Change number
+                    Change {method === "phone" ? "number" : "email"}
                   </button>
-                  <span className="text-border">•</span>
-                  <button
-                    type="button"
-                    onClick={switchToEmail}
-                    className="text-primary font-medium hover:underline"
-                  >
-                    Use email
-                  </button>
+                  {method === "phone" && (
+                    <>
+                      <span className="text-border">•</span>
+                      <button type="button" onClick={switchToEmail} className="text-primary font-medium hover:underline">Use email</button>
+                    </>
+                  )}
                 </div>
               </div>
             )}
@@ -774,16 +740,10 @@ function AuthPage() {
         )}
 
         {mode !== "forgot" && (
-          <p className="text-sm text-center text-muted-foreground mt-5">
-            {mode === "signin" ? "New here?" : "Already have an account?"}{" "}
-            <button
-              type="button"
-              onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-              className="text-primary font-medium hover:underline"
-            >
-              {mode === "signin" ? "Create an account" : "Sign in"}
-            </button>
-          </p>
+          <div className="mt-5 space-y-2 text-center text-sm text-muted-foreground">
+            <p>New users are registered securely after OTP verification.</p>
+            <button type="button" onClick={() => setMode("forgot")} className="text-primary font-medium hover:underline">Forgot password?</button>
+          </div>
         )}
         {mode === "forgot" && !forgotSent && (
           <p className="text-sm text-center text-muted-foreground mt-5">
