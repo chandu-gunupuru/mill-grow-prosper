@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Loader2, Leaf, ArrowLeft, Mail, Phone, CheckCircle2, AlertTriangle, Clock, RotateCw, ShieldAlert, ExternalLink } from "lucide-react";
+import { Loader2, ArrowLeft, Mail, Phone, CheckCircle2, AlertTriangle, Clock, RotateCw, ShieldAlert, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/useAuth";
@@ -10,7 +10,16 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { Logo } from "@/components/Logo";
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({ meta: [{ title: "Sign in — Gayathri Modern Rice Mill" }] }),
+  head: () => ({
+    meta: [
+      { title: "Sign in — Gayathri Modern Rice Mill" },
+      { name: "description", content: "Securely sign in to Gayathri Modern Rice Mill with an email or mobile OTP." },
+      { property: "og:title", content: "Sign in — Gayathri Modern Rice Mill" },
+      { property: "og:description", content: "Securely sign in with an email or mobile OTP." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: AuthPage,
 });
 
@@ -31,7 +40,6 @@ function AuthPage() {
   const [forgotSent, setForgotSent] = useState(false);
   const [method, setMethod] = useState<"email" | "phone">("email");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
@@ -79,34 +87,6 @@ function AuthPage() {
 
 
 
-
-  const handleEmail = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setBusy(true);
-    try {
-      if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: window.location.origin,
-            data: { full_name: fullName },
-          },
-        });
-        if (error) throw error;
-        toast.success("Account created! Check your email to confirm.");
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        toast.success("Welcome back!");
-        navigate({ to: "/" });
-      }
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Authentication failed");
-    } finally {
-      setBusy(false);
-    }
-  };
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -235,7 +215,7 @@ function AuthPage() {
       });
   };
 
-  const classifyPhoneError = (raw: string, stage: "send" | "verify") => {
+  const classifyOtpError = (raw: string, stage: "send" | "verify", target: "phone" | "email") => {
     const m = raw.toLowerCase();
     // delivery / provider failures from the SMS gateway
     const providerCodes = ["30003", "30004", "30005", "30006", "30007", "30008", "21610", "21614"];
@@ -249,21 +229,21 @@ function AuthPage() {
       m.includes("landline") ||
       m.includes("unreachable")
     ) {
-      return { kind: "delivery_failed" as const, message: "Your carrier rejected the SMS (number unreachable, landline, or blocked). Please try a different number or use email." };
+      return { kind: "delivery_failed" as const, message: "Your carrier rejected the SMS. Check the mobile number or use email instead." };
     }
     if (m.includes("sms") || m.includes("provider") || m.includes("not enabled") || m.includes("unsupported") || m.includes("twilio") || m.includes("messagebird")) {
-      return { kind: "provider_down" as const, message: "Our SMS provider is unavailable right now. Please use email to sign in." };
+      return { kind: "provider_down" as const, message: "SMS delivery is unavailable right now. Please use email to sign in." };
     }
     if (m.includes("invalid") && m.includes("phone")) {
-      return { kind: "invalid_phone" as const, message: "That phone number looks invalid. Include the country code, e.g. +911234567890." };
+      return { kind: "invalid_phone" as const, message: "Enter a valid 10-digit Indian mobile number beginning with 6, 7, 8, or 9." };
     }
     if (m.includes("rate") || m.includes("too many")) {
       return { kind: "rate_limited" as const, message: "Too many attempts. Please wait a minute before trying again." };
     }
     if (stage === "verify" && (m.includes("token") || m.includes("expired") || m.includes("otp"))) {
-      return { kind: "bad_code" as const, message: "That code is incorrect or has expired. Request a new one or use email." };
+      return { kind: "bad_code" as const, message: "That OTP is incorrect or has expired. Request a new code and try again." };
     }
-    return { kind: "unknown" as const, message: stage === "send" ? "Couldn't send the OTP. Please try again or use email." : "Couldn't verify the code. Please try again or use email." };
+    return { kind: "unknown" as const, message: stage === "send" ? `Couldn't send the ${target === "phone" ? "SMS" : "email"} OTP. Please try again.` : "Couldn't verify the OTP. Please try again." };
   };
 
   const switchToEmail = () => {
@@ -275,12 +255,18 @@ function AuthPage() {
     setSendAttempts(0);
     setVerifyAttempts(0);
     setResendIn(0);
-    toast.message("Switched to email sign-in", { description: "Enter your email and password to continue." });
+    toast.message("Switched to email sign-in", { description: "Enter your email to receive a secure OTP." });
   };
 
   const sendOtp = async (isResend: boolean) => {
-    if (!/^\+[1-9]\d{6,14}$/.test(phone.trim())) {
-      toast.error("Enter your phone in international format, e.g. +911234567890");
+    const normalizedEmail = email.trim().toLowerCase();
+    const target = method;
+    if (target === "phone" && !/^[6-9]\d{9}$/.test(phone)) {
+      toast.error("Enter a valid 10-digit Indian mobile number beginning with 6, 7, 8, or 9.");
+      return;
+    }
+    if (target === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+      toast.error("Enter a valid email address.");
       return;
     }
     if (isResend && resendIn > 0) {
@@ -298,10 +284,20 @@ function AuthPage() {
     setSmsStatus("sending");
     setSmsStatusMessage(isResend ? "Requesting a new code from the SMS provider…" : "Asking the SMS provider to send your code…");
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        phone: phone.trim(),
-        options: mode === "signup" ? { data: { full_name: fullName } } : undefined,
-      });
+      const metadata = fullName.trim() ? { full_name: fullName.trim() } : undefined;
+      const { error } = target === "phone"
+        ? await supabase.auth.signInWithOtp({
+            phone: `+91${phone}`,
+            options: { shouldCreateUser: true, data: metadata },
+          })
+        : await supabase.auth.signInWithOtp({
+            email: normalizedEmail,
+            options: {
+              shouldCreateUser: true,
+              emailRedirectTo: window.location.origin,
+              data: metadata,
+            },
+          });
       if (error) throw error;
       const nextAttempt = sendAttempts + 1;
       setSendAttempts(nextAttempt);
@@ -312,16 +308,17 @@ function AuthPage() {
       const cooldown = cooldownFor(nextAttempt);
       setResendIn(cooldown);
       setSmsStatus("sent");
+      const destination = target === "phone" ? `+91 ${phone.slice(0, 5)} ${phone.slice(5)}` : normalizedEmail;
       setSmsStatusMessage(
         isResend
-          ? `New code sent to ${phone.trim()} (attempt ${nextAttempt} of ${MAX_SENDS}).`
-          : `Code sent to ${phone.trim()}. It usually arrives in under 30 seconds.`,
+          ? `New OTP sent to ${destination} (attempt ${nextAttempt} of ${MAX_SENDS}).`
+          : `OTP sent to ${destination}.`,
       );
       toast.success(isResend ? "New code sent" : "OTP sent", {
         description: `You can request another in ${cooldown}s.`,
       });
     } catch (err) {
-      const info = classifyPhoneError(err instanceof Error ? err.message : "", "send");
+      const info = classifyOtpError(err instanceof Error ? err.message : "", "send", target);
       setSmsStatus("failed");
       setSmsStatusMessage(info.message);
       toast.error(info.message, {
@@ -333,6 +330,10 @@ function AuthPage() {
   };
 
   const verifyOtpCode = async () => {
+    if (!/^\d{6}$/.test(otp)) {
+      toast.error("Enter the complete 6-digit OTP.");
+      return;
+    }
     if (verifyAttempts >= MAX_VERIFY) {
       toast.error("Too many verification attempts", {
         description: "Request a new code or use email to sign in.",
@@ -342,18 +343,17 @@ function AuthPage() {
     }
     setBusy(true);
     try {
-      const { error } = await supabase.auth.verifyOtp({
-        phone: phone.trim(),
-        token: otp.trim(),
-        type: "sms",
-      });
+      const { data, error } = method === "phone"
+        ? await supabase.auth.verifyOtp({ phone: `+91${phone}`, token: otp, type: "sms" })
+        : await supabase.auth.verifyOtp({ email: email.trim().toLowerCase(), token: otp, type: "email" });
       if (error) throw error;
+      if (!data.session || !data.user) throw new Error("The OTP was not verified. Please try again.");
       toast.success("Welcome!");
       navigate({ to: "/" });
     } catch (err) {
       const next = verifyAttempts + 1;
       setVerifyAttempts(next);
-      const info = classifyPhoneError(err instanceof Error ? err.message : "", "verify");
+      const info = classifyOtpError(err instanceof Error ? err.message : "", "verify", method);
       const remaining = Math.max(0, MAX_VERIFY - next);
       const desc = remaining > 0
         ? `${remaining} attempt${remaining === 1 ? "" : "s"} left before you'll need a new code.`
@@ -367,13 +367,13 @@ function AuthPage() {
     }
   };
 
-  const handlePhone = async (e: React.FormEvent) => {
+  const handleOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (otpSent) await verifyOtpCode();
     else await sendOtp(false);
   };
 
-  const handleChangeNumber = () => {
+  const resetOtpStep = () => {
     setOtpSent(false);
     setOtp("");
     setSmsStatus("idle");
