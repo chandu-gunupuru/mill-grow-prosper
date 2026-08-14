@@ -7,9 +7,10 @@ import { BRAND, styles } from './_brand'
 interface MagicLinkEmailProps {
   siteName: string
   confirmationUrl: string
+  token?: string
 }
 
-export const MagicLinkEmail = ({ confirmationUrl }: MagicLinkEmailProps) => (
+export const MagicLinkEmail = ({ confirmationUrl, token }: MagicLinkEmailProps) => (
   <Html lang="en" dir="ltr">
     <Head />
     <Preview>Your one-tap sign-in link for {BRAND.name}</Preview>
@@ -21,10 +22,8 @@ export const MagicLinkEmail = ({ confirmationUrl }: MagicLinkEmailProps) => (
         </Section>
         <Section style={styles.body}>
           <Heading style={styles.h1}>Sign in to your account</Heading>
-          <Text style={styles.text}>
-            Tap the button to sign in. No password needed — this link expires shortly and can only
-            be used once.
-          </Text>
+          <Text style={styles.text}>Use this one-time password to sign in. It expires shortly and can only be used once.</Text>
+          {token ? <Text style={styles.code}>{token}</Text> : null}
           <Section style={styles.buttonWrap}>
             <Link style={styles.button} href={confirmationUrl}>Sign in</Link>
           </Section>

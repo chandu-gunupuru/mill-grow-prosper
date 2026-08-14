@@ -1,14 +1,22 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Loader2, Leaf, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { Loader2, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "@tanstack/react-router";
 import { ColorThemeSwitcher } from "@/components/ColorThemeSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { Logo } from "@/components/Logo";
 
 export const Route = createFileRoute("/reset-password")({
-  head: () => ({ meta: [{ title: "Reset password — Gayathri Modern Rice Mill" }] }),
+  head: () => ({ meta: [
+    { title: "Reset password — Gayathri Modern Rice Mill" },
+    { name: "description", content: "Securely reset your Gayathri Modern Rice Mill account password." },
+    { property: "og:title", content: "Reset password — Gayathri Modern Rice Mill" },
+    { property: "og:description", content: "Securely reset your account password." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: ResetPasswordPage,
 });
 
@@ -62,13 +70,7 @@ function ResetPasswordPage() {
       <header className="fixed top-0 inset-x-0 z-50 border-b border-border bg-background/80 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 h-16">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-md bg-gradient-gold grid place-items-center shadow-gold">
-              <Leaf className="w-5 h-5 text-primary" />
-            </div>
-            <div className="leading-tight">
-              <div className="font-display font-bold text-primary">Gayathri</div>
-              <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Modern Rice Mill</div>
-            </div>
+            <Logo size={36} showText={true} />
           </Link>
           <ColorThemeSwitcher />
 <ThemeToggle />
@@ -80,10 +82,7 @@ function ResetPasswordPage() {
           Back
         </Link>
         <Link to="/" className="flex items-center justify-center gap-2 mb-6">
-          <div className="w-9 h-9 rounded-md bg-gradient-gold grid place-items-center">
-            <Leaf className="w-5 h-5 text-primary" />
-          </div>
-          <span className="font-display font-bold text-primary">Gayathri</span>
+          <Logo size={40} showText={true} />
         </Link>
 
         {done ? (
