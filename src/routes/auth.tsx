@@ -395,13 +395,7 @@ function AuthPage() {
       <header className="fixed top-0 inset-x-0 z-50 border-b border-border bg-background/80 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 h-16">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-md bg-gradient-gold grid place-items-center shadow-gold">
-              <Leaf className="w-5 h-5 text-primary" />
-            </div>
-            <div className="leading-tight">
-              <div className="font-display font-bold text-primary">Gayathri</div>
-              <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Modern Rice Mill</div>
-            </div>
+            <Logo size={36} showText={true} />
           </Link>
           <ColorThemeSwitcher />
 <ThemeToggle />
