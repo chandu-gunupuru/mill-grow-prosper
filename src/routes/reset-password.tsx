@@ -26,18 +26,16 @@ function ResetPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
-  const [validHash, setValidHash] = useState(false);
+  const [validRecovery, setValidRecovery] = useState(false);
+  const [checkingRecovery, setCheckingRecovery] = useState(true);
 
   useEffect(() => {
-    // Check if this page was loaded with a recovery hash from the email link
     const checkHash = async () => {
+      const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+      const hasRecoveryLink = hash.get("type") === "recovery" || Boolean(hash.get("access_token")) || Boolean(new URLSearchParams(window.location.search).get("code"));
       const { data, error } = await supabase.auth.getSession();
-      if (error || !data.session) {
-        // No session with recovery type — user may have navigated directly
-        // Let them try anyway; updateUser will fail if the token is invalid
-        return;
-      }
-      setValidHash(true);
+      setValidRecovery(!error && Boolean(data.session) && hasRecoveryLink);
+      setCheckingRecovery(false);
     };
     checkHash();
   }, []);
@@ -85,7 +83,17 @@ function ResetPasswordPage() {
           <Logo size={40} showText={true} />
         </Link>
 
-        {done ? (
+        {checkingRecovery ? (
+          <div className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" /> Checking reset link…
+          </div>
+        ) : !validRecovery ? (
+          <div className="space-y-4 py-4 text-center">
+            <h1 className="text-xl font-display font-bold">Reset link expired</h1>
+            <p className="text-sm text-muted-foreground">Request a new password reset link to continue.</p>
+            <button type="button" onClick={() => navigate({ to: "/auth" })} className="text-sm font-medium text-primary hover:underline">Return to sign in</button>
+          </div>
+        ) : done ? (
           <div className="text-center space-y-4 py-4">
             <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto" />
             <h2 className="text-xl font-display font-bold">Password updated</h2>
