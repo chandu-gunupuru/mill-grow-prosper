@@ -35,12 +35,11 @@ function getPopupHelpUrl(): string {
 function AuthPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [mode, setMode] = useState<"signin" | "signup" | "forgot">("signin");
+  const [mode, setMode] = useState<"signin" | "forgot">("signin");
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotSent, setForgotSent] = useState(false);
   const [method, setMethod] = useState<"email" | "phone">("email");
   const [email, setEmail] = useState("");
-  const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
@@ -50,7 +49,6 @@ function AuthPage() {
   const [resendIn, setResendIn] = useState(0);
   const [sendAttempts, setSendAttempts] = useState(0);
   const [verifyAttempts, setVerifyAttempts] = useState(0);
-  const [lastSentAt, setLastSentAt] = useState<number | null>(null);
 
   const MAX_SENDS = 4;
   const MAX_VERIFY = 5;
@@ -282,20 +280,18 @@ function AuthPage() {
     }
     setBusy(true);
     setSmsStatus("sending");
-    setSmsStatusMessage(isResend ? "Requesting a new code from the SMS provider…" : "Asking the SMS provider to send your code…");
+    setSmsStatusMessage(isResend ? "Requesting a new OTP…" : `Sending an OTP by ${target === "phone" ? "SMS" : "email"}…`);
     try {
-      const metadata = fullName.trim() ? { full_name: fullName.trim() } : undefined;
       const { error } = target === "phone"
         ? await supabase.auth.signInWithOtp({
             phone: `+91${phone}`,
-            options: { shouldCreateUser: true, data: metadata },
+            options: { shouldCreateUser: true },
           })
         : await supabase.auth.signInWithOtp({
             email: normalizedEmail,
             options: {
               shouldCreateUser: true,
               emailRedirectTo: window.location.origin,
-              data: metadata,
             },
           });
       if (error) throw error;
@@ -304,7 +300,6 @@ function AuthPage() {
       setVerifyAttempts(0);
       setOtp("");
       setOtpSent(true);
-      setLastSentAt(Date.now());
       const cooldown = cooldownFor(nextAttempt);
       setResendIn(cooldown);
       setSmsStatus("sent");
@@ -321,9 +316,7 @@ function AuthPage() {
       const info = classifyOtpError(err instanceof Error ? err.message : "", "send", target);
       setSmsStatus("failed");
       setSmsStatusMessage(info.message);
-      toast.error(info.message, {
-        action: { label: "Use email", onClick: switchToEmail },
-      });
+      toast.error(info.message, target === "phone" ? { action: { label: "Use email", onClick: switchToEmail } } : undefined);
     } finally {
       setBusy(false);
     }
@@ -381,7 +374,6 @@ function AuthPage() {
     setSendAttempts(0);
     setVerifyAttempts(0);
     setResendIn(0);
-    setLastSentAt(null);
   };
 
 
@@ -410,10 +402,10 @@ function AuthPage() {
           <Logo size={40} showText={true} />
         </Link>
         <h1 className="text-2xl font-display font-bold mb-1">
-          {mode === "signin" ? "Sign in" : mode === "signup" ? "Create your account" : "Reset your password"}
+          {mode === "signin" ? "Sign in" : "Reset your password"}
         </h1>
         <p className="text-sm text-muted-foreground mb-6">
-          {mode === "signin" ? "Welcome back. Sign in to continue." : mode === "signup" ? "Join to place wholesale orders." : "Enter your email and we'll send you a reset link."}
+          {mode === "signin" ? "Welcome back. Sign in securely with a one-time password." : "Enter your email and we'll send you a reset link."}
         </p>
 
         {mode !== "forgot" && (
@@ -596,15 +588,6 @@ function AuthPage() {
           </form>
         ) : (
           <form onSubmit={handleOtp} className="space-y-3">
-            {mode === "signup" && !otpSent && (
-              <input
-                type="text"
-                placeholder="Full name"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-md bg-secondary border border-border focus:border-primary outline-none text-sm"
-              />
-            )}
             {method === "phone" ? (
               <label className="block">
                 <span className="sr-only">10-digit Indian mobile number</span>
@@ -662,7 +645,7 @@ function AuthPage() {
                     {smsStatus === "failed" && "OTP delivery failed"}
                   </p>
                   {smsStatusMessage && <p className="opacity-90 mt-0.5">{smsStatusMessage}</p>}
-                  {(smsStatus === "delayed" || smsStatus === "failed") && (
+                  {method === "phone" && (smsStatus === "delayed" || smsStatus === "failed") && (
                     <button
                       type="button"
                       onClick={switchToEmail}
